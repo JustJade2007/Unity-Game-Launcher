@@ -1,0 +1,116 @@
+# ============================================================
+#  Unity Game Launcher — .gitignore
+# ============================================================
+
+# ------------------------------------
+#  Secrets & API Keys
+# ------------------------------------
+keys.env
+keys.txt
+*.key
+*.pem
+secrets.*
+.env
+.env.*
+!.env.example
+
+# ------------------------------------
+#  AI / Antigravity (client-side)
+# ------------------------------------
+.gemini/
+.agents/
+antigravity/
+
+# ------------------------------------
+#  TODO (local task tracking)
+# ------------------------------------
+TODO.md
+TODO.txt
+todo.md
+todo.txt
+
+# ------------------------------------
+#  OS — Windows
+# ------------------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ------------------------------------
+#  OS — macOS
+# ------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ------------------------------------
+#  OS — Linux
+# ------------------------------------
+*~
+.directory
+
+# ------------------------------------
+#  IDEs & Editors
+# ------------------------------------
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# JetBrains (Rider, IntelliJ, etc.)
+.idea/
+*.iml
+
+# ------------------------------------
+#  Build Outputs & Packages
+# ------------------------------------
+bin/
+obj/
+out/
+dist/
+build/
+*.exe
+*.dll
+*.pdb
+*.msi
+*.msix
+*.nupkg
+*.jar
+node_modules/
+.nuget/
+packages/
+
+# ------------------------------------
+#  Logs & Temp Files
+# ------------------------------------
+*.log
+*.tmp
+*.bak
+*.swp
+*.cache
+logs/
+temp/
+tmp/
+
+# ------------------------------------
+#  Unity (if any Unity assets are used)
+# ------------------------------------
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+*.pidb
+*.booproj
+*.svd
+*.pdb
+sysinfo.txt
+*.unityproj

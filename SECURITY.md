@@ -22,5 +22,7 @@ Please include:
 ## Environment & Secrets Policy
 - **Never commit `.env` or sensitive secret files.** All local API keys and user credentials must reside in ignored environment files.
 - Only safe, public tokens (such as Supabase `anon` / public keys guarded by Row Level Security) should be referenced client-side.
+- **Steam Web API Keys**: The Steam Web API key is used exclusively for read-only library and achievement querying. API keys must remain strictly in ignored `.env` or local configuration stores and never committed to source control.
+- **Native Protocol & Process Execution**: Unity Game Launcher invokes registered OS protocols (e.g. `steam://`, `com.epicgames.launcher://`, `goggalaxy://`, `origin2://`, `uplay://`, `battlenet://`) via Electron's `shell.openExternal`. All launcher IDs and URIs are sanitized before execution.
 - **External Configuration & Data**: The user's external runtime `config.json` and `games.json` files reside in `%APPDATA%\Unity Game Launcher` (in installed mode) or within the `data\` directory alongside the portable executable. Users running the portable binary on shared or removable media should protect their USB drives with BitLocker or drive-level encryption if sensitive session or account tokens are stored.
 

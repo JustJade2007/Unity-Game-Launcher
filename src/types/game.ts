@@ -1,4 +1,4 @@
-export type LauncherType = 'Steam' | 'Epic Games' | 'GOG' | 'Xbox' | 'Battle.net' | 'Local';
+export type LauncherType = 'Steam' | 'Epic Games' | 'GOG' | 'EA' | 'Ubisoft' | 'Xbox' | 'Battle.net' | 'Local';
 
 export type FriendStatus = 'playing_now' | 'online' | 'away' | 'offline';
 
@@ -37,8 +37,30 @@ export interface GamePlaytime {
   recentMinutes?: number; // Minutes played in the last 2 weeks
 }
 
+export interface OwnershipSource {
+  launcher: LauncherType;
+  gameId: string;
+  installed: boolean;
+  installPath?: string;
+  launchUri?: string;
+  installUri?: string;
+}
+
+export interface LauncherStatus {
+  id: LauncherType;
+  name: string;
+  installed: boolean;
+  accountName?: string;
+  accountId?: string;
+  clientPath?: string;
+  gameCount: number;
+  isSyncing?: boolean;
+  error?: string;
+}
+
 export interface Game {
   id: string;
+  appId?: string;
   title: string;
   tagline: string;
   description: string;
@@ -49,12 +71,16 @@ export interface Game {
   launcher: LauncherType;
   installed: boolean;
   installPath?: string;
+  launchUri?: string;
+  installUri?: string;
   sizeGb?: number;
   playtime: GamePlaytime;
   media: GameMedia;
   achievements: Achievement[];
   friends: FriendActivity[];
   favorite?: boolean;
+  ownershipSources?: OwnershipSource[];
+  needsCloudUpload?: boolean;
 }
 
 export type ViewMode = 'grid' | 'detailed' | 'spotlight';

@@ -16,5 +16,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   saveConfig: (config) => ipcRenderer.invoke('config-save', config),
   loadLibrary: () => ipcRenderer.invoke('library-load'),
   saveLibrary: (games) => ipcRenderer.invoke('library-save', games),
+  getLauncherStatus: () => ipcRenderer.invoke('launcher-get-status'),
+  syncLaunchers: (options) => ipcRenderer.invoke('launcher-sync-all', options),
+  launchGame: (game, launcher) => ipcRenderer.invoke('launcher-launch-game', { game, launcher }),
+  installGame: (game, launcher) => ipcRenderer.invoke('launcher-install-game', { game, launcher }),
+  stopGameSession: (gameId) => ipcRenderer.invoke('session-stop', { gameId }),
+  getActiveSessions: () => ipcRenderer.invoke('session-get-active'),
+  onSessionStarted: (callback) => {
+    const handler = (_event, session) => callback(session);
+    ipcRenderer.on('game-session-started', handler);
+    return () => ipcRenderer.removeListener('game-session-started', handler);
+  },
+  onSessionEnded: (callback) => {
+    const handler = (_event, session) => callback(session);
+    ipcRenderer.on('game-session-ended', handler);
+    return () => ipcRenderer.removeListener('game-session-ended', handler);
+  },
   isElectron: true,
 });

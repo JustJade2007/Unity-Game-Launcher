@@ -6,6 +6,7 @@ import { FriendsPlayingList } from './FriendsPlayingList';
 import {
   X,
   Play,
+  Download,
   Star,
   Clock,
   Trophy,
@@ -15,6 +16,7 @@ import {
   Layers,
   Image as ImageIcon,
 } from 'lucide-react';
+import { LauncherType } from '../../types/game';
 
 interface GameDetailViewProps {
   game: Game;
@@ -24,10 +26,12 @@ interface GameDetailViewProps {
 type TabType = 'overview' | 'achievements' | 'friends';
 
 export const GameDetailView: React.FC<GameDetailViewProps> = ({ game, onClose }) => {
-  const { toggleFavorite } = useLibrary();
+  const { toggleFavorite, launchGame, installGame } = useLibrary();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [achievementFilter, setAchievementFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
+  const [selectedLauncher, setSelectedLauncher] = useState<LauncherType>(game.launcher);
+  const [isLaunching, setIsLaunching] = useState(false);
 
   const hoursPlayed = Math.round((game.playtime.totalMinutes / 60) * 10) / 10;
   const unlockedCount = game.achievements.filter((a) => a.unlocked).length;
@@ -99,6 +103,26 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game, onClose })
                 <p className="text-xs sm:text-sm text-gray-300 mt-1 line-clamp-2">
                   {game.tagline}
                 </p>
+
+                {/* Multi-Launcher Ownership Selector if available */}
+                {game.ownershipSources && game.ownershipSources.length > 1 && (
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <span className="text-[11px] text-gray-400">Launch with:</span>
+                    {game.ownershipSources.map((source) => (
+                      <button
+                        key={source.launcher}
+                        onClick={() => setSelectedLauncher(source.launcher)}
+                        className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-md border transition-all ${
+                          selectedLauncher === source.launcher
+                            ? 'bg-indigo-600 text-white border-indigo-400 shadow-sm'
+                            : 'bg-black/40 text-gray-400 border-white/10 hover:text-white'
+                        }`}
+                      >
+                        {source.launcher} {source.installed ? '(Installed)' : '(Owned)'}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}
@@ -115,9 +139,39 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game, onClose })
                   <Star className={`w-5 h-5 ${game.favorite ? 'fill-current' : ''}`} />
                 </button>
 
-                <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition-all">
-                  <Play className="w-4 h-4 fill-current" />
-                  <span>{game.installed ? 'Launch Game' : 'Install'}</span>
+                <button
+                  onClick={async () => {
+                    setIsLaunching(true);
+                    try {
+                      const source = game.ownershipSources?.find((s) => s.launcher === selectedLauncher);
+                      const isInstalled = source ? source.installed : game.installed;
+                      if (isInstalled) {
+                        await launchGame(game, selectedLauncher);
+                      } else {
+                        await installGame(game, selectedLauncher);
+                      }
+                    } finally {
+                      setIsLaunching(false);
+                    }
+                  }}
+                  disabled={isLaunching}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl text-white font-bold text-sm shadow-xl transition-all ${
+                    (game.ownershipSources?.find((s) => s.launcher === selectedLauncher)?.installed ?? game.installed)
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-indigo-600/30'
+                      : 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 shadow-blue-600/30'
+                  }`}
+                >
+                  {(game.ownershipSources?.find((s) => s.launcher === selectedLauncher)?.installed ?? game.installed) ? (
+                    <>
+                      <Play className="w-4 h-4 fill-current" />
+                      <span>{isLaunching ? 'Starting...' : 'Launch Game'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      <span>{isLaunching ? 'Requesting Install...' : `Install via ${selectedLauncher}`}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

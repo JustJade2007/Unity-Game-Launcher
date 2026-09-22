@@ -9,12 +9,19 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [Unreleased]
 
 ### Added
+- **Multi-Platform Launcher Adapters (Core Foundation)**:
+  - Full modular adapter architecture supporting Steam, Epic Games, GOG Galaxy, EA App, Ubisoft Connect, Xbox / Microsoft Store, and Battle.net.
+  - Steam integration combining local multi-library VDF scanning (`libraryfolders.vdf`, `appmanifest_*.acf`) with Steam Web API key integration (`B9704EF5F81AE0BA3AC20F633883B503`) to discover both installed and uninstalled owned titles.
+  - Native launcher protocol execution (`steam://run/<id>`, `steam://install/<id>`, `com.epicgames.launcher://`, `goggalaxy://`, `origin2://`, `uplay://`, `battlenet://`, `xbox://`).
+- **Cross-Launcher Duplicate Reconciliation Engine**: Ingests installed and owned titles into unified entries with multi-store attribution (`ownershipSources`), prioritizing installed copies for one-click launch while providing launcher switchers in the game detail modal.
+- **Gameplay Process Lifecycle & Session Tracking**: Electron process tracker capturing gameplay duration, incrementing playtime in real-time, and updating last played timestamps.
+- **Launchers & Sync Dashboard**: Top bar indicator and dedicated modal displaying explicit connection status, detected account names, game counts across all 7 platforms, and cloud upload status.
 - **Windows NSIS Setup Installer**: Production-ready setup installer (`Unity Game Launcher Setup <version>.exe`) allowing custom installation directory selection, Start Menu & Desktop shortcut generation, and full Windows uninstallation support.
 - **Standalone Portable Executable**: Zero-install portable executable (`Unity Game Launcher-Portable-<version>.exe`) designed to run anywhere (including removable USB media).
 - **External Configuration & Data System**: Isolated runtime configuration (`config.json`) and external game library database (`games.json`) stored in `%APPDATA%\Unity Game Launcher` (in installed mode) or within a local `data\` directory adjacent to the executable (in portable mode).
 - **Explorer Quick-Access & Mode Badge**: TitleBar indicator showing active portable state and one-click "Config" button to open the active configuration directory in Windows File Explorer.
 - **One-Click Build Automation**: Added `build-executables.bat` script and npm commands (`dist`, `dist:installer`, `dist:portable`, `dist:all`) to compile installer and portable executables.
-- Environment configuration templates (`.env.example` and `keys.env.example`) documenting Supabase URL and anon API key parameters for cloud authentication and storage.
+- Environment configuration templates (`.env.example` and `keys.env.example`) documenting Steam Web API key, Supabase URL, and anon API key parameters.
 
 ---
 

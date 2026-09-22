@@ -21,13 +21,6 @@ secrets.*
 .agents/
 antigravity/
 
-# ------------------------------------
-#  TODO (local task tracking)
-# ------------------------------------
-TODO.md
-TODO.txt
-todo.md
-todo.txt
 
 # ------------------------------------
 #  OS — Windows
@@ -107,7 +100,7 @@ tmp/
 # ------------------------------------
 #  Unity (if any Unity assets are used)
 # ------------------------------------
-[Ll]ibrary/
+/[Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/

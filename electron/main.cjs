@@ -196,6 +196,92 @@ ipcMain.handle('library-save', async (_event, games) => {
   }
 });
 
+// Launcher Platform & Sync Engine Handlers
+const LibraryEngine = require('./engine/libraryEngine.cjs');
+const processTracker = require('./engine/processTracker.cjs');
+
+let libraryEngine = null;
+function getLibraryEngine() {
+  if (!libraryEngine) {
+    const { gamesPath } = getConfigFilePaths();
+    libraryEngine = new LibraryEngine(gamesPath);
+  }
+  return libraryEngine;
+}
+
+ipcMain.handle('launcher-get-status', async () => {
+  try {
+    return await getLibraryEngine().getLauncherStatuses();
+  } catch (err) {
+    console.error('Failed to get launcher statuses:', err);
+    return [];
+  }
+});
+
+ipcMain.handle('launcher-sync-all', async (_event, options) => {
+  try {
+    const result = await getLibraryEngine().syncAll(options || {});
+    return result;
+  } catch (err) {
+    console.error('Failed to sync launcher libraries:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('launcher-launch-game', async (_event, { game, launcher }) => {
+  try {
+    const result = await getLibraryEngine().launchGame(game, launcher);
+    processTracker.startSession(game.id, game.title);
+    if (mainWindow) {
+      mainWindow.webContents.send('game-session-started', { gameId: game.id, gameTitle: game.title });
+    }
+    return result;
+  } catch (err) {
+    console.error(`Failed to launch ${game?.title}:`, err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('launcher-install-game', async (_event, { game, launcher }) => {
+  try {
+    return await getLibraryEngine().installGame(game, launcher);
+  } catch (err) {
+    console.error(`Failed to install ${game?.title}:`, err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('session-stop', async (_event, { gameId }) => {
+  try {
+    const session = processTracker.endSession(gameId);
+    if (session) {
+      // Update games.json with new playtime
+      const { gamesPath } = getConfigFilePaths();
+      if (fs.existsSync(gamesPath)) {
+        const games = JSON.parse(fs.readFileSync(gamesPath, 'utf8'));
+        const idx = games.findIndex((g) => g.id === gameId);
+        if (idx !== -1) {
+          games[idx].playtime = games[idx].playtime || { totalMinutes: 0 };
+          games[idx].playtime.totalMinutes = (games[idx].playtime.totalMinutes || 0) + session.durationMinutes;
+          games[idx].playtime.lastPlayed = session.endedAt;
+          fs.writeFileSync(gamesPath, JSON.stringify(games, null, 2), 'utf8');
+        }
+      }
+      if (mainWindow) {
+        mainWindow.webContents.send('game-session-ended', session);
+      }
+    }
+    return { success: true, session };
+  } catch (err) {
+    console.error(`Failed to stop session for ${gameId}:`, err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('session-get-active', () => {
+  return processTracker.getActiveSessions();
+});
+
 app.whenReady().then(() => {
   ensureConfigFiles();
   createWindow();

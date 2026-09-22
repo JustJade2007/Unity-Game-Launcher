@@ -31,6 +31,21 @@ export interface ElectronAPI {
   saveConfig: (config: AppConfig) => Promise<{ success: boolean; error?: string }>;
   loadLibrary: () => Promise<Game[]>;
   saveLibrary: (games: Game[]) => Promise<{ success: boolean; error?: string }>;
+  getLauncherStatus: () => Promise<import('./game').LauncherStatus[]>;
+  syncLaunchers: (options?: { apiKey?: string; steamId?: string }) => Promise<{
+    success: boolean;
+    totalGames?: number;
+    installedCount?: number;
+    uninstalledCount?: number;
+    games?: Game[];
+    error?: string;
+  }>;
+  launchGame: (game: Game, launcher?: string) => Promise<{ success: boolean; uri?: string; error?: string }>;
+  installGame: (game: Game, launcher?: string) => Promise<{ success: boolean; uri?: string; error?: string }>;
+  stopGameSession: (gameId: string) => Promise<{ success: boolean; session?: { gameId: string; durationMinutes: number; endedAt: string } }>;
+  getActiveSessions: () => Promise<Array<{ gameId: string; gameTitle: string; durationMinutes: number; startTime: number }>>;
+  onSessionStarted: (callback: (session: { gameId: string; gameTitle: string }) => void) => () => void;
+  onSessionEnded: (callback: (session: { gameId: string; gameTitle: string; durationMinutes: number; endedAt: string }) => void) => () => void;
   isElectron?: boolean;
 }
 

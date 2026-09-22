@@ -5,12 +5,17 @@ import {
   HardDrive,
   Compass,
   FilterX,
-  Layers,
   Sparkles,
 } from 'lucide-react';
 import { useLibrary } from '../../context/LibraryContext';
 
-export const Sidebar: React.FC = () => {
+import { LauncherType } from '../../types/game';
+
+interface SidebarProps {
+  onOpenLaunchers?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers }) => {
   const {
     filters,
     setSelectedCategory,
@@ -117,10 +122,17 @@ export const Sidebar: React.FC = () => {
         <div>
           <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 px-3 mb-2 flex items-center justify-between">
             <span>Launchers</span>
-            <Layers className="w-3 h-3 text-gray-500" />
+            {onOpenLaunchers && (
+              <button
+                onClick={onOpenLaunchers}
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-normal underline"
+              >
+                Sync
+              </button>
+            )}
           </div>
           <div className="space-y-1">
-            {allLaunchers.map(({ name, count }) => {
+            {allLaunchers.map(({ name, count }: { name: LauncherType; count: number }) => {
               const isSelected = filters.selectedLauncher === name;
               return (
                 <button
@@ -149,7 +161,7 @@ export const Sidebar: React.FC = () => {
             <Sparkles className="w-3 h-3 text-gray-500" />
           </div>
           <div className="flex flex-wrap gap-1.5 px-1">
-            {allCategories.map(({ name, count }) => {
+            {allCategories.map(({ name, count }: { name: string; count: number }) => {
               const isSelected = filters.selectedCategory === name;
               return (
                 <button

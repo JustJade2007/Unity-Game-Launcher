@@ -27,8 +27,12 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 | Achievements & badge showcase | ✅ Implemented |
 | Live friends activity & rich presence | ✅ Implemented |
 | Playtime tracking & categories | ✅ Implemented |
-| Multiple launcher integration | 🚧 In Progress |
-| Local game detection | 🚧 In Progress |
+| Multiple launcher integration (Steam, Epic, GOG, EA, Ubisoft, Xbox, BNet) | ✅ Implemented |
+| Local client & game detection | ✅ Implemented |
+| Steam Web API owned uninstalled sync | ✅ Implemented |
+| Native launcher URI execution & install routing | ✅ Implemented |
+| Cross-launcher duplicate reconciliation | ✅ Implemented |
+| Cloud storage sync indicator (Supabase) | ✅ Implemented |
 | Account management | 🗓️ Planned |
 | Automatic updates | 🗓️ Planned |
 

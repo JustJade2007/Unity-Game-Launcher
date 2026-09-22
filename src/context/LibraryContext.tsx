@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
-import { Game, LauncherType, ViewMode, SortField, SortDirection, FilterState } from '../types/game';
+import { Game, LauncherType, ViewMode, SortField, SortDirection, FilterState, LauncherStatus } from '../types/game';
 
 interface LibraryContextType {
   games: Game[];
@@ -22,9 +22,20 @@ interface LibraryContextType {
   allLaunchers: { name: LauncherType; count: number }[];
   totalPlaytimeHours: number;
   totalGamesCount: number;
+  // Launcher integration & syncing
+  launcherStatuses: LauncherStatus[];
+  isSyncing: boolean;
+  syncError: string | null;
+  refreshLauncherStatuses: () => Promise<void>;
+  syncLaunchers: (options?: { apiKey?: string; steamId?: string }) => Promise<{ success: boolean; totalGames?: number; error?: string }>;
+  launchGame: (game: Game, launcher?: LauncherType) => Promise<boolean>;
+  installGame: (game: Game, launcher?: LauncherType) => Promise<boolean>;
+  hasPendingCloudUploads: boolean;
+  markCloudUploaded: () => void;
 }
 
 const STORAGE_KEY = 'unity_launcher_games';
+const PENDING_UPLOAD_KEY = 'unity_launcher_pending_uploads';
 
 const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
 
@@ -43,6 +54,12 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [launcherStatuses, setLauncherStatuses] = useState<LauncherStatus[]>([]);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [syncError, setSyncError] = useState<string | null>(null);
+  const [hasPendingCloudUploads, setHasPendingCloudUploads] = useState<boolean>(() => {
+    return localStorage.getItem(PENDING_UPLOAD_KEY) === 'true';
+  });
 
   const [filters, setFilters] = useState<FilterState>({
     searchQuery: '',
@@ -53,6 +70,17 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     sortField: 'lastPlayed',
     sortDirection: 'desc',
   });
+
+  const refreshLauncherStatuses = async () => {
+    if (window.electronAPI?.getLauncherStatus) {
+      try {
+        const statuses = await window.electronAPI.getLauncherStatus();
+        setLauncherStatuses(statuses);
+      } catch (err) {
+        console.error('Failed to get launcher statuses:', err);
+      }
+    }
+  };
 
   // Load games from external file system if running in Electron
   useEffect(() => {
@@ -75,6 +103,35 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
           }
         }
       }).catch(console.error);
+
+      refreshLauncherStatuses();
+    }
+  }, []);
+
+  // Listen for active game session events
+  useEffect(() => {
+    if (window.electronAPI?.onSessionEnded) {
+      const unsub = window.electronAPI.onSessionEnded((session) => {
+        setGames((prev) =>
+          prev.map((g) => {
+            if (g.id === session.gameId) {
+              const prevMins = g.playtime?.totalMinutes || 0;
+              return {
+                ...g,
+                playtime: {
+                  ...g.playtime,
+                  totalMinutes: prevMins + session.durationMinutes,
+                  lastPlayed: session.endedAt,
+                },
+              };
+            }
+            return g;
+          })
+        );
+        setHasPendingCloudUploads(true);
+        localStorage.setItem(PENDING_UPLOAD_KEY, 'true');
+      });
+      return unsub;
     }
   }, []);
 
@@ -90,6 +147,57 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       window.electronAPI.saveLibrary(games).catch(console.error);
     }
   }, [games]);
+
+  const syncLaunchers = async (options?: { apiKey?: string; steamId?: string }) => {
+    if (!window.electronAPI?.syncLaunchers) {
+      return { success: false, error: 'Electron runtime not detected' };
+    }
+
+    setIsSyncing(true);
+    setSyncError(null);
+
+    try {
+      const result = await window.electronAPI.syncLaunchers(options);
+      if (result.success && Array.isArray(result.games)) {
+        setGames(result.games);
+        setHasPendingCloudUploads(true);
+        localStorage.setItem(PENDING_UPLOAD_KEY, 'true');
+        await refreshLauncherStatuses();
+        return { success: true, totalGames: result.totalGames };
+      } else {
+        const errorMsg = result.error || 'Failed to sync launchers';
+        setSyncError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Unknown sync error';
+      setSyncError(errorMsg);
+      return { success: false, error: errorMsg };
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const launchGame = async (game: Game, launcher?: LauncherType): Promise<boolean> => {
+    if (window.electronAPI?.launchGame) {
+      const res = await window.electronAPI.launchGame(game, launcher);
+      return Boolean(res?.success);
+    }
+    return false;
+  };
+
+  const installGame = async (game: Game, launcher?: LauncherType): Promise<boolean> => {
+    if (window.electronAPI?.installGame) {
+      const res = await window.electronAPI.installGame(game, launcher);
+      return Boolean(res?.success);
+    }
+    return false;
+  };
+
+  const markCloudUploaded = () => {
+    setHasPendingCloudUploads(false);
+    localStorage.setItem(PENDING_UPLOAD_KEY, 'false');
+  };
 
   const selectedGame = useMemo(() => {
     if (!selectedGameId) {
@@ -202,12 +310,16 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       Steam: 0,
       'Epic Games': 0,
       GOG: 0,
+      EA: 0,
+      Ubisoft: 0,
       Xbox: 0,
       'Battle.net': 0,
       Local: 0,
     };
-    games.forEach((g) => {
-      counts[g.launcher] = (counts[g.launcher] || 0) + 1;
+    games.forEach((g: Game) => {
+      if (counts[g.launcher] !== undefined) {
+        counts[g.launcher] = (counts[g.launcher] || 0) + 1;
+      }
     });
     return (Object.entries(counts) as [LauncherType, number][])
       .filter(([, count]) => count > 0)
@@ -242,6 +354,15 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         allLaunchers,
         totalPlaytimeHours,
         totalGamesCount: games.length,
+        launcherStatuses,
+        isSyncing,
+        syncError,
+        refreshLauncherStatuses,
+        syncLaunchers,
+        launchGame,
+        installGame,
+        hasPendingCloudUploads,
+        markCloudUploaded,
       }}
     >
       {children}

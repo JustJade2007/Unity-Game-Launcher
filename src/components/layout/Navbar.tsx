@@ -2,7 +2,11 @@ import React from 'react';
 import { Search, LayoutGrid, Rows3, Sparkles, ArrowUpDown, Clock, Gamepad2 } from 'lucide-react';
 import { useLibrary } from '../../context/LibraryContext';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onOpenLaunchers?: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers }) => {
   const {
     filters,
     setSearchQuery,
@@ -11,6 +15,8 @@ export const Navbar: React.FC = () => {
     setSorting,
     totalGamesCount,
     totalPlaytimeHours,
+    isSyncing,
+    hasPendingCloudUploads,
   } = useLibrary();
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -49,8 +55,8 @@ export const Navbar: React.FC = () => {
         />
       </div>
 
-      {/* Middle Stats Badges */}
-      <div className="hidden md:flex items-center gap-4 text-xs font-medium text-gray-400">
+      {/* Middle Stats Badges & Launcher Trigger */}
+      <div className="hidden md:flex items-center gap-3 text-xs font-medium text-gray-400">
         <div className="flex items-center gap-1.5 bg-[#161822] px-3 py-1.5 rounded-full border border-white/5">
           <Gamepad2 className="w-3.5 h-3.5 text-indigo-400" />
           <span>{totalGamesCount} Games</span>
@@ -59,6 +65,20 @@ export const Navbar: React.FC = () => {
           <Clock className="w-3.5 h-3.5 text-cyan-400" />
           <span>{totalPlaytimeHours.toLocaleString()}h Total Playtime</span>
         </div>
+
+        {onOpenLaunchers && (
+          <button
+            onClick={onOpenLaunchers}
+            className="flex items-center gap-2 bg-[#161822] hover:bg-[#1f2230] px-3 py-1.5 rounded-full border border-white/10 text-gray-300 hover:text-white transition-all relative"
+            title="Launchers & Cloud Sync"
+          >
+            <span className={`w-2 h-2 rounded-full ${isSyncing ? 'bg-amber-400 animate-ping' : hasPendingCloudUploads ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+            <span>Launchers & Sync</span>
+            {hasPendingCloudUploads && (
+              <span className="w-2 h-2 rounded-full bg-blue-400 absolute -top-0.5 -right-0.5 animate-pulse" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* View & Sort Controls */}

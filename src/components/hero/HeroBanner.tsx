@@ -1,20 +1,21 @@
 import React from 'react';
-import { Play, Star, Clock, Trophy } from 'lucide-react';
+import { Play, Star, Clock, Trophy, Download } from 'lucide-react';
 import { useLibrary } from '../../context/LibraryContext';
+import { Achievement, FriendActivity } from '../../types/game';
 
 export const HeroBanner: React.FC = () => {
-  const { selectedGame, toggleFavorite } = useLibrary();
+  const { selectedGame, toggleFavorite, launchGame, installGame } = useLibrary();
 
   if (!selectedGame) return null;
 
   const hoursPlayed = Math.round((selectedGame.playtime.totalMinutes / 60) * 10) / 10;
-  const unlockedCount = selectedGame.achievements.filter((a) => a.unlocked).length;
+  const unlockedCount = selectedGame.achievements.filter((a: Achievement) => a.unlocked).length;
   const totalAchievements = selectedGame.achievements.length;
   const achievementPercent =
     totalAchievements > 0 ? Math.round((unlockedCount / totalAchievements) * 100) : 0;
 
   const friendsPlayingNow = selectedGame.friends.filter(
-    (f) => f.status === 'playing_now'
+    (f: FriendActivity) => f.status === 'playing_now'
   );
 
   return (
@@ -37,7 +38,7 @@ export const HeroBanner: React.FC = () => {
             {selectedGame.launcher}
           </span>
           <div className="flex items-center gap-1.5 overflow-hidden">
-            {selectedGame.categories.slice(0, 3).map((cat) => (
+            {selectedGame.categories.slice(0, 3).map((cat: string) => (
               <span
                 key={cat}
                 className="text-[11px] px-2 py-0.5 rounded bg-white/10 text-gray-300 backdrop-blur-sm"
@@ -75,10 +76,30 @@ export const HeroBanner: React.FC = () => {
         <div className="flex flex-wrap items-center gap-4">
           {/* Play / Launch Button */}
           <button
-            className="flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/40 hover:shadow-indigo-500/60 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+            onClick={() => {
+              if (selectedGame.installed) {
+                launchGame(selectedGame);
+              } else {
+                installGame(selectedGame);
+              }
+            }}
+            className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl font-semibold text-sm shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 ${
+              selectedGame.installed
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-indigo-600/40 hover:shadow-indigo-500/60'
+                : 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white shadow-blue-600/40 hover:shadow-blue-500/60'
+            }`}
           >
-            <Play className="w-4 h-4 fill-current" />
-            <span>{selectedGame.installed ? 'Play Now' : 'Install Game'}</span>
+            {selectedGame.installed ? (
+              <>
+                <Play className="w-4 h-4 fill-current" />
+                <span>Play Now</span>
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                <span>Install via {selectedGame.launcher}</span>
+              </>
+            )}
           </button>
 
           {/* Favorite Toggle */}
@@ -124,7 +145,7 @@ export const HeroBanner: React.FC = () => {
             {friendsPlayingNow.length > 0 && (
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-1.5 overflow-hidden">
-                  {friendsPlayingNow.slice(0, 3).map((friend) => (
+                  {friendsPlayingNow.slice(0, 3).map((friend: FriendActivity) => (
                     <img
                       key={friend.id}
                       src={friend.avatarUrl}

@@ -1,0 +1,395 @@
+import React, { useState } from 'react';
+import { Game } from '../../types/game';
+import { useLibrary } from '../../context/LibraryContext';
+import { AchievementCard } from './AchievementCard';
+import { FriendsPlayingList } from './FriendsPlayingList';
+import {
+  X,
+  Play,
+  Star,
+  Clock,
+  Trophy,
+  Users,
+  HardDrive,
+  Calendar,
+  Layers,
+  Image as ImageIcon,
+} from 'lucide-react';
+
+interface GameDetailViewProps {
+  game: Game;
+  onClose: () => void;
+}
+
+type TabType = 'overview' | 'achievements' | 'friends';
+
+export const GameDetailView: React.FC<GameDetailViewProps> = ({ game, onClose }) => {
+  const { toggleFavorite } = useLibrary();
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [achievementFilter, setAchievementFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
+  const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
+
+  const hoursPlayed = Math.round((game.playtime.totalMinutes / 60) * 10) / 10;
+  const unlockedCount = game.achievements.filter((a) => a.unlocked).length;
+  const totalAchievements = game.achievements.length;
+  const achievementPercent =
+    totalAchievements > 0 ? Math.round((unlockedCount / totalAchievements) * 100) : 0;
+
+  const friendsPlayingNow = game.friends.filter((f) => f.status === 'playing_now');
+
+  const filteredAchievements = game.achievements.filter((a) => {
+    if (achievementFilter === 'unlocked') return a.unlocked;
+    if (achievementFilter === 'locked') return !a.unlocked;
+    return true;
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200">
+      <div className="relative w-full max-w-5xl max-h-[90vh] bg-[#0c0e15] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+        {/* Top Floating Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-30 p-2 rounded-full bg-black/60 hover:bg-black/80 text-gray-400 hover:text-white border border-white/10 backdrop-blur-md transition-colors"
+          title="Close details"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* Scrollable Container */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Header Banner */}
+          <div className="relative h-72 sm:h-80 w-full overflow-hidden">
+            <img
+              src={game.media.heroUrl}
+              alt={game.title}
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e15] via-[#0c0e15]/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0c0e15] via-transparent to-transparent" />
+
+            {/* Banner Content */}
+            <div className="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 z-10">
+              <div className="max-w-2xl">
+                {/* Platform badge & categories */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    {game.launcher}
+                  </span>
+                  {game.categories.slice(0, 3).map((cat) => (
+                    <span
+                      key={cat}
+                      className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-gray-300 backdrop-blur-sm"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Logo or Title */}
+                {game.media.logoUrl ? (
+                  <img
+                    src={game.media.logoUrl}
+                    alt={game.title}
+                    className="max-h-16 object-contain mb-2 drop-shadow-xl"
+                  />
+                ) : null}
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight drop-shadow-md">
+                  {game.title}
+                </h1>
+                <p className="text-xs sm:text-sm text-gray-300 mt-1 line-clamp-2">
+                  {game.tagline}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <button
+                  onClick={() => toggleFavorite(game.id)}
+                  className={`p-3 rounded-xl border backdrop-blur-md transition-all ${
+                    game.favorite
+                      ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
+                      : 'bg-black/50 border-white/10 text-gray-300 hover:text-white'
+                  }`}
+                  title="Favorite"
+                >
+                  <Star className={`w-5 h-5 ${game.favorite ? 'fill-current' : ''}`} />
+                </button>
+
+                <button className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm shadow-xl shadow-indigo-600/30 transition-all">
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>{game.installed ? 'Launch Game' : 'Install'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Info Grid Bar */}
+          <div className="px-6 py-3 bg-[#11131c] border-y border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+            <div className="flex items-center gap-2.5">
+              <Clock className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+              <div>
+                <div className="text-gray-400 text-[10px]">Playtime</div>
+                <div className="font-semibold text-white">{hoursPlayed} Hours</div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <Trophy className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <div>
+                <div className="text-gray-400 text-[10px]">Achievements</div>
+                <div className="font-semibold text-white">
+                  {unlockedCount}/{totalAchievements} ({achievementPercent}%)
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <HardDrive className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <div>
+                <div className="text-gray-400 text-[10px]">Install Size</div>
+                <div className="font-semibold text-white">
+                  {game.sizeGb ? `${game.sizeGb} GB` : 'Unknown'}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <Calendar className="w-4 h-4 text-rose-400 flex-shrink-0" />
+              <div>
+                <div className="text-gray-400 text-[10px]">Release Date</div>
+                <div className="font-semibold text-white">
+                  {new Date(game.releaseDate).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tab Navigation */}
+          <div className="px-6 border-b border-white/5 flex items-center gap-6">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`py-3.5 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+                activeTab === 'overview'
+                  ? 'border-indigo-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span>Overview</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('achievements')}
+              className={`py-3.5 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+                activeTab === 'achievements'
+                  ? 'border-indigo-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <Trophy className="w-4 h-4" />
+              <span>Achievements ({unlockedCount}/{totalAchievements})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('friends')}
+              className={`py-3.5 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+                activeTab === 'friends'
+                  ? 'border-indigo-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>
+                Friends Activity ({game.friends.length})
+                {friendsPlayingNow.length > 0 && (
+                  <span className="ml-1 px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px]">
+                    {friendsPlayingNow.length} live
+                  </span>
+                )}
+              </span>
+            </button>
+          </div>
+
+          {/* Tab Content Panes */}
+          <div className="p-6">
+            {/* OVERVIEW TAB */}
+            {activeTab === 'overview' && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left 2 Cols: Description & Screenshots */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
+                      About the Game
+                    </h3>
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      {game.description}
+                    </p>
+                  </div>
+
+                  {/* Screenshots Gallery */}
+                  {game.media.screenshots.length > 0 && (
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-2">
+                        <ImageIcon className="w-4 h-4" />
+                        <span>Screenshots</span>
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        {game.media.screenshots.map((shot, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => setSelectedScreenshot(shot)}
+                            className="group relative aspect-video rounded-xl overflow-hidden cursor-pointer border border-white/5 hover:border-indigo-500/50"
+                          >
+                            <img
+                              src={shot}
+                              alt={`${game.title} screenshot ${idx + 1}`}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right 1 Col: Metadata & Developer Card */}
+                <div className="space-y-5">
+                  <div className="p-4 rounded-xl bg-[#141622] border border-white/5 space-y-3 text-xs">
+                    <div>
+                      <div className="text-gray-400 text-[11px]">Developer</div>
+                      <div className="font-semibold text-white mt-0.5">{game.developer}</div>
+                    </div>
+
+                    <div>
+                      <div className="text-gray-400 text-[11px]">Publisher</div>
+                      <div className="font-semibold text-white mt-0.5">{game.publisher}</div>
+                    </div>
+
+                    <div>
+                      <div className="text-gray-400 text-[11px]">Platform</div>
+                      <div className="font-semibold text-white mt-0.5">{game.launcher}</div>
+                    </div>
+
+                    {game.installPath && (
+                      <div>
+                        <div className="text-gray-400 text-[11px]">Install Path</div>
+                        <div className="font-mono text-[10px] text-gray-300 mt-0.5 break-all">
+                          {game.installPath}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Tags */}
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-400 mb-2">Categories & Tags</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {game.categories.map((c) => (
+                        <span
+                          key={c}
+                          className="text-[11px] px-2.5 py-1 rounded-md bg-[#161824] border border-white/5 text-gray-300"
+                        >
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ACHIEVEMENTS TAB */}
+            {activeTab === 'achievements' && (
+              <div className="space-y-6">
+                {/* Progress bar */}
+                <div className="p-4 rounded-xl bg-[#141622] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex-1 w-full">
+                    <div className="flex justify-between items-center text-xs font-medium mb-2">
+                      <span className="text-white font-bold">Achievement Progress</span>
+                      <span className="text-indigo-400 font-semibold">
+                        {unlockedCount} of {totalAchievements} Unlocked ({achievementPercent}%)
+                      </span>
+                    </div>
+                    <div className="w-full h-2.5 bg-[#0b0c12] rounded-full overflow-hidden border border-white/5">
+                      <div
+                        className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500"
+                        style={{ width: `${achievementPercent}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Filter chips */}
+                  <div className="flex items-center gap-1.5 bg-[#0b0c12] p-1 rounded-lg border border-white/5 flex-shrink-0">
+                    <button
+                      onClick={() => setAchievementFilter('all')}
+                      className={`text-xs px-3 py-1 rounded-md font-medium transition-all ${
+                        achievementFilter === 'all'
+                          ? 'bg-indigo-600 text-white'
+                          : 'text-gray-400 hover:text-gray-200'
+                      }`}
+                    >
+                      All ({totalAchievements})
+                    </button>
+                    <button
+                      onClick={() => setAchievementFilter('unlocked')}
+                      className={`text-xs px-3 py-1 rounded-md font-medium transition-all ${
+                        achievementFilter === 'unlocked'
+                          ? 'bg-indigo-600 text-white'
+                          : 'text-gray-400 hover:text-gray-200'
+                      }`}
+                    >
+                      Unlocked ({unlockedCount})
+                    </button>
+                    <button
+                      onClick={() => setAchievementFilter('locked')}
+                      className={`text-xs px-3 py-1 rounded-md font-medium transition-all ${
+                        achievementFilter === 'locked'
+                          ? 'bg-indigo-600 text-white'
+                          : 'text-gray-400 hover:text-gray-200'
+                      }`}
+                    >
+                      Locked ({totalAchievements - unlockedCount})
+                    </button>
+                  </div>
+                </div>
+
+                {/* Achievements List Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {filteredAchievements.map((ach) => (
+                    <AchievementCard key={ach.id} achievement={ach} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* FRIENDS TAB */}
+            {activeTab === 'friends' && (
+              <div>
+                <FriendsPlayingList friends={game.friends} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Screenshot Lightbox Modal */}
+        {selectedScreenshot && (
+          <div
+            onClick={() => setSelectedScreenshot(null)}
+            className="fixed inset-0 z-60 bg-black/90 flex items-center justify-center p-4 cursor-pointer"
+          >
+            <img
+              src={selectedScreenshot}
+              alt="Screenshot Preview"
+              className="max-w-full max-h-full rounded-lg shadow-2xl object-contain"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

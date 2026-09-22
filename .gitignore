@@ -82,6 +82,8 @@ build/
 *.msix
 *.nupkg
 *.jar
+*.tsbuildinfo
+.vite/
 node_modules/
 .nuget/
 packages/

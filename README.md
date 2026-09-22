@@ -23,7 +23,10 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 
 | Feature | Status |
 |---|---|
-| Unified game library | 🚧 In Progress |
+| Unified game library framework | ✅ Implemented |
+| Achievements & badge showcase | ✅ Implemented |
+| Live friends activity & rich presence | ✅ Implemented |
+| Playtime tracking & categories | ✅ Implemented |
 | Multiple launcher integration | 🚧 In Progress |
 | Local game detection | 🚧 In Progress |
 | Account management | 🗓️ Planned |
@@ -35,7 +38,8 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 
 ### Prerequisites
 
-> Requirements will be listed here once the project reaches a runnable state.
+- **Node.js**: v18.0.0 or later (v22+ recommended)
+- **npm**: v9.0.0 or later
 
 ### Installation
 
@@ -43,15 +47,32 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 # Clone the repository
 git clone https://github.com/JustJade2007/Unity-Game-Launcher.git
 cd Unity-Game-Launcher
-```
 
-> Full installation instructions coming soon.
+# Install dependencies
+npm install
+```
 
 ---
 
 ## 🛠️ Development
 
-> Build and contribution instructions will be added as the project matures.
+Run the local development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
 
 ---
 

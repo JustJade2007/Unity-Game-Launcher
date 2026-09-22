@@ -6,19 +6,24 @@ import { HeroBanner } from './components/hero/HeroBanner';
 import { GameGrid } from './components/library/GameGrid';
 import { GameDetailView } from './components/detail/GameDetailView';
 import { Game } from './types/game';
+import { TitleBar } from './components/layout/TitleBar';
 
 const MainLayout: React.FC = () => {
   const { filters, filteredGames } = useLibrary();
   const [detailGame, setDetailGame] = useState<Game | null>(null);
 
   return (
-    <div className="flex h-screen w-screen bg-[#08090c] text-gray-100 overflow-hidden font-sans">
-      {/* Sidebar Navigation */}
-      <Sidebar />
+    <div className="flex flex-col h-screen w-screen bg-[#08090c] text-gray-100 overflow-hidden font-sans">
+      {/* Desktop Native Titlebar */}
+      <TitleBar />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#0a0b10]">
-        <Navbar />
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* Sidebar Navigation */}
+        <Sidebar />
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#0a0b10]">
+          <Navbar />
 
         {/* Scrollable Viewport */}
         <main className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
@@ -52,6 +57,7 @@ const MainLayout: React.FC = () => {
           {/* Game Library Collection */}
           <GameGrid onOpenDetail={(game) => setDetailGame(game)} />
         </main>
+      </div>
       </div>
 
       {/* Detail Modal Overlay */}

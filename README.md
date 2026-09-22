@@ -41,7 +41,11 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 - **Node.js**: v18.0.0 or later (v22+ recommended)
 - **npm**: v9.0.0 or later
 
-### Installation
+### Quick Start (Windows)
+
+Simply double-click the **`launch.bat`** file in the root directory. It will automatically verify dependencies, build the latest assets, and launch the native desktop application window.
+
+### Manual Setup & Commands
 
 ```bash
 # Clone the repository
@@ -50,28 +54,31 @@ cd Unity-Game-Launcher
 
 # Install dependencies
 npm install
+
+# Launch desktop application
+npm start
 ```
 
 ---
 
 ## 🛠️ Development
 
-Run the local development server:
+Launch the desktop app in development mode (with hot-reload):
 
 ```bash
 npm run dev
 ```
 
-Build for production:
+Build application assets:
 
 ```bash
 npm run build
 ```
 
-Preview the production build:
+Run compiled desktop app:
 
 ```bash
-npm run preview
+npm start
 ```
 
 ---

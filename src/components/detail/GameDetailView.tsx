@@ -27,7 +27,7 @@ interface GameDetailViewProps {
 type TabType = 'overview' | 'achievements' | 'friends';
 
 export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGame, onClose }) => {
-  const { games, toggleFavorite, launchGame, installGame, fetchAchievements } = useLibrary();
+  const { games, toggleFavorite, launchGame, installGame, fetchAchievements, enrichGameMedia } = useLibrary();
   const game = games.find((g) => g.id === initialGame.id) || initialGame;
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -36,6 +36,50 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
   const [selectedLauncher, setSelectedLauncher] = useState<LauncherType>(game.launcher);
   const [isLaunching, setIsLaunching] = useState(false);
   const [isFetchingAchievements, setIsFetchingAchievements] = useState(false);
+
+  const targetAppId = game.appId || (game.id?.startsWith('steam_') ? game.id.replace('steam_', '') : null);
+
+  const heroCandidates = React.useMemo(() => {
+    const list: string[] = [];
+    if (game.media.heroUrl) list.push(game.media.heroUrl);
+    if (targetAppId) {
+      list.push(
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/page_bg_generated_v6b.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/header.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/header.jpg`
+      );
+    }
+    if (game.media.screenshots?.[0]) list.push(game.media.screenshots[0]);
+    if (game.media.coverUrl) list.push(game.media.coverUrl);
+    return Array.from(new Set(list.filter(Boolean)));
+  }, [game.media.heroUrl, game.media.screenshots, game.media.coverUrl, targetAppId]);
+
+  const [heroIdx, setHeroIdx] = useState(0);
+  const [heroFailed, setHeroFailed] = useState(false);
+
+  useEffect(() => {
+    setHeroIdx(0);
+    setHeroFailed(false);
+  }, [game.id]);
+
+  const currentHeroSrc = heroIdx < heroCandidates.length ? heroCandidates[heroIdx] : null;
+
+  const handleHeroError = () => {
+    if (heroIdx + 1 < heroCandidates.length) {
+      setHeroIdx((prev) => prev + 1);
+    } else {
+      setHeroFailed(true);
+    }
+  };
+
+  useEffect(() => {
+    // If game has missing images, attempt automatic media enrichment with SteamDB
+    if (!game.media?.coverUrl || !game.media?.heroUrl) {
+      enrichGameMedia(game.id);
+    }
+  }, [game.id]);
 
   useEffect(() => {
     // Automatically fetch real achievements if empty or on initial open
@@ -86,11 +130,19 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
         <div className="flex-1 overflow-y-auto">
           {/* Header Banner */}
           <div className="relative h-72 sm:h-80 w-full overflow-hidden">
-            <img
-              src={game.media.heroUrl}
-              alt={game.title}
-              className="w-full h-full object-cover object-center"
-            />
+            {!heroFailed && currentHeroSrc ? (
+              <img
+                key={currentHeroSrc}
+                src={currentHeroSrc}
+                alt={game.title}
+                onError={handleHeroError}
+                className="w-full h-full object-cover object-center"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-indigo-950/70 via-[#101322] to-[#0c0e15]">
+                <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e15] via-[#0c0e15]/60 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#0c0e15] via-transparent to-transparent" />
 

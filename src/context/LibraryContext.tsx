@@ -31,6 +31,8 @@ interface LibraryContextType {
   launchGame: (game: Game, launcher?: LauncherType) => Promise<boolean>;
   installGame: (game: Game, launcher?: LauncherType) => Promise<boolean>;
   fetchAchievements: (gameId: string) => Promise<Achievement[]>;
+  enrichGameMedia: (gameId: string) => Promise<boolean>;
+  enrichAllMedia: () => Promise<number>;
   hasPendingCloudUploads: boolean;
   markCloudUploaded: () => void;
 }
@@ -218,6 +220,38 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return target.achievements || [];
   };
 
+  const enrichGameMedia = async (gameId: string): Promise<boolean> => {
+    if (window.electronAPI?.enrichGameMedia) {
+      try {
+        const res = await window.electronAPI.enrichGameMedia(gameId);
+        if (res.success && res.media) {
+          setGames((prev) =>
+            prev.map((g) => (g.id === gameId ? { ...g, media: res.media! } : g))
+          );
+          return Boolean(res.changed);
+        }
+      } catch (err) {
+        console.error('Failed to enrich game media:', err);
+      }
+    }
+    return false;
+  };
+
+  const enrichAllMedia = async (): Promise<number> => {
+    if (window.electronAPI?.enrichAllMedia) {
+      try {
+        const res = await window.electronAPI.enrichAllMedia();
+        if (res.success && Array.isArray(res.games)) {
+          setGames(res.games);
+          return res.updatedCount || 0;
+        }
+      } catch (err) {
+        console.error('Failed to bulk enrich media:', err);
+      }
+    }
+    return 0;
+  };
+
   const markCloudUploaded = () => {
     setHasPendingCloudUploads(false);
     localStorage.setItem(PENDING_UPLOAD_KEY, 'false');
@@ -386,6 +420,8 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         launchGame,
         installGame,
         fetchAchievements,
+        enrichGameMedia,
+        enrichAllMedia,
         hasPendingCloudUploads,
         markCloudUploaded,
       }}

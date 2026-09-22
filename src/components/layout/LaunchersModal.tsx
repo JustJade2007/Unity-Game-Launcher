@@ -11,6 +11,7 @@ import {
   Key,
   User,
   ShieldCheck,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { LauncherType, LauncherStatus } from '../../types/game';
 
@@ -36,12 +37,29 @@ export const LaunchersModal: React.FC<LaunchersModalProps> = ({ isOpen, onClose 
     syncError,
     syncLaunchers,
     refreshLauncherStatuses,
+    enrichAllMedia,
     hasPendingCloudUploads,
     markCloudUploaded,
   } = useLibrary();
 
   const [steamIdOverride, setSteamIdOverride] = useState('');
   const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
+  const [isEnriching, setIsEnriching] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleEnrichMedia = async () => {
+    setIsEnriching(true);
+    setSyncFeedback(null);
+    try {
+      const updated = await enrichAllMedia();
+      setSyncFeedback(`SteamDB image enrichment completed: ${updated} games updated with verified covers & media.`);
+    } catch {
+      setSyncFeedback('Image enrichment encountered an error.');
+    } finally {
+      setIsEnriching(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -261,6 +279,16 @@ export const LaunchersModal: React.FC<LaunchersModalProps> = ({ isOpen, onClose 
               className="px-4 py-2 text-xs font-semibold text-gray-300 hover:text-white rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors"
             >
               Close
+            </button>
+
+            <button
+              onClick={handleEnrichMedia}
+              disabled={isEnriching || isSyncing}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-purple-300 hover:text-white rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 transition-all disabled:opacity-50"
+              title="Enrich titles missing covers or hero artwork with SteamDB & Steam CDN"
+            >
+              <ImageIcon className={`w-3.5 h-3.5 ${isEnriching ? 'animate-pulse' : ''}`} />
+              {isEnriching ? 'Enriching Images...' : 'Fetch SteamDB Images'}
             </button>
 
             <button

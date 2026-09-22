@@ -270,6 +270,24 @@ ipcMain.handle('launcher-get-achievements', async (_event, { gameId, launcher, a
   }
 });
 
+ipcMain.handle('launcher-enrich-media', async (_event, { gameId }) => {
+  try {
+    return await getLibraryEngine().enrichGameMedia(gameId);
+  } catch (err) {
+    console.error(`Failed to enrich media for ${gameId}:`, err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('launcher-enrich-all-media', async () => {
+  try {
+    return await getLibraryEngine().enrichLibraryMedia();
+  } catch (err) {
+    console.error('Failed to bulk enrich library media:', err);
+    return { success: false, error: err.message };
+  }
+});
+
 ipcMain.handle('session-stop', async (_event, { gameId }) => {
   try {
     const session = processTracker.endSession(gameId);

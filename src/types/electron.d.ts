@@ -51,6 +51,19 @@ export interface ElectronAPI {
     achievements: import('./game').Achievement[];
     error?: string;
   }>;
+  enrichGameMedia: (gameId: string) => Promise<{
+    success: boolean;
+    changed?: boolean;
+    media?: import('./game').GameMedia;
+    game?: Game;
+    error?: string;
+  }>;
+  enrichAllMedia: () => Promise<{
+    success: boolean;
+    updatedCount?: number;
+    games?: Game[];
+    error?: string;
+  }>;
   stopGameSession: (gameId: string) => Promise<{ success: boolean; session?: { gameId: string; durationMinutes: number; endedAt: string } }>;
   getActiveSessions: () => Promise<Array<{ gameId: string; gameTitle: string; durationMinutes: number; startTime: number }>>;
   onSessionStarted: (callback: (session: { gameId: string; gameTitle: string }) => void) => () => void;

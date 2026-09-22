@@ -1,4 +1,5 @@
 const fs = require('fs');
+const steamdbImageService = require('./steamdbImageService.cjs');
 const SteamAdapter = require('../adapters/steamAdapter.cjs');
 const EpicAdapter = require('../adapters/epicAdapter.cjs');
 const GogAdapter = require('../adapters/gogAdapter.cjs');
@@ -205,7 +206,20 @@ class LibraryEngine {
       }
     }
 
-    const mergedLibrary = Array.from(unifiedMap.values());
+    let mergedLibrary = Array.from(unifiedMap.values());
+
+    // Enrich titles lacking media (non-Steam games or Steam apps without standard 600x900 covers)
+    try {
+      const needsEnrichment = mergedLibrary.some(
+        (g) => !g.media?.coverUrl || g.launcher !== 'Steam'
+      );
+      if (needsEnrichment) {
+        const { games: enrichedGames } = await steamdbImageService.enrichLibrary(mergedLibrary);
+        mergedLibrary = enrichedGames;
+      }
+    } catch (enrichErr) {
+      console.error('[LibraryEngine] Error enriching media with SteamDB:', enrichErr);
+    }
 
     // Write safely to disk
     if (this.gamesPath) {
@@ -325,6 +339,71 @@ class LibraryEngine {
     } catch (err) {
       console.error(`[LibraryEngine] Error fetching achievements for ${resolvedAppId || gameId}:`, err);
       return { success: false, achievements: [], error: err.message };
+    }
+  }
+
+  /**
+   * Enriches media for a single game using SteamDB & Steam static CDNs.
+   * @param {string} gameId
+   * @returns {Promise<{ success: boolean, changed: boolean, media: object, game?: object, error?: string }>}
+   */
+  async enrichGameMedia(gameId) {
+    if (!this.gamesPath || !fs.existsSync(this.gamesPath)) {
+      return { success: false, error: 'Games library store not found' };
+    }
+
+    try {
+      const content = fs.readFileSync(this.gamesPath, 'utf8');
+      const games = JSON.parse(content);
+      const idx = games.findIndex((g) => g.id === gameId || g.appId === gameId);
+      if (idx === -1) {
+        return { success: false, error: `Game with id ${gameId} not found` };
+      }
+
+      const { changed, media } = await steamdbImageService.enrichGameMedia(games[idx]);
+      if (changed) {
+        games[idx].media = media;
+        fs.writeFileSync(this.gamesPath, JSON.stringify(games, null, 2), 'utf8');
+      }
+
+      return {
+        success: true,
+        changed,
+        media: games[idx].media,
+        game: games[idx],
+      };
+    } catch (err) {
+      console.error(`[LibraryEngine] Error enriching media for game ${gameId}:`, err);
+      return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * Enriches media across the entire library store.
+   * @returns {Promise<{ success: boolean, updatedCount: number, games: Array<object>, error?: string }>}
+   */
+  async enrichLibraryMedia() {
+    if (!this.gamesPath || !fs.existsSync(this.gamesPath)) {
+      return { success: false, error: 'Games library store not found' };
+    }
+
+    try {
+      const content = fs.readFileSync(this.gamesPath, 'utf8');
+      const games = JSON.parse(content);
+      const { updatedCount, games: enrichedGames } = await steamdbImageService.enrichLibrary(games);
+
+      if (updatedCount > 0) {
+        fs.writeFileSync(this.gamesPath, JSON.stringify(enrichedGames, null, 2), 'utf8');
+      }
+
+      return {
+        success: true,
+        updatedCount,
+        games: enrichedGames,
+      };
+    } catch (err) {
+      console.error('[LibraryEngine] Error running bulk library media enrichment:', err);
+      return { success: false, error: err.message };
     }
   }
 }

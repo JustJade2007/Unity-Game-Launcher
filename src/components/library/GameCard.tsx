@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Game } from '../../types/game';
 import { useLibrary } from '../../context/LibraryContext';
-import { Clock, Star, Play, Download } from 'lucide-react';
+import { Clock, Star, Play, Download, Gamepad2 } from 'lucide-react';
 
 interface GameCardProps {
   game: Game;
@@ -14,6 +14,38 @@ export const GameCard: React.FC<GameCardProps> = ({ game, onOpenDetail }) => {
   const isSelected = selectedGame?.id === game.id;
   const hoursPlayed = Math.round((game.playtime.totalMinutes / 60) * 10) / 10;
   const friendsPlayingNow = game.friends.filter((f) => f.status === 'playing_now');
+
+  const targetAppId = game.appId || (game.id?.startsWith('steam_') ? game.id.replace('steam_', '') : null);
+
+  // Progressive SteamDB & Steam static CDN fallback candidates
+  const fallbackCandidates = useMemo(() => {
+    const list: string[] = [];
+    if (game.media.coverUrl) list.push(game.media.coverUrl);
+    if (targetAppId) {
+      list.push(
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/capsule_616x353.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/header.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/header.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/capsule_231x87.jpg`
+      );
+    }
+    if (game.media.screenshots?.[0]) list.push(game.media.screenshots[0]);
+    if (game.media.iconUrl) list.push(game.media.iconUrl);
+    return Array.from(new Set(list.filter(Boolean)));
+  }, [game.media.coverUrl, game.media.screenshots, game.media.iconUrl, targetAppId]);
+
+  const [candidateIdx, setCandidateIdx] = useState(0);
+  const [hasImageFailed, setHasImageFailed] = useState(false);
+
+  const currentImageSrc = candidateIdx < fallbackCandidates.length ? fallbackCandidates[candidateIdx] : null;
+
+  const handleImageError = () => {
+    if (candidateIdx + 1 < fallbackCandidates.length) {
+      setCandidateIdx((prev) => prev + 1);
+    } else {
+      setHasImageFailed(true);
+    }
+  };
 
   const handleClick = () => {
     setSelectedGame(game);
@@ -44,14 +76,30 @@ export const GameCard: React.FC<GameCardProps> = ({ game, onOpenDetail }) => {
     >
       {/* Poster Image (2:3 aspect ratio) */}
       <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#0d0e14]">
-        <img
-          src={game.media.coverUrl || 'https://via.placeholder.com/600x900?text=No+Cover'}
-          alt={game.title}
-          loading="lazy"
-          className={`w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out ${
-            !game.installed ? 'opacity-80 saturate-[0.85]' : ''
-          }`}
-        />
+        {!hasImageFailed && currentImageSrc ? (
+          <img
+            key={currentImageSrc}
+            src={currentImageSrc}
+            alt={game.title}
+            loading="lazy"
+            onError={handleImageError}
+            className={`w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out ${
+              !game.installed ? 'opacity-80 saturate-[0.85]' : ''
+            }`}
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-indigo-950/60 via-[#121420] to-[#0a0c12] text-center select-none relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl" />
+            <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-violet-500/10 rounded-full blur-2xl" />
+            <Gamepad2 className="w-10 h-10 text-indigo-400/40 mb-3" />
+            <h3 className="text-xs font-bold text-white line-clamp-3 leading-snug drop-shadow-md">
+              {game.title}
+            </h3>
+            <span className="mt-3 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-indigo-300">
+              {game.launcher}
+            </span>
+          </div>
+        )}
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#141620] via-transparent to-black/40 opacity-80 group-hover:opacity-90 transition-opacity" />

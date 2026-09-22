@@ -8,6 +8,43 @@ export const HeroBanner: React.FC = () => {
 
   if (!selectedGame) return null;
 
+  const targetAppId = selectedGame.appId || (selectedGame.id?.startsWith('steam_') ? selectedGame.id.replace('steam_', '') : null);
+
+  const heroCandidates = React.useMemo(() => {
+    const list: string[] = [];
+    if (selectedGame.media.heroUrl) list.push(selectedGame.media.heroUrl);
+    if (targetAppId) {
+      list.push(
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/page_bg_generated_v6b.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/header.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/header.jpg`
+      );
+    }
+    if (selectedGame.media.screenshots?.[0]) list.push(selectedGame.media.screenshots[0]);
+    if (selectedGame.media.coverUrl) list.push(selectedGame.media.coverUrl);
+    return Array.from(new Set(list.filter(Boolean)));
+  }, [selectedGame.media.heroUrl, selectedGame.media.screenshots, selectedGame.media.coverUrl, targetAppId]);
+
+  const [heroIdx, setHeroIdx] = React.useState(0);
+  const [heroFailed, setHeroFailed] = React.useState(false);
+
+  React.useEffect(() => {
+    setHeroIdx(0);
+    setHeroFailed(false);
+  }, [selectedGame.id]);
+
+  const currentHeroSrc = heroIdx < heroCandidates.length ? heroCandidates[heroIdx] : null;
+
+  const handleHeroError = () => {
+    if (heroIdx + 1 < heroCandidates.length) {
+      setHeroIdx((prev) => prev + 1);
+    } else {
+      setHeroFailed(true);
+    }
+  };
+
   const hoursPlayed = Math.round((selectedGame.playtime.totalMinutes / 60) * 10) / 10;
   const unlockedCount = selectedGame.achievements.filter((a: Achievement) => a.unlocked).length;
   const totalAchievements = selectedGame.achievements.length;
@@ -21,11 +58,19 @@ export const HeroBanner: React.FC = () => {
   return (
     <div className="relative w-full h-[360px] overflow-hidden rounded-2xl mb-6 select-none border border-white/10 shadow-2xl group">
       {/* Background Image with Ambient Overlays */}
-      <img
-        src={selectedGame.media.heroUrl}
-        alt={selectedGame.title}
-        className="absolute inset-0 w-full h-full object-cover object-center transform scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
-      />
+      {!heroFailed && currentHeroSrc ? (
+        <img
+          key={currentHeroSrc}
+          src={currentHeroSrc}
+          alt={selectedGame.title}
+          onError={handleHeroError}
+          className="absolute inset-0 w-full h-full object-cover object-center transform scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/70 via-[#101322] to-[#08090c]">
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        </div>
+      )}
       {/* Dark gradient fades */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#08090c] via-[#08090c]/70 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#08090c] via-[#08090c]/80 to-transparent" />

@@ -80,7 +80,7 @@
 - [ ] Add native file and directory selection dialogs
 - [ ] Support custom executable paths, arguments, and working directory entries
 - [ ] Build local binary metadata parser (icons, version headers, file properties)
-- [ ] Integrate SteamDB fallback lookup for metadata enrichment
+- [x] Integrate SteamDB fallback lookup for metadata enrichment
 
 ### 📁 Custom Library Item Maintenance
 - [ ] Implement manual entry edit forms and directory rescanning

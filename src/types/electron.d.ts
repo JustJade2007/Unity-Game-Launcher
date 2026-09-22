@@ -68,6 +68,7 @@ export interface ElectronAPI {
   getActiveSessions: () => Promise<Array<{ gameId: string; gameTitle: string; durationMinutes: number; startTime: number }>>;
   onSessionStarted: (callback: (session: { gameId: string; gameTitle: string }) => void) => () => void;
   onSessionEnded: (callback: (session: { gameId: string; gameTitle: string; durationMinutes: number; endedAt: string }) => void) => () => void;
+  onLibraryUpdated?: (callback: (games: Game[]) => void) => () => void;
   isElectron?: boolean;
 }
 

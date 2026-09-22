@@ -34,5 +34,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('game-session-ended', handler);
     return () => ipcRenderer.removeListener('game-session-ended', handler);
   },
+  onLibraryUpdated: (callback) => {
+    const handler = (_event, games) => callback(games);
+    ipcRenderer.on('library-updated', handler);
+    return () => ipcRenderer.removeListener('library-updated', handler);
+  },
   isElectron: true,
 });

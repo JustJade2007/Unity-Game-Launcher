@@ -137,6 +137,19 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, []);
 
+  // Listen for background multi-launcher library sync updates
+  useEffect(() => {
+    if (window.electronAPI?.onLibraryUpdated) {
+      const unsub = window.electronAPI.onLibraryUpdated((updatedGames) => {
+        if (Array.isArray(updatedGames) && updatedGames.length > 0) {
+          setGames(updatedGames);
+          refreshLauncherStatuses();
+        }
+      });
+      return unsub;
+    }
+  }, []);
+
   // Persist games changes to localStorage and external disk file
   useEffect(() => {
     try {

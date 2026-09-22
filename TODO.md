@@ -9,7 +9,7 @@
 | Ref | Milestone / Issue | Category | Status | Target |
 |:---|:---|:---|:---:|:---|
 | **Phase 1** | [Core Framework & Desktop Shell](#-phase-1-core-framework--desktop-shell-complete) | Core App | 🟢 Complete | v0.2.0 |
-| **#3** | [Launcher Integration & Library Syncing](#-issue-3-launcher-integration-and-library-syncing-core-foundation) | Data Ingestion | ⚪ Planned | Next Sprint |
+| **#3** | [Launcher Integration & Library Syncing](#-issue-3-launcher-integration-and-library-syncing-core-foundation) | Data Ingestion | 🟢 Complete | v0.2.0 |
 | **#4** | [Local Directory & Custom Game Management](#-issue-4-local-directory-and-custom-game-management) | Library Tools | ⚪ Planned | Next Sprint |
 | **#5** | [User Profiles & Federated Authentication](#-issue-5-user-profiles-and-federated-authentication) | Identity & Auth | ⚪ Planned | Sprint 3 |
 | **#7** | [Library Organization & Game Discovery](#-issue-7-library-organization-and-game-discovery) | Catalog & UX | ⚪ Planned | Sprint 3 |

@@ -9,10 +9,14 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [Unreleased]
 
 ### Added
-- **Multi-Platform Launcher Adapters (Core Foundation)**:
-  - Full modular adapter architecture supporting Steam, Epic Games, GOG Galaxy, EA App, Ubisoft Connect, Xbox / Microsoft Store, and Battle.net.
-  - Steam integration combining local multi-library VDF scanning (`libraryfolders.vdf`, `appmanifest_*.acf`) with Steam Web API key integration (`B9704EF5F81AE0BA3AC20F633883B503`) to discover both installed and uninstalled owned titles.
-  - Native launcher protocol execution (`steam://run/<id>`, `steam://install/<id>`, `com.epicgames.launcher://`, `goggalaxy://`, `origin2://`, `uplay://`, `battlenet://`, `xbox://`).
+- **Multi-Platform Launcher Detection & Scanning (Ubisoft, EA, GOG, Battle.net, Xbox)**:
+  - Built high-performance Windows Registry and system helper utility (`electron/adapters/registryHelper.cjs`) enabling safe, fast detection across 32-bit and 64-bit registry hives without native binary dependencies.
+  - Implemented comprehensive Ubisoft Connect adapter (`ubisoftAdapter.cjs`) detecting launcher installations across registry keys, Windows uninstall entries, and local directories; discovering active user accounts via local savegame stores and launcher logs; parsing installed game manifests (`Installs/*`, `configurations`, and uninstall entries); resolving executable paths (`UNO.exe`); computing disk sizes; and extracting game artwork.
+  - Implemented GOG Galaxy adapter (`gogAdapter.cjs`) resolving client installation paths, detecting active user profiles from `config.json`, and scanning installed GOG titles from Windows Registry hives and local library paths.
+  - Implemented EA App adapter (`eaAdapter.cjs`) detecting EA Desktop and legacy Origin client installations, identifying active player user IDs from `user_*.ini`, and scanning installed games via `Origin\LocalContent` manifests (`.dat`, `.mfst`).
+  - Implemented Battle.net adapter (`battlenetAdapter.cjs`) discovering Battle.net client paths from registry and uninstall databases, reading active account credentials from `Battle.net.config`, and scanning installed Blizzard games across known product directories.
+  - Implemented Xbox adapter (`xboxAdapter.cjs`) discovering games installed in `C:\XboxGames`, `D:\XboxGames`, and Microsoft Store gaming libraries, resolving launch helpers (`gamelaunchhelper.exe`) and direct executables.
+  - Added real-time multi-launcher background discovery and live update channel (`onLibraryUpdated`) ensuring existing libraries automatically discover and ingest non-Steam titles on startup.
 - **Cross-Launcher Duplicate Reconciliation Engine**: Ingests installed and owned titles into unified entries with multi-store attribution (`ownershipSources`), prioritizing installed copies for one-click launch while providing launcher switchers in the game detail modal.
 - **Gameplay Process Lifecycle & Session Tracking**: Electron process tracker capturing gameplay duration, incrementing playtime in real-time, and updating last played timestamps.
 - **Launchers & Sync Dashboard**: Top bar indicator and dedicated modal displaying explicit connection status, detected account names, game counts across all 7 platforms, and cloud upload status.

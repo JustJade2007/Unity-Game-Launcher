@@ -48,7 +48,17 @@ class LibraryEngine {
         const installed = await adapter.isInstalled();
         const account = await adapter.getActiveAccount();
         const clientPath = await adapter.getClientPath();
-        const count = currentLibrary.filter((g) => g.launcher === id || g.ownershipSources?.some((s) => s.launcher === id)).length;
+        let count = currentLibrary.filter((g) => g.launcher === id || g.ownershipSources?.some((s) => s.launcher === id)).length;
+
+        // If library store hasn't been synced for this installed launcher, get count from adapter
+        if (count === 0 && installed && typeof adapter.scanInstalledGames === 'function') {
+          try {
+            const detected = await adapter.scanInstalledGames();
+            if (Array.isArray(detected)) {
+              count = detected.length;
+            }
+          } catch {}
+        }
 
         statuses.push({
           id,
@@ -174,11 +184,15 @@ class LibraryEngine {
 
         // If this copy is installed, prioritize installed state and launch paths
         if (item.installed) {
+          const wasNotInstalled = !existing.installed;
           existing.installed = true;
           existing.installPath = item.installPath || existing.installPath;
           existing.sizeGb = item.sizeGb || existing.sizeGb;
-          if (item.launcher === 'Steam') {
-            existing.launcher = 'Steam'; // Prefer Steam if available
+          if (wasNotInstalled || item.launcher === 'Steam') {
+            existing.launcher = item.launcher;
+            if (item.launchUri) existing.launchUri = item.launchUri;
+            if (item.installUri) existing.installUri = item.installUri;
+            if (item.executable) existing.executable = item.executable;
           }
         }
 
@@ -197,11 +211,18 @@ class LibraryEngine {
         }
 
         // Enhance media if existing lacks it
+        if (!existing.media) existing.media = { coverUrl: '', heroUrl: '', screenshots: [] };
         if (!existing.media.coverUrl && item.media?.coverUrl) {
           existing.media.coverUrl = item.media.coverUrl;
         }
         if (!existing.media.heroUrl && item.media?.heroUrl) {
           existing.media.heroUrl = item.media.heroUrl;
+        }
+        if (!existing.media.iconUrl && item.media?.iconUrl) {
+          existing.media.iconUrl = item.media.iconUrl;
+        }
+        if (!existing.media.logoUrl && item.media?.logoUrl) {
+          existing.media.logoUrl = item.media.logoUrl;
         }
       }
     }

@@ -180,6 +180,23 @@ ipcMain.handle('library-load', async () => {
       const data = fs.readFileSync(gamesPath, 'utf-8');
       const games = JSON.parse(data);
       if (Array.isArray(games) && games.length > 0) {
+        // If the library was saved when only Steam was supported, trigger a background multi-launcher sync
+        const hasOtherLaunchers = games.some(
+          (g) => g.launcher !== 'Steam' || g.ownershipSources?.some((s) => s.launcher !== 'Steam')
+        );
+        if (!hasOtherLaunchers) {
+          console.log('[Main] Existing library contains only Steam titles; initiating background multi-launcher discovery...');
+          getLibraryEngine()
+            .syncAll()
+            .then((res) => {
+              if (mainWindow && res?.games) {
+                mainWindow.webContents.send('library-updated', res.games);
+              }
+            })
+            .catch((err) => {
+              console.error('[Main] Background multi-launcher discovery error:', err);
+            });
+        }
         return games;
       }
     }
@@ -326,8 +343,11 @@ app.whenReady().then(async () => {
     if (fs.existsSync(gamesPath)) {
       const data = fs.readFileSync(gamesPath, 'utf-8');
       const games = JSON.parse(data);
-      if (!Array.isArray(games) || games.length === 0) {
-        console.log('[Main] Running initial library discovery on app ready...');
+      const hasOtherLaunchers = Array.isArray(games) && games.some(
+        (g) => g.launcher !== 'Steam' || g.ownershipSources?.some((s) => s.launcher !== 'Steam')
+      );
+      if (!Array.isArray(games) || games.length === 0 || !hasOtherLaunchers) {
+        console.log('[Main] Running multi-launcher discovery on app ready...');
         await getLibraryEngine().syncAll();
       }
     }

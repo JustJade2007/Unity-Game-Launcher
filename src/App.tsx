@@ -49,9 +49,11 @@ const MainLayout: React.FC = () => {
               </span>
             </div>
 
-            <span className="text-xs text-gray-400">
-              Click any game for full details & achievements
-            </span>
+            {filteredGames.length > 0 && (
+              <span className="text-xs text-gray-400">
+                Click any game for full details & achievements
+              </span>
+            )}
           </div>
 
           {/* Game Library Collection */}

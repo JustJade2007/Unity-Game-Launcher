@@ -1,11 +1,10 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { Game, LauncherType, ViewMode, SortField, SortDirection, FilterState } from '../types/game';
-import { MOCK_GAMES } from '../data/mockGames';
 
 interface LibraryContextType {
   games: Game[];
-  selectedGame: Game;
-  setSelectedGame: (game: Game) => void;
+  selectedGame: Game | null;
+  setSelectedGame: (game: Game | null) => void;
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   filters: FilterState;
@@ -16,6 +15,8 @@ interface LibraryContextType {
   toggleInstalledOnly: () => void;
   setSorting: (field: SortField, direction: SortDirection) => void;
   toggleFavorite: (gameId: string) => void;
+  addGame: (game: Game) => void;
+  removeGame: (gameId: string) => void;
   filteredGames: Game[];
   allCategories: { name: string; count: number }[];
   allLaunchers: { name: LauncherType; count: number }[];
@@ -23,11 +24,24 @@ interface LibraryContextType {
   totalGamesCount: number;
 }
 
+const STORAGE_KEY = 'unity_launcher_games';
+
 const LibraryContext = createContext<LibraryContextType | undefined>(undefined);
 
 export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [games, setGames] = useState<Game[]>(MOCK_GAMES);
-  const [selectedGameId, setSelectedGameId] = useState<string>(MOCK_GAMES[0]?.id || '');
+  const [games, setGames] = useState<Game[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // Ignore parse errors and fallback to empty
+    }
+    return [];
+  });
+
+  const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
   const [filters, setFilters] = useState<FilterState>({
@@ -40,12 +54,24 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     sortDirection: 'desc',
   });
 
+  // Persist games changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+    } catch {
+      // LocalStorage error handling
+    }
+  }, [games]);
+
   const selectedGame = useMemo(() => {
-    return games.find((g) => g.id === selectedGameId) || games[0];
+    if (!selectedGameId) {
+      return games.length > 0 ? games[0] : null;
+    }
+    return games.find((g) => g.id === selectedGameId) || (games.length > 0 ? games[0] : null);
   }, [games, selectedGameId]);
 
-  const setSelectedGame = (game: Game) => {
-    setSelectedGameId(game.id);
+  const setSelectedGame = (game: Game | null) => {
+    setSelectedGameId(game ? game.id : null);
   };
 
   const setSearchQuery = (query: string) => {
@@ -76,6 +102,14 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setGames((prev) =>
       prev.map((g) => (g.id === gameId ? { ...g, favorite: !g.favorite } : g))
     );
+  };
+
+  const addGame = (game: Game) => {
+    setGames((prev) => [...prev.filter((g) => g.id !== game.id), game]);
+  };
+
+  const removeGame = (gameId: string) => {
+    setGames((prev) => prev.filter((g) => g.id !== gameId));
   };
 
   // Filter and sort games
@@ -173,6 +207,8 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         toggleInstalledOnly,
         setSorting,
         toggleFavorite,
+        addGame,
+        removeGame,
         filteredGames,
         allCategories,
         allLaunchers,

@@ -22,7 +22,7 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
   - Achievements tab with progress bar (unlocked vs. locked counts), rarity percentages, points, unlock dates, and status filters.
   - Friends tab with live "Currently Playing" rich presence indicators and list of friends who own the title.
 - **Multi-Launcher & Category Filtering**: Support for Steam, Epic Games, GOG, Xbox, and Local games with live tag filtering and multi-criteria sorting.
-- **Mock Library Dataset**: High-fidelity sample games with cover arts, transparent logos, badges, and active friends.
+- **Clean State Architecture**: Library framework operates cleanly without any template or mock placeholder data, with persistent storage and dynamic empty-state support.
 
 ## [0.1.0] - 2026-09-21
 

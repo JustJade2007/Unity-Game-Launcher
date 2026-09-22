@@ -42,6 +42,15 @@ export interface ElectronAPI {
   }>;
   launchGame: (game: Game, launcher?: string) => Promise<{ success: boolean; uri?: string; error?: string }>;
   installGame: (game: Game, launcher?: string) => Promise<{ success: boolean; uri?: string; error?: string }>;
+  getAchievements: (
+    gameId?: string,
+    launcher?: string,
+    appId?: string
+  ) => Promise<{
+    success: boolean;
+    achievements: import('./game').Achievement[];
+    error?: string;
+  }>;
   stopGameSession: (gameId: string) => Promise<{ success: boolean; session?: { gameId: string; durationMinutes: number; endedAt: string } }>;
   getActiveSessions: () => Promise<Array<{ gameId: string; gameTitle: string; durationMinutes: number; startTime: number }>>;
   onSessionStarted: (callback: (session: { gameId: string; gameTitle: string }) => void) => () => void;

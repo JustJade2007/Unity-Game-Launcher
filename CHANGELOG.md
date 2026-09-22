@@ -21,6 +21,8 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - **Standalone Portable Executable**: Zero-install portable executable (`Unity Game Launcher-Portable-<version>.exe`) designed to run anywhere (including removable USB media).
 - **External Configuration & Data System**: Isolated runtime configuration (`config.json`) and external game library database (`games.json`) stored in `%APPDATA%\Unity Game Launcher` (in installed mode) or within a local `data\` directory adjacent to the executable (in portable mode).
 - **Explorer Quick-Access & Mode Badge**: TitleBar indicator showing active portable state and one-click "Config" button to open the active configuration directory in Windows File Explorer.
+- **Live Achievement Synchronization**: Integrated Steam Web API endpoints (`GetSchemaForGame`, `GetPlayerAchievements`, `GetGlobalAchievementPercentagesForApp`) in `SteamAdapter` and `LibraryEngine` to fetch real game achievements, player unlock timestamps, secret status, and global rarity percentages on demand, caching results directly into the external `games.json` store.
+- **Enhanced Achievement Showcase UI**: Real-time progress bar, dynamic category chips (All, Unlocked, Locked), animated refresh button, and responsive loading skeleton in `GameDetailView`.
 - **One-Click Build Automation**: Added `build-executables.bat` script and npm commands (`dist`, `dist:installer`, `dist:portable`, `dist:all`) to compile installer and portable executables.
 - Environment configuration templates (`.env.example` and `keys.env.example`) documenting Steam Web API key, Supabase URL, and anon API key parameters.
 
@@ -68,6 +70,3 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Security
 - Security vulnerability fixes
 -->
-
-[Unreleased]: https://github.com/JustJade2007/Unity-Game-Launcher/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/JustJade2007/Unity-Game-Launcher/releases/tag/v0.1.0

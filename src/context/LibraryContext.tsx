@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
-import { Game, LauncherType, ViewMode, SortField, SortDirection, FilterState, LauncherStatus } from '../types/game';
+import { Game, LauncherType, ViewMode, SortField, SortDirection, FilterState, LauncherStatus, Achievement } from '../types/game';
 
 interface LibraryContextType {
   games: Game[];
@@ -30,6 +30,7 @@ interface LibraryContextType {
   syncLaunchers: (options?: { apiKey?: string; steamId?: string }) => Promise<{ success: boolean; totalGames?: number; error?: string }>;
   launchGame: (game: Game, launcher?: LauncherType) => Promise<boolean>;
   installGame: (game: Game, launcher?: LauncherType) => Promise<boolean>;
+  fetchAchievements: (gameId: string) => Promise<Achievement[]>;
   hasPendingCloudUploads: boolean;
   markCloudUploaded: () => void;
 }
@@ -191,6 +192,30 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return Boolean(res?.success);
     }
     return false;
+  };
+
+  const fetchAchievements = async (gameId: string): Promise<Achievement[]> => {
+    const target = games.find((g) => g.id === gameId);
+    if (!target) return [];
+
+    if (window.electronAPI?.getAchievements) {
+      try {
+        const res = await window.electronAPI.getAchievements(target.id, target.launcher, target.appId);
+        if (res.success && Array.isArray(res.achievements)) {
+          setGames((prev) => {
+            const next = prev.map((g) => (g.id === gameId ? { ...g, achievements: res.achievements } : g));
+            if (window.electronAPI?.saveLibrary) {
+              window.electronAPI.saveLibrary(next);
+            }
+            return next;
+          });
+          return res.achievements;
+        }
+      } catch (err) {
+        console.error('Failed to fetch achievements for game:', err);
+      }
+    }
+    return target.achievements || [];
   };
 
   const markCloudUploaded = () => {
@@ -360,6 +385,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         syncLaunchers,
         launchGame,
         installGame,
+        fetchAchievements,
         hasPendingCloudUploads,
         markCloudUploaded,
       }}

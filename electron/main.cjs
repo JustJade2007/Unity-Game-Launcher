@@ -261,6 +261,15 @@ ipcMain.handle('launcher-install-game', async (_event, { game, launcher }) => {
   }
 });
 
+ipcMain.handle('launcher-get-achievements', async (_event, { gameId, launcher, appId }) => {
+  try {
+    return await getLibraryEngine().getAchievements(gameId, launcher, appId);
+  } catch (err) {
+    console.error(`Failed to get achievements for ${gameId || appId}:`, err);
+    return { success: false, achievements: [], error: err.message };
+  }
+});
+
 ipcMain.handle('session-stop', async (_event, { gameId }) => {
   try {
     const session = processTracker.endSession(gameId);

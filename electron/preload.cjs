@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   syncLaunchers: (options) => ipcRenderer.invoke('launcher-sync-all', options),
   launchGame: (game, launcher) => ipcRenderer.invoke('launcher-launch-game', { game, launcher }),
   installGame: (game, launcher) => ipcRenderer.invoke('launcher-install-game', { game, launcher }),
+  getAchievements: (gameId, launcher, appId) => ipcRenderer.invoke('launcher-get-achievements', { gameId, launcher, appId }),
   stopGameSession: (gameId) => ipcRenderer.invoke('session-stop', { gameId }),
   getActiveSessions: () => ipcRenderer.invoke('session-get-active'),
   onSessionStarted: (callback) => {

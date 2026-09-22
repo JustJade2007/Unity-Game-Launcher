@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Game } from '../../types/game';
 import { useLibrary } from '../../context/LibraryContext';
 import { AchievementCard } from './AchievementCard';
@@ -15,6 +15,7 @@ import {
   Calendar,
   Layers,
   Image as ImageIcon,
+  RefreshCw,
 } from 'lucide-react';
 import { LauncherType } from '../../types/game';
 
@@ -25,17 +26,39 @@ interface GameDetailViewProps {
 
 type TabType = 'overview' | 'achievements' | 'friends';
 
-export const GameDetailView: React.FC<GameDetailViewProps> = ({ game, onClose }) => {
-  const { toggleFavorite, launchGame, installGame } = useLibrary();
+export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGame, onClose }) => {
+  const { games, toggleFavorite, launchGame, installGame, fetchAchievements } = useLibrary();
+  const game = games.find((g) => g.id === initialGame.id) || initialGame;
+
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [achievementFilter, setAchievementFilter] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
   const [selectedLauncher, setSelectedLauncher] = useState<LauncherType>(game.launcher);
   const [isLaunching, setIsLaunching] = useState(false);
+  const [isFetchingAchievements, setIsFetchingAchievements] = useState(false);
+
+  useEffect(() => {
+    // Automatically fetch real achievements if empty or on initial open
+    if (!game.achievements || game.achievements.length === 0) {
+      setIsFetchingAchievements(true);
+      fetchAchievements(game.id).finally(() => {
+        setIsFetchingAchievements(false);
+      });
+    }
+  }, [game.id]);
+
+  const handleRefreshAchievements = async () => {
+    setIsFetchingAchievements(true);
+    try {
+      await fetchAchievements(game.id);
+    } finally {
+      setIsFetchingAchievements(false);
+    }
+  };
 
   const hoursPlayed = Math.round((game.playtime.totalMinutes / 60) * 10) / 10;
-  const unlockedCount = game.achievements.filter((a) => a.unlocked).length;
-  const totalAchievements = game.achievements.length;
+  const unlockedCount = (game.achievements || []).filter((a) => a.unlocked).length;
+  const totalAchievements = (game.achievements || []).length;
   const achievementPercent =
     totalAchievements > 0 ? Math.round((unlockedCount / totalAchievements) * 100) : 0;
 
@@ -364,7 +387,17 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game, onClose })
                 <div className="p-4 rounded-xl bg-[#141622] border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex-1 w-full">
                     <div className="flex justify-between items-center text-xs font-medium mb-2">
-                      <span className="text-white font-bold">Achievement Progress</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-bold">Achievement Progress</span>
+                        <button
+                          onClick={handleRefreshAchievements}
+                          disabled={isFetchingAchievements}
+                          title="Refresh achievements from platform"
+                          className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isFetchingAchievements ? 'animate-spin text-indigo-400' : ''}`} />
+                        </button>
+                      </div>
                       <span className="text-indigo-400 font-semibold">
                         {unlockedCount} of {totalAchievements} Unlocked ({achievementPercent}%)
                       </span>
@@ -412,12 +445,53 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game, onClose })
                   </div>
                 </div>
 
+                {/* Loading Skeleton */}
+                {isFetchingAchievements && totalAchievements === 0 && (
+                  <div className="space-y-3">
+                    <div className="text-xs text-indigo-400 flex items-center gap-2">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Fetching real-time achievements from Steam...</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-pulse">
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="p-3 rounded-xl bg-[#141622] border border-white/5 flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-lg bg-white/5" />
+                          <div className="flex-1 space-y-2">
+                            <div className="h-3 w-1/3 bg-white/10 rounded" />
+                            <div className="h-2.5 w-2/3 bg-white/5 rounded" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty State */}
+                {!isFetchingAchievements && totalAchievements === 0 && (
+                  <div className="p-8 text-center rounded-xl bg-[#141622] border border-white/5 space-y-3">
+                    <Trophy className="w-8 h-8 text-gray-500 mx-auto" />
+                    <p className="text-sm font-semibold text-gray-300">No achievements recorded for this title</p>
+                    <p className="text-xs text-gray-500 max-w-sm mx-auto">
+                      This game may not support platform achievements, or Steam profile statistics could be private.
+                    </p>
+                    <button
+                      onClick={handleRefreshAchievements}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 text-xs font-medium hover:bg-indigo-600/30 transition-all"
+                    >
+                      <RefreshCw className="w-3 h-3" />
+                      Fetch Achievements
+                    </button>
+                  </div>
+                )}
+
                 {/* Achievements List Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {filteredAchievements.map((ach) => (
-                    <AchievementCard key={ach.id} achievement={ach} />
-                  ))}
-                </div>
+                {totalAchievements > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {filteredAchievements.map((ach) => (
+                      <AchievementCard key={ach.id} achievement={ach} />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

@@ -15,11 +15,13 @@ secrets.*
 !.env.example
 
 # ------------------------------------
-#  AI / Antigravity (client-side)
+#  Tooling & Configs
 # ------------------------------------
 .gemini/
 .agents/
 antigravity/
+.vibecoding/
+vibecoding/
 
 
 # ------------------------------------

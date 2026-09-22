@@ -19,7 +19,7 @@ function normalizeTitle(title) {
 
 class LibraryEngine {
   constructor(gamesPath) {
-    this.gamesPath = gamesPath;
+    this.gamesPath = typeof gamesPath === 'string' ? gamesPath : (gamesPath?.gamesPath || null);
     this.adapters = {
       Steam: new SteamAdapter(),
       'Epic Games': new EpicAdapter(),
@@ -258,6 +258,74 @@ class LibraryEngine {
     };
 
     return adapter.installGame(gameToInstall);
+  }
+
+  /**
+   * Fetch achievements for a specific game title and cache them in games.json
+   * @param {string} [gameId]
+   * @param {string} [launcher]
+   * @param {string} [appId]
+   * @returns {Promise<{ success: boolean, achievements: Array<any>, error?: string }>}
+   */
+  async getAchievements(gameId, launcher, appId) {
+    let resolvedLauncher = launcher;
+    let resolvedAppId = appId;
+
+    if (this.gamesPath && (!resolvedLauncher || !resolvedAppId)) {
+      try {
+        if (fs.existsSync(this.gamesPath)) {
+          const content = fs.readFileSync(this.gamesPath, 'utf8');
+          const games = JSON.parse(content);
+          const found = games.find(
+            (g) => g.id === gameId || g.appId === gameId || (appId && g.appId === appId)
+          );
+          if (found) {
+            if (!resolvedLauncher) resolvedLauncher = found.launcher;
+            if (!resolvedAppId) {
+              resolvedAppId = found.appId || (found.id?.startsWith('steam_') ? found.id.replace('steam_', '') : null);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[LibraryEngine] Error reading games.json for achievement lookup:', err);
+      }
+    }
+
+    if (!resolvedLauncher) resolvedLauncher = 'Steam';
+    const adapter = this.adapters[resolvedLauncher];
+    if (!adapter || typeof adapter.fetchAchievements !== 'function') {
+      return {
+        success: false,
+        achievements: [],
+        error: `Platform "${resolvedLauncher}" does not support achievement fetching.`,
+      };
+    }
+
+    try {
+      const achievements = await adapter.fetchAchievements(resolvedAppId || gameId);
+
+      // Persist achievements to games.json
+      if (this.gamesPath && fs.existsSync(this.gamesPath) && Array.isArray(achievements) && achievements.length > 0) {
+        try {
+          const content = fs.readFileSync(this.gamesPath, 'utf8');
+          const games = JSON.parse(content);
+          const idx = games.findIndex(
+            (g) => g.id === gameId || (resolvedAppId && (g.appId === resolvedAppId || g.id === `steam_${resolvedAppId}`))
+          );
+          if (idx !== -1) {
+            games[idx].achievements = achievements;
+            fs.writeFileSync(this.gamesPath, JSON.stringify(games, null, 2), 'utf8');
+          }
+        } catch (err) {
+          console.error('[LibraryEngine] Error updating games.json with fetched achievements:', err);
+        }
+      }
+
+      return { success: true, achievements: achievements || [] };
+    } catch (err) {
+      console.error(`[LibraryEngine] Error fetching achievements for ${resolvedAppId || gameId}:`, err);
+      return { success: false, achievements: [], error: err.message };
+    }
   }
 }
 

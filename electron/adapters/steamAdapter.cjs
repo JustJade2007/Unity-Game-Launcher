@@ -329,6 +329,122 @@ class SteamAdapter extends BaseAdapter {
     }
     throw new Error('No valid Steam install URI or AppID found');
   }
+
+  /**
+   * Fetch achievements for a Steam game by AppID.
+   * Merges game schema, player achievement statuses, and global unlock percentages.
+   * @param {string} appId
+   * @param {object} [options]
+   * @returns {Promise<Array<any>>}
+   */
+  async fetchAchievements(appId, options = {}) {
+    if (!appId) return [];
+    const cleanAppId = String(appId).replace(/^steam_/, '').trim();
+    if (!cleanAppId || !/^\d+$/.test(cleanAppId)) return [];
+
+    const apiKey = options.apiKey || process.env.STEAM_API_KEY || 'B9704EF5F81AE0BA3AC20F633883B503';
+    let steamId = options.steamId;
+
+    if (!steamId) {
+      const activeAccount = await this.getActiveAccount();
+      steamId = activeAccount ? activeAccount.id : null;
+    }
+
+    const httpsGetJson = (url) => {
+      return new Promise((resolve) => {
+        https.get(url, (res) => {
+          let raw = '';
+          res.on('data', (chunk) => {
+            raw += chunk;
+          });
+          res.on('end', () => {
+            try {
+              if (res.statusCode >= 200 && res.statusCode < 300) {
+                resolve(JSON.parse(raw));
+              } else {
+                resolve(null);
+              }
+            } catch {
+              resolve(null);
+            }
+          });
+        }).on('error', (err) => {
+          console.error(`[SteamAdapter] Network error fetching ${url}:`, err);
+          resolve(null);
+        });
+      });
+    };
+
+    try {
+      const schemaUrl = `https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=${apiKey}&appid=${cleanAppId}`;
+      const playerUrl = steamId
+        ? `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=${cleanAppId}&key=${apiKey}&steamid=${steamId}`
+        : null;
+      const globalUrl = `https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=${cleanAppId}`;
+
+      const [schemaData, playerData, globalData] = await Promise.all([
+        httpsGetJson(schemaUrl),
+        playerUrl ? httpsGetJson(playerUrl) : Promise.resolve(null),
+        httpsGetJson(globalUrl),
+      ]);
+
+      const rawSchemaAchievements = schemaData?.game?.availableGameStats?.achievements || [];
+      if (!Array.isArray(rawSchemaAchievements) || rawSchemaAchievements.length === 0) {
+        return [];
+      }
+
+      const playerMap = new Map();
+      if (playerData?.playerstats?.achievements && Array.isArray(playerData.playerstats.achievements)) {
+        for (const p of playerData.playerstats.achievements) {
+          playerMap.set(p.apiname, p);
+        }
+      }
+
+      const globalMap = new Map();
+      if (globalData?.achievementpercentages?.achievements && Array.isArray(globalData.achievementpercentages.achievements)) {
+        for (const g of globalData.achievementpercentages.achievements) {
+          globalMap.set(g.name, parseFloat(g.percent));
+        }
+      }
+
+      const results = [];
+      for (const item of rawSchemaAchievements) {
+        const apiname = item.name;
+        const playerStat = playerMap.get(apiname);
+        const unlocked = playerStat ? playerStat.achieved === 1 : false;
+        const unlockTime = playerStat?.unlocktime;
+        const unlockedAt = unlocked && unlockTime && unlockTime > 0
+          ? new Date(unlockTime * 1000).toISOString()
+          : undefined;
+
+        const rawPct = globalMap.get(apiname);
+        const rarityPercentage = typeof rawPct === 'number' && !isNaN(rawPct)
+          ? Math.round(rawPct * 10) / 10
+          : 0;
+
+        const isSecret = Boolean(item.hidden);
+        const iconUrl = unlocked
+          ? (item.icon || item.icongray)
+          : (item.icongray || item.icon);
+
+        results.push({
+          id: apiname,
+          title: item.displayName || apiname,
+          description: item.description || (isSecret ? 'Hidden achievement' : ''),
+          iconUrl: iconUrl || '',
+          unlocked,
+          unlockedAt,
+          rarityPercentage,
+          isSecret,
+        });
+      }
+
+      return results;
+    } catch (err) {
+      console.error(`[SteamAdapter] Error fetching achievements for ${cleanAppId}:`, err);
+      return [];
+    }
+  }
 }
 
 module.exports = SteamAdapter;

@@ -74,6 +74,16 @@ class BaseAdapter {
   async installGame(game) {
     throw new Error(`installGame not implemented for ${this.name}`);
   }
+
+  /**
+   * Fetch achievements for a specific game title.
+   * @param {string} _appId
+   * @param {object} _options
+   * @returns {Promise<Array<any>>}
+   */
+  async fetchAchievements(_appId, _options = {}) {
+    return [];
+  }
 }
 
 module.exports = BaseAdapter;

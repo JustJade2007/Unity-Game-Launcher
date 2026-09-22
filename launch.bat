@@ -28,6 +28,15 @@ if not exist "dist\" (
 )
 
 echo [Launch] Opening Unity Game Launcher...
+REM Prefer launching compiled portable binary if available in release folder
+for %%F in ("release\Unity-Game-Launcher-Portable-*.exe") do (
+    if exist "%%F" (
+        echo [Launch] Found compiled binary: %%F
+        start "" "%%F"
+        exit /b 0
+    )
+)
+
 if exist "node_modules\.bin\electron.cmd" (
     start "" "node_modules\.bin\electron.cmd" .
 ) else (

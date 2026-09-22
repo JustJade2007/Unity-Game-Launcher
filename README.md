@@ -43,7 +43,8 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 
 ### Quick Start (Windows)
 
-Simply double-click the **`launch.bat`** file in the root directory. It will automatically verify dependencies, build the latest assets, and launch the native desktop application window.
+- **Launch Development / Desktop App**: Double-click **`launch.bat`** in the root directory. It verifies dependencies, compiles assets, and launches the app directly.
+- **Build Executables**: Double-click **`build-executables.bat`** to package either or both the **NSIS Setup Installer** and **Standalone Portable Executable**.
 
 ### Manual Setup & Commands
 
@@ -55,9 +56,40 @@ cd Unity-Game-Launcher
 # Install dependencies
 npm install
 
-# Launch desktop application
+# Launch desktop application in development mode
+npm run dev
+
+# Run compiled desktop app
 npm start
 ```
+
+---
+
+## 📦 Packaging & Executables
+
+Build native Windows binaries targeting either a standard system installer or a zero-install portable executable:
+
+```bash
+# Build BOTH the NSIS Installer and Standalone Portable EXE
+npm run dist:all
+
+# Build ONLY the NSIS Setup Installer (.exe)
+npm run dist:installer
+
+# Build ONLY the Standalone Portable (.exe)
+npm run dist:portable
+```
+
+All compiled binaries are placed inside the **`release/`** directory:
+- **`Unity Game Launcher Setup <version>.exe`**: Standard Windows installer with custom directory picker, desktop/start-menu shortcuts, and uninstaller.
+- **`Unity-Game-Launcher-Portable-<version>.exe`**: Standalone executable that runs without installation.
+
+### ⚙️ External Configuration & Data Storage
+
+Unity Game Launcher keeps runtime configurations separate from application binaries:
+- **Installed Mode**: Config and library files are stored in `%APPDATA%\Unity Game Launcher\` (`config.json` and `games.json`).
+- **Portable Mode**: Config and library files are kept inside a local `data\` folder adjacent to the portable `.exe`, making it 100% self-contained for USB drives.
+- **Quick Access**: Click the **Config** button in the top TitleBar at any time to open the active configuration directory in Windows File Explorer.
 
 ---
 
@@ -74,14 +106,6 @@ Build application assets:
 ```bash
 npm run build
 ```
-
-Run compiled desktop app:
-
-```bash
-npm start
-```
-
----
 
 ## 🤝 Contributing
 

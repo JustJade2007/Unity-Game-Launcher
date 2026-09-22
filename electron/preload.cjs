@@ -10,5 +10,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('window-maximized-state', handler);
     return () => ipcRenderer.removeListener('window-maximized-state', handler);
   },
+  getAppPaths: () => ipcRenderer.invoke('app-get-paths'),
+  openConfigFolder: () => ipcRenderer.invoke('app-open-config-folder'),
+  loadConfig: () => ipcRenderer.invoke('config-load'),
+  saveConfig: (config) => ipcRenderer.invoke('config-save', config),
+  loadLibrary: () => ipcRenderer.invoke('library-load'),
+  saveLibrary: (games) => ipcRenderer.invoke('library-save', games),
   isElectron: true,
 });

@@ -74,7 +74,10 @@ bin/
 obj/
 out/
 dist/
+dist-electron/
+release/
 build/
+data/
 *.exe
 *.dll
 *.pdb
@@ -87,6 +90,7 @@ build/
 node_modules/
 .nuget/
 packages/
+
 
 # ------------------------------------
 #  Logs & Temp Files

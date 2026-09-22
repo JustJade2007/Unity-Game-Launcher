@@ -1,5 +1,60 @@
-const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
 const path = require('path');
+const fs = require('fs');
+
+// Check for electron-builder portable environment
+const isPortable = Boolean(process.env.PORTABLE_EXECUTABLE_DIR);
+if (isPortable) {
+  const portableDataDir = path.join(process.env.PORTABLE_EXECUTABLE_DIR, 'data');
+  try {
+    if (!fs.existsSync(portableDataDir)) {
+      fs.mkdirSync(portableDataDir, { recursive: true });
+    }
+    app.setPath('userData', portableDataDir);
+  } catch (err) {
+    console.error('Failed to initialize portable data directory:', err);
+  }
+}
+
+// Config file management
+function getConfigFilePaths() {
+  const userDataDir = app.getPath('userData');
+  return {
+    userDataDir,
+    configPath: path.join(userDataDir, 'config.json'),
+    gamesPath: path.join(userDataDir, 'games.json'),
+  };
+}
+
+function ensureConfigFiles() {
+  const { userDataDir, configPath, gamesPath } = getConfigFilePaths();
+  try {
+    if (!fs.existsSync(userDataDir)) {
+      fs.mkdirSync(userDataDir, { recursive: true });
+    }
+
+    // Default configuration file
+    if (!fs.existsSync(configPath)) {
+      const defaultConfig = {
+        version: '0.2.0',
+        theme: 'dark',
+        autoLaunchOnStartup: false,
+        minimizeToTray: false,
+        defaultViewMode: 'grid',
+        defaultSortField: 'lastPlayed',
+        defaultSortDirection: 'desc'
+      };
+      fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), 'utf-8');
+    }
+
+    // External game library store (clean, no mock/template data)
+    if (!fs.existsSync(gamesPath)) {
+      fs.writeFileSync(gamesPath, JSON.stringify([], null, 2), 'utf-8');
+    }
+  } catch (err) {
+    console.error('Error ensuring config files:', err);
+  }
+}
 
 // Disable default menu
 Menu.setApplicationMenu(null);
@@ -71,7 +126,78 @@ ipcMain.handle('window-is-maximized', () => {
   return mainWindow ? mainWindow.isMaximized() : false;
 });
 
+// App & Configuration IPC Handlers
+ipcMain.handle('app-get-paths', () => {
+  const paths = getConfigFilePaths();
+  return {
+    ...paths,
+    isPortable,
+    appPath: app.getAppPath(),
+  };
+});
+
+ipcMain.handle('app-open-config-folder', async () => {
+  const { userDataDir } = getConfigFilePaths();
+  try {
+    ensureConfigFiles();
+    await shell.openPath(userDataDir);
+    return { success: true, path: userDataDir };
+  } catch (err) {
+    console.error('Failed to open config folder:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('config-load', async () => {
+  const { configPath } = getConfigFilePaths();
+  try {
+    ensureConfigFiles();
+    const data = fs.readFileSync(configPath, 'utf-8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Failed to load config.json:', err);
+    return null;
+  }
+});
+
+ipcMain.handle('config-save', async (_event, config) => {
+  const { configPath } = getConfigFilePaths();
+  try {
+    ensureConfigFiles();
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to save config.json:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('library-load', async () => {
+  const { gamesPath } = getConfigFilePaths();
+  try {
+    ensureConfigFiles();
+    const data = fs.readFileSync(gamesPath, 'utf-8');
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Failed to load games.json:', err);
+    return [];
+  }
+});
+
+ipcMain.handle('library-save', async (_event, games) => {
+  const { gamesPath } = getConfigFilePaths();
+  try {
+    ensureConfigFiles();
+    fs.writeFileSync(gamesPath, JSON.stringify(games, null, 2), 'utf-8');
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to save games.json:', err);
+    return { success: false, error: err.message };
+  }
+});
+
 app.whenReady().then(() => {
+  ensureConfigFiles();
   createWindow();
 
   app.on('activate', () => {

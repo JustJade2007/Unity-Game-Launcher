@@ -54,12 +54,40 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     sortDirection: 'desc',
   });
 
-  // Persist games changes
+  // Load games from external file system if running in Electron
+  useEffect(() => {
+    if (window.electronAPI?.loadLibrary) {
+      window.electronAPI.loadLibrary().then((diskGames) => {
+        if (Array.isArray(diskGames) && diskGames.length > 0) {
+          setGames(diskGames);
+        } else {
+          // If disk file is empty but localStorage has items, sync to disk
+          try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+              const localGames = JSON.parse(saved);
+              if (Array.isArray(localGames) && localGames.length > 0) {
+                window.electronAPI?.saveLibrary?.(localGames);
+              }
+            }
+          } catch {
+            // Ignore parse errors
+          }
+        }
+      }).catch(console.error);
+    }
+  }, []);
+
+  // Persist games changes to localStorage and external disk file
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
     } catch {
       // LocalStorage error handling
+    }
+
+    if (window.electronAPI?.saveLibrary) {
+      window.electronAPI.saveLibrary(games).catch(console.error);
     }
   }, [games]);
 

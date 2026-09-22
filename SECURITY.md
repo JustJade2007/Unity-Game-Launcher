@@ -22,3 +22,5 @@ Please include:
 ## Environment & Secrets Policy
 - **Never commit `.env` or sensitive secret files.** All local API keys and user credentials must reside in ignored environment files.
 - Only safe, public tokens (such as Supabase `anon` / public keys guarded by Row Level Security) should be referenced client-side.
+- **External Configuration & Data**: The user's external runtime `config.json` and `games.json` files reside in `%APPDATA%\Unity Game Launcher` (in installed mode) or within the `data\` directory alongside the portable executable. Users running the portable binary on shared or removable media should protect their USB drives with BitLocker or drive-level encryption if sensitive session or account tokens are stored.
+

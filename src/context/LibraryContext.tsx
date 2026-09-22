@@ -85,21 +85,20 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Load games from external file system if running in Electron
   useEffect(() => {
     if (window.electronAPI?.loadLibrary) {
-      window.electronAPI.loadLibrary().then((diskGames) => {
+      window.electronAPI.loadLibrary().then(async (diskGames) => {
         if (Array.isArray(diskGames) && diskGames.length > 0) {
           setGames(diskGames);
         } else {
-          // If disk file is empty but localStorage has items, sync to disk
-          try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-              const localGames = JSON.parse(saved);
-              if (Array.isArray(localGames) && localGames.length > 0) {
-                window.electronAPI?.saveLibrary?.(localGames);
+          // If library is empty, automatically discover installed and owned titles
+          if (window.electronAPI?.syncLaunchers) {
+            try {
+              const res = await window.electronAPI.syncLaunchers();
+              if (res.success && Array.isArray(res.games) && res.games.length > 0) {
+                setGames(res.games);
               }
+            } catch (err) {
+              console.error('Initial auto-sync error:', err);
             }
-          } catch {
-            // Ignore parse errors
           }
         }
       }).catch(console.error);

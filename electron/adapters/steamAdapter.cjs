@@ -23,6 +23,33 @@ class SteamAdapter extends BaseAdapter {
   }
 
   detectSteamRoot() {
+    if (process.platform === 'win32') {
+      try {
+        const { execSync } = require('child_process');
+        const regCommands = [
+          'reg query "HKCU\\Software\\Valve\\Steam" /v SteamPath',
+          'reg query "HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam" /v InstallPath',
+          'reg query "HKLM\\SOFTWARE\\Valve\\Steam" /v InstallPath',
+        ];
+        for (const cmd of regCommands) {
+          try {
+            const out = execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+            const match = out.match(/(?:SteamPath|InstallPath)\s+REG_SZ\s+(.*)/i);
+            if (match && match[1]) {
+              const regPath = path.normalize(match[1].trim());
+              if (fs.existsSync(regPath) && fs.existsSync(path.join(regPath, 'steam.exe'))) {
+                return regPath;
+              }
+            }
+          } catch {
+            // continue
+          }
+        }
+      } catch {
+        // continue
+      }
+    }
+
     const candidates = [
       'C:\\Program Files (x86)\\Steam',
       'C:\\Program Files\\Steam',
@@ -84,7 +111,7 @@ class SteamAdapter extends BaseAdapter {
   getLibraryFolders() {
     if (!this.steamRoot) return [];
     const libraryVdfPath = path.join(this.steamRoot, 'steamapps', 'libraryfolders.vdf');
-    const folders = [this.steamRoot];
+    const folders = [path.normalize(this.steamRoot)];
 
     if (!fs.existsSync(libraryVdfPath)) return folders;
 
@@ -95,8 +122,9 @@ class SteamAdapter extends BaseAdapter {
 
       for (const [key, folderInfo] of Object.entries(libraryfolders)) {
         if (folderInfo && typeof folderInfo === 'object' && folderInfo.path) {
-          const folderPath = folderInfo.path.replace(/\\\\/g, '\\');
-          if (!folders.includes(folderPath) && fs.existsSync(folderPath)) {
+          const folderPath = path.normalize(folderInfo.path.replace(/\\\\/g, '\\'));
+          const exists = folders.some((f) => f.toLowerCase() === folderPath.toLowerCase());
+          if (!exists && fs.existsSync(folderPath)) {
             folders.push(folderPath);
           }
         }

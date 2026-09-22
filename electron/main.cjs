@@ -176,8 +176,18 @@ ipcMain.handle('library-load', async () => {
   const { gamesPath } = getConfigFilePaths();
   try {
     ensureConfigFiles();
-    const data = fs.readFileSync(gamesPath, 'utf-8');
-    return JSON.parse(data);
+    if (fs.existsSync(gamesPath)) {
+      const data = fs.readFileSync(gamesPath, 'utf-8');
+      const games = JSON.parse(data);
+      if (Array.isArray(games) && games.length > 0) {
+        return games;
+      }
+    }
+
+    // Automatically detect and ingest installed/owned games if empty
+    console.log('[Main] Library is empty, executing automatic launcher discovery & ingestion...');
+    const result = await getLibraryEngine().syncAll();
+    return result.games || [];
   } catch (err) {
     console.error('Failed to load games.json:', err);
     return [];
@@ -282,8 +292,22 @@ ipcMain.handle('session-get-active', () => {
   return processTracker.getActiveSessions();
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   ensureConfigFiles();
+  const { gamesPath } = getConfigFilePaths();
+  try {
+    if (fs.existsSync(gamesPath)) {
+      const data = fs.readFileSync(gamesPath, 'utf-8');
+      const games = JSON.parse(data);
+      if (!Array.isArray(games) || games.length === 0) {
+        console.log('[Main] Running initial library discovery on app ready...');
+        await getLibraryEngine().syncAll();
+      }
+    }
+  } catch (err) {
+    console.error('[Main] Initial sync on app ready error:', err);
+  }
+
   createWindow();
 
   app.on('activate', () => {

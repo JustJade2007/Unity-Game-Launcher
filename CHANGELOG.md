@@ -8,6 +8,9 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Added
+- Environment configuration templates (`.env.example` and `keys.env.example`) documenting Supabase URL and anon API key parameters for cloud authentication and storage.
+
 ---
 
 ## [0.2.0] - 2026-09-22

@@ -16,6 +16,8 @@ import {
   Ghost,
   Users,
   Search,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 
 interface RandomGameModalProps {
@@ -61,8 +63,65 @@ const MOOD_PRESETS: MoodPreset[] = [
     id: 'coop',
     name: 'Play with Friends',
     icon: <Users className="w-3.5 h-3.5 text-emerald-400" />,
-    description: 'Multiplayer, co-op, party, and team-based games',
-    keywords: ['co-op', 'multiplayer', 'pvp', 'online', 'party'],
+    description: 'Party games, friend slop, PvP, and co-op multiplayer',
+    keywords: [
+      'co-op',
+      'coop',
+      'multiplayer',
+      'multi-player',
+      'party',
+      'pvp',
+      'online',
+      'jackbox',
+      'jack in the box',
+      'party game',
+      'friend slop',
+      'friendslop',
+      'peak',
+      'repo',
+      'lethal company',
+      'content warning',
+      'among us',
+      'fall guys',
+      'gang beasts',
+      'human fall flat',
+      'duck game',
+      'stick fight',
+      'tabletop simulator',
+      'overcooked',
+      'it takes two',
+      'a way out',
+      'siege',
+      'rainbow six',
+      'battlefield',
+      'counter-strike',
+      'cs:go',
+      'cs2',
+      'destiny',
+      'helldivers',
+      'deep rock galactic',
+      'sea of thieves',
+      'phasmophobia',
+      'valheim',
+      'terraria',
+      'minecraft',
+      'rust',
+      'ark',
+      'the forest',
+      'sons of the forest',
+      'left 4 dead',
+      'payday',
+      'borderlands',
+      'speedrunners',
+      'golf with your friends',
+      'pummel party',
+      'rocket league',
+      'brawlhalla',
+      'smash',
+      'team',
+      'mmo',
+      'battle royale',
+    ],
   },
   {
     id: 'quick',
@@ -73,6 +132,101 @@ const MOOD_PRESETS: MoodPreset[] = [
     maxPlaytimeHours: 10,
   },
 ];
+
+// High-fidelity synthesized audio generator using Web Audio API
+class WheelAudioEngine {
+  private ctx: AudioContext | null = null;
+  private soundEnabled: boolean = true;
+
+  constructor() {
+    // AudioContext will be initialized on first user interaction to comply with browser autoplay policies
+  }
+
+  public setSoundEnabled(enabled: boolean) {
+    this.soundEnabled = enabled;
+  }
+
+  public isEnabled(): boolean {
+    return this.soundEnabled;
+  }
+
+  private ensureContext() {
+    if (!this.ctx || this.ctx.state === 'closed') {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+  }
+
+  // Mechanical click / tick sound as each peg/slice passes
+  public playTick(pitchMultiplier = 1.0) {
+    if (!this.soundEnabled) return;
+    try {
+      this.ensureContext();
+      if (!this.ctx) return;
+
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      // Crisp click pitch
+      osc.frequency.setValueAtTime(800 * pitchMultiplier, now);
+      osc.frequency.exponentialRampToValueAtTime(150, now + 0.035);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch {
+      // Ignore audio synthesis errors gracefully
+    }
+  }
+
+  // Triumphant victory fanfare chord when winner lands
+  public playWinnerFanfare() {
+    if (!this.soundEnabled) return;
+    try {
+      this.ensureContext();
+      if (!this.ctx) return;
+
+      const now = this.ctx.currentTime;
+      // Cheerful major chord progression: C5, E5, G5, C6
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+
+      notes.forEach((freq, idx) => {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        const startTime = now + idx * 0.1;
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+
+        gain.gain.setValueAtTime(0.25, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(startTime);
+        osc.stop(startTime + 0.55);
+      });
+    } catch {
+      // Ignore audio synthesis errors gracefully
+    }
+  }
+}
+
+const wheelAudio = new WheelAudioEngine();
 
 export const RandomGameModal: React.FC<RandomGameModalProps> = ({
   isOpen,
@@ -87,6 +241,7 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
   const [onlyUnplayed, setOnlyUnplayed] = useState<boolean>(false);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [naturalQuery, setNaturalQuery] = useState<string>('');
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
   // Spinning wheel state
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
@@ -94,6 +249,19 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
   const [winnerGame, setWinnerGame] = useState<Game | null>(null);
   const [winnerRationale, setWinnerRationale] = useState<string>('');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const soundIntervalRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    wheelAudio.setSoundEnabled(soundEnabled);
+  }, [soundEnabled]);
+
+  // Clean up sound timers on unmount
+  useEffect(() => {
+    return () => {
+      soundIntervalRef.current.forEach((t) => clearTimeout(t));
+      soundIntervalRef.current = [];
+    };
+  }, []);
 
   // Filter pool computation
   const eligiblePool = useMemo(() => {
@@ -121,9 +289,27 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
       if (selectedMood) {
         const mood = MOOD_PRESETS.find((m) => m.id === selectedMood);
         if (mood) {
-          const gameText = `${game.categories.join(' ')} ${(game.tags || []).join(' ')} ${game.tagline || ''}`.toLowerCase();
-          const matchesKeyword = mood.keywords.some((kw) => gameText.includes(kw));
-          if (!matchesKeyword) return false;
+          const gameTitleLower = (game.title || '').toLowerCase();
+          const gameCategoriesLower = game.categories.map((c) => c.toLowerCase()).join(' ');
+          const gameTagsLower = (game.tags || []).map((t) => t.toLowerCase()).join(' ');
+          const gameTaglineLower = (game.tagline || '').toLowerCase();
+          const gameDescLower = (game.description || '').toLowerCase();
+
+          const combinedText = `${gameTitleLower} ${gameCategoriesLower} ${gameTagsLower} ${gameTaglineLower} ${gameDescLower}`;
+
+          // Special check for 'coop' / 'Play with Friends':
+          // Must match friend slop, multiplayer, party, or co-op keywords in title, tags, or description
+          if (mood.id === 'coop') {
+            const matchesFriendSlop = mood.keywords.some((kw) => {
+              // Word boundary or substring matching
+              return combinedText.includes(kw);
+            });
+            if (!matchesFriendSlop) return false;
+          } else {
+            const matchesKeyword = mood.keywords.some((kw) => combinedText.includes(kw));
+            if (!matchesKeyword) return false;
+          }
+
           if (mood.maxPlaytimeHours !== undefined) {
             const playedHours = (game.playtime.totalMinutes || 0) / 60;
             if (playedHours > mood.maxPlaytimeHours) return false;
@@ -155,6 +341,7 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
       return true;
     });
   }, [games, onlyInstalled, onlyUnplayed, selectedTag, selectedMood, naturalQuery]);
+
 
   // Aggregate candidate tags for filter dropdown
   const availableTags = useMemo(() => {
@@ -259,6 +446,10 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
   const handleSpin = () => {
     if (isSpinning || wheelSlices.length === 0) return;
 
+    // Clear any previous scheduled audio ticks
+    soundIntervalRef.current.forEach((t) => clearTimeout(t));
+    soundIntervalRef.current = [];
+
     setIsSpinning(true);
     setWinnerGame(null);
     setWinnerRationale('');
@@ -275,9 +466,35 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
 
     setWheelRotation(finalAngle);
 
+    // Dynamic ticking sound effect that slows down along with the 4500ms cubic-bezier spin
+    if (soundEnabled) {
+      // Schedule tick clicks with exponentially increasing delays simulating deceleration
+      let currentTime = 0;
+      let delay = 45; // Starts at 45ms between ticks
+      const totalDuration = 4400;
+
+      while (currentTime < totalDuration) {
+        const scheduledTime = currentTime;
+        const pitch = Math.max(0.65, 1.2 - (currentTime / totalDuration) * 0.55);
+        const timer = window.setTimeout(() => {
+          wheelAudio.playTick(pitch);
+        }, scheduledTime);
+        soundIntervalRef.current.push(timer);
+
+        currentTime += delay;
+        // Non-linear deceleration ramp
+        delay = Math.floor(delay * 1.055) + 3;
+      }
+    }
+
     setTimeout(() => {
       setIsSpinning(false);
       setWinnerGame(chosen);
+
+      // Play cheerful victory fanfare sound
+      if (soundEnabled) {
+        wheelAudio.playWinnerFanfare();
+      }
 
       // Generate helpful human rationale
       const reasons: string[] = [];
@@ -324,12 +541,26 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              title={soundEnabled ? 'Mute wheel sound effects' : 'Enable wheel sound effects'}
+              className={`p-2 rounded-xl border transition-colors ${
+                soundEnabled
+                  ? 'border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20'
+                  : 'border-white/10 bg-white/5 text-gray-400 hover:text-white'
+              }`}
+            >
+              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            </button>
+
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Content Body: 2 Columns */}
@@ -389,15 +620,21 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-gray-300">Exclude uninstalled titles</span>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={onlyInstalled}
                   onClick={() => setOnlyInstalled(!onlyInstalled)}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${
                     onlyInstalled ? 'bg-emerald-600' : 'bg-gray-700'
                   }`}
                 >
                   <span
-                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                      onlyInstalled ? 'translate-x-4.5' : 'translate-x-1'
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200 ease-in-out ${
+                      onlyInstalled ? 'translate-x-4.5' : 'translate-x-0.5'
                     }`}
+                    style={{
+                      transform: onlyInstalled ? 'translateX(18px)' : 'translateX(3px)',
+                    }}
                   />
                 </button>
               </div>
@@ -405,15 +642,21 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-gray-300">Unplayed backlog titles only</span>
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={onlyUnplayed}
                   onClick={() => setOnlyUnplayed(!onlyUnplayed)}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${
                     onlyUnplayed ? 'bg-amber-600' : 'bg-gray-700'
                   }`}
                 >
                   <span
-                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
-                      onlyUnplayed ? 'translate-x-4.5' : 'translate-x-1'
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200 ease-in-out ${
+                      onlyUnplayed ? 'translate-x-4.5' : 'translate-x-0.5'
                     }`}
+                    style={{
+                      transform: onlyUnplayed ? 'translateX(18px)' : 'translateX(3px)',
+                    }}
                   />
                 </button>
               </div>
@@ -467,15 +710,17 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
                 />
               </div>
 
-              {/* Spin Trigger Button */}
-              <button
-                onClick={handleSpin}
-                disabled={isSpinning || eligiblePool.length === 0}
-                className="mt-6 flex items-center gap-2.5 px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-white font-extrabold text-sm shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed group"
-              >
-                <RotateCw className={`w-4 h-4 ${isSpinning ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-                <span>{isSpinning ? 'Selecting...' : 'Spin the Wheel!'}</span>
-              </button>
+              {/* Spin Trigger Button & Sound indicator */}
+              <div className="mt-6 flex items-center gap-3">
+                <button
+                  onClick={handleSpin}
+                  disabled={isSpinning || eligiblePool.length === 0}
+                  className="flex items-center gap-2.5 px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-white font-extrabold text-sm shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed group"
+                >
+                  <RotateCw className={`w-4 h-4 ${isSpinning ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+                  <span>{isSpinning ? 'Selecting...' : 'Spin the Wheel!'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Winner Spotlight Card */}

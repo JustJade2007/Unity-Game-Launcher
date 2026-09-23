@@ -106,6 +106,7 @@
 - [ ] Securely link and unlink third-party accounts
 - [ ] Toggle profile visibility (Public vs. Private)
 - [ ] Normalize provider payloads without dropping source-specific fields
+- [ ] Addition to game discovery wheel, add an option to only do games selected friends have
 
 ### 🎨 Profile UI & Data Aggregation
 - [ ] Display linked accounts and badges

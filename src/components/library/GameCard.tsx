@@ -17,25 +17,46 @@ export const GameCard: React.FC<GameCardProps> = ({ game, onOpenDetail }) => {
 
   const targetAppId = game.appId || (game.id?.startsWith('steam_') ? game.id.replace('steam_', '') : null);
 
-  // Progressive SteamDB & Steam static CDN fallback candidates
+  // Progressive SteamDB, hero banner & static CDN fallback candidates
   const fallbackCandidates = useMemo(() => {
     const list: string[] = [];
     if (game.media.coverUrl) list.push(game.media.coverUrl);
     if (targetAppId) {
       list.push(
-        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/capsule_616x353.jpg`,
-        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/header.jpg`,
-        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/header.jpg`,
-        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/capsule_231x87.jpg`
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/library_600x900.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/library_600x900.jpg`,
+        `https://steamcdn-a.akamaihd.net/steam/apps/${targetAppId}/library_600x900.jpg`
       );
     }
-    if (game.media.screenshots?.[0]) list.push(game.media.screenshots[0]);
+    // Hero banner fallback: if the game has a hero banner, cleanly center & crop to 2:3 card
+    if (game.media.heroUrl) list.push(game.media.heroUrl);
+    if (targetAppId) {
+      list.push(
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/capsule_616x353.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/capsule_616x353.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/header.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/header.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/page_bg_generated_v6b.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/capsule_231x87.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/capsule_231x87.jpg`
+      );
+    }
+    if (game.media.screenshots && game.media.screenshots.length > 0) {
+      list.push(...game.media.screenshots);
+    }
     if (game.media.iconUrl) list.push(game.media.iconUrl);
     return Array.from(new Set(list.filter(Boolean)));
-  }, [game.media.coverUrl, game.media.screenshots, game.media.iconUrl, targetAppId]);
+  }, [game.media.coverUrl, game.media.heroUrl, game.media.screenshots, game.media.iconUrl, targetAppId]);
 
   const [candidateIdx, setCandidateIdx] = useState(0);
   const [hasImageFailed, setHasImageFailed] = useState(false);
+
+  React.useEffect(() => {
+    setCandidateIdx(0);
+    setHasImageFailed(false);
+  }, [game.id, game.media.coverUrl, game.media.heroUrl]);
 
   const currentImageSrc = candidateIdx < fallbackCandidates.length ? fallbackCandidates[candidateIdx] : null;
 

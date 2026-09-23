@@ -8,6 +8,70 @@ interface GameGridProps {
   onOpenDetail?: (game: Game) => void;
 }
 
+const GameListThumbnail: React.FC<{ game: Game }> = ({ game }) => {
+  const targetAppId = game.appId || (game.id?.startsWith('steam_') ? game.id.replace('steam_', '') : null);
+
+  const fallbackCandidates = React.useMemo(() => {
+    const list: string[] = [];
+    if (game.media.coverUrl) list.push(game.media.coverUrl);
+    if (targetAppId) {
+      list.push(
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/library_600x900.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/library_600x900.jpg`,
+        `https://steamcdn-a.akamaihd.net/steam/apps/${targetAppId}/library_600x900.jpg`
+      );
+    }
+    if (game.media.heroUrl) list.push(game.media.heroUrl);
+    if (targetAppId) {
+      list.push(
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/library_hero.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/capsule_616x353.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/capsule_616x353.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/header.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${targetAppId}/header.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${targetAppId}/page_bg_generated_v6b.jpg`
+      );
+    }
+    if (game.media.screenshots && game.media.screenshots.length > 0) {
+      list.push(...game.media.screenshots);
+    }
+    if (game.media.iconUrl) list.push(game.media.iconUrl);
+    return Array.from(new Set(list.filter(Boolean)));
+  }, [game.media.coverUrl, game.media.heroUrl, game.media.screenshots, game.media.iconUrl, targetAppId]);
+
+  const [idx, setIdx] = React.useState(0);
+  const [failed, setFailed] = React.useState(false);
+
+  React.useEffect(() => {
+    setIdx(0);
+    setFailed(false);
+  }, [game.id, game.media.coverUrl, game.media.heroUrl]);
+
+  const src = idx < fallbackCandidates.length ? fallbackCandidates[idx] : null;
+
+  if (failed || !src) {
+    return (
+      <div className="w-14 h-18 bg-indigo-950/40 border border-white/10 rounded-lg flex items-center justify-center flex-shrink-0 text-indigo-400/50">
+        <Gamepad2 className="w-6 h-6" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={game.title}
+      loading="lazy"
+      onError={() => {
+        if (idx + 1 < fallbackCandidates.length) setIdx((prev) => prev + 1);
+        else setFailed(true);
+      }}
+      className="w-14 h-18 object-cover rounded-lg flex-shrink-0 bg-[#0d0e14]"
+    />
+  );
+};
+
 export const GameGrid: React.FC<GameGridProps> = ({ onOpenDetail }) => {
   const { filteredGames, viewMode, selectedGame, setSelectedGame, totalGamesCount, launchGame, installGame } = useLibrary();
 
@@ -63,11 +127,7 @@ export const GameGrid: React.FC<GameGridProps> = ({ onOpenDetail }) => {
               }`}
             >
               {/* Thumbnail */}
-              <img
-                src={game.media.coverUrl}
-                alt={game.title}
-                className="w-14 h-18 object-cover rounded-lg flex-shrink-0"
-              />
+              <GameListThumbnail game={game} />
 
               {/* Info */}
               <div className="flex-1 min-w-0">

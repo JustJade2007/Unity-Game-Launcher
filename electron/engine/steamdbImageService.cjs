@@ -209,10 +209,15 @@ class SteamDBImageService {
         `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cleanId}/library_600x900.jpg`,
         `https://cdn.akamai.steamstatic.com/steam/apps/${cleanId}/library_600x900.jpg`,
         `https://steamcdn-a.akamaihd.net/steam/apps/${cleanId}/library_600x900.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cleanId}/library_hero.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${cleanId}/library_hero.jpg`,
         `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cleanId}/capsule_616x353.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${cleanId}/capsule_616x353.jpg`,
         `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cleanId}/header.jpg`,
         `https://cdn.akamai.steamstatic.com/steam/apps/${cleanId}/header.jpg`,
+        `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cleanId}/page_bg_generated_v6b.jpg`,
         `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cleanId}/capsule_231x87.jpg`,
+        `https://cdn.akamai.steamstatic.com/steam/apps/${cleanId}/capsule_231x87.jpg`,
       ],
       heroes: [
         `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cleanId}/library_hero.jpg`,
@@ -354,11 +359,18 @@ class SteamDBImageService {
       }
     }
 
-    const hasCover = Boolean(currentMedia.coverUrl && !currentMedia.coverUrl.includes('placeholder.com'));
-    const hasHero = Boolean(currentMedia.heroUrl && !currentMedia.heroUrl.includes('placeholder.com'));
+    let coverWorking = Boolean(currentMedia.coverUrl && !currentMedia.coverUrl.includes('placeholder.com'));
+    if (coverWorking) {
+      coverWorking = await this.checkUrl(currentMedia.coverUrl);
+    }
 
-    // If game already has both a cover and hero backdrop, skip heavy network searches
-    if (hasCover && hasHero) {
+    let heroWorking = Boolean(currentMedia.heroUrl && !currentMedia.heroUrl.includes('placeholder.com'));
+    if (heroWorking) {
+      heroWorking = await this.checkUrl(currentMedia.heroUrl);
+    }
+
+    // If game already has both a verified reachable cover and hero backdrop, skip heavy network searches
+    if (coverWorking && heroWorking) {
       return { changed, media: currentMedia };
     }
 
@@ -376,9 +388,6 @@ class SteamDBImageService {
       }
     }
 
-    let coverWorking = hasCover;
-    let heroWorking = hasHero;
-
     if (targetAppId) {
       const candidates = this.getCandidateUrls(targetAppId);
       const storeDetails = await this.fetchStoreDetails(targetAppId);
@@ -387,14 +396,17 @@ class SteamDBImageService {
       if (!coverWorking) {
         const coverCandidates = [
           ...candidates.covers,
+          ...(currentMedia.heroUrl && heroWorking ? [currentMedia.heroUrl] : []),
           ...(storeDetails?.headerImage ? [storeDetails.headerImage] : []),
           ...(storeDetails?.capsuleImage ? [storeDetails.capsuleImage] : []),
+          ...(storeDetails?.background ? [storeDetails.background] : []),
         ];
 
         const workingCover = await this.findFirstWorkingUrl(coverCandidates);
         if (workingCover && workingCover !== currentMedia.coverUrl) {
           currentMedia.coverUrl = workingCover;
           changed = true;
+          coverWorking = true;
         }
       }
 
@@ -402,6 +414,7 @@ class SteamDBImageService {
       if (!heroWorking) {
         const heroCandidates = [
           ...candidates.heroes,
+          ...(currentMedia.coverUrl && coverWorking ? [currentMedia.coverUrl] : []),
           ...(storeDetails?.background ? [storeDetails.background] : []),
           ...(storeDetails?.screenshots?.[0] ? [storeDetails.screenshots[0]] : []),
         ];
@@ -410,6 +423,7 @@ class SteamDBImageService {
         if (workingHero && workingHero !== currentMedia.heroUrl) {
           currentMedia.heroUrl = workingHero;
           changed = true;
+          heroWorking = true;
         }
       }
 
@@ -438,6 +452,20 @@ class SteamDBImageService {
         currentMedia.iconUrl = currentMedia.coverUrl;
         changed = true;
       }
+    }
+
+    // Fallback: If cover is not working or missing, but hero banner is verified working, heal cover
+    if (!coverWorking && currentMedia.heroUrl && heroWorking) {
+      currentMedia.coverUrl = currentMedia.heroUrl;
+      changed = true;
+      coverWorking = true;
+    }
+
+    // Fallback: If hero is not working or missing, but cover is verified working, heal hero
+    if (!heroWorking && currentMedia.coverUrl && coverWorking) {
+      currentMedia.heroUrl = currentMedia.coverUrl;
+      changed = true;
+      heroWorking = true;
     }
 
     return { changed, media: currentMedia };

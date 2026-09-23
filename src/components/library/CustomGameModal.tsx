@@ -336,7 +336,7 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
       favorite: editingGame ? Boolean(editingGame.favorite) : false,
       playtime: editingGame?.playtime || { totalMinutes: 0 },
       media: {
-        coverUrl: coverUrl.trim() || iconUrl || '',
+        coverUrl: coverUrl.trim() || heroUrl.trim() || iconUrl || '',
         heroUrl: heroUrl.trim() || '',
         iconUrl: iconUrl.trim() || undefined,
         screenshots: editingGame?.media?.screenshots || [],

@@ -8,6 +8,8 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-23
+
 ### Added
 - **Intelligent Category & Genre Classification Engine**:
   - **Accurate Software & Utility Categorization**: Built dedicated categorization engine (`electron/engine/categoryService.cjs`) eliminating misleading `"Action"` tags from software applications, utilities, servers, and non-action games. Software utilities (such as `Crosshair X`, `Scope X`, `Mouse X`, `Lossless Scaling`, `VoiceAttack`, `Soundpad Demo`, `VRoid Studio`) are now accurately categorized as `['Utilities', 'Software']`, `['Tools', 'Server']`, or specialized software tags (e.g. `Audio Production`, `Animation & Modeling`, `Design & Illustration`), with strict exclusion of action/gaming tags.

@@ -36,7 +36,7 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 | Progressive artwork fallback & hero banner healing | ✅ Implemented |
 | Intelligent category & genre classification engine | ✅ Implemented |
 | Software & tools isolation (invisible by default in games) | ✅ Implemented |
-| Authentic store release dates (Zero "Invalid Date") | ✅ Implemented |
+| Authentic store release dates & sync preservation (Zero false "TBA") | ✅ Implemented |
 | Cross-launcher duplicate reconciliation & installed state prioritization | ✅ Implemented |
 | Local directory & custom game management | ✅ Implemented |
 | Native executable picker & directory scanner | ✅ Implemented |

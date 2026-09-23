@@ -201,10 +201,23 @@ class LibraryEngine {
           hidden: prior ? Boolean(prior.hidden) : false,
           isCustom: prior ? Boolean(prior.isCustom) : false,
           isSoftware: prior?.isSoftware !== undefined ? prior.isSoftware : (item.isSoftware !== undefined ? item.isSoftware : isSoftwareItem(item)),
+          releaseDate: (prior?.releaseDate && prior.releaseDate.trim() !== '') ? prior.releaseDate : (item.releaseDate || ''),
+          description: (prior?.description && prior.description.trim() !== '') ? prior.description : (item.description || ''),
+          developer: (prior?.developer && prior.developer.trim() !== '') ? prior.developer : (item.developer || ''),
+          publisher: (prior?.publisher && prior.publisher.trim() !== '') ? prior.publisher : (item.publisher || ''),
+          categories: (prior?.categories && prior.categories.length > 0) ? prior.categories : (item.categories || []),
+          genres: (prior?.genres && prior.genres.length > 0) ? prior.genres : (item.genres || []),
           executablePath: prior?.executablePath || item.executablePath,
           launchArguments: prior?.launchArguments || item.launchArguments,
           workingDirectory: prior?.workingDirectory || item.workingDirectory,
           sourceDirectory: prior?.sourceDirectory || item.sourceDirectory,
+          media: {
+            coverUrl: prior?.media?.coverUrl || item.media?.coverUrl || '',
+            heroUrl: prior?.media?.heroUrl || item.media?.heroUrl || '',
+            iconUrl: prior?.media?.iconUrl || item.media?.iconUrl || '',
+            logoUrl: prior?.media?.logoUrl || item.media?.logoUrl || '',
+            screenshots: (prior?.media?.screenshots && prior.media.screenshots.length > 0) ? prior.media.screenshots : (item.media?.screenshots || []),
+          },
           ownershipSources: [
             {
               launcher: item.launcher,
@@ -253,6 +266,23 @@ class LibraryEngine {
         // If existing title is a launcher utility and item is the actual game, upgrade title
         if (existing.title.toLowerCase().endsWith(' launcher') && !item.title.toLowerCase().endsWith(' launcher')) {
           existing.title = item.title;
+        }
+
+        // Preserve metadata if missing on existing
+        if ((!existing.releaseDate || existing.releaseDate.trim() === '') && item.releaseDate) {
+          existing.releaseDate = item.releaseDate;
+        }
+        if ((!existing.description || existing.description.trim() === '') && item.description) {
+          existing.description = item.description;
+        }
+        if ((!existing.developer || existing.developer.trim() === '') && item.developer) {
+          existing.developer = item.developer;
+        }
+        if ((!existing.publisher || existing.publisher.trim() === '') && item.publisher) {
+          existing.publisher = item.publisher;
+        }
+        if ((!existing.genres || existing.genres.length === 0) && item.genres?.length > 0) {
+          existing.genres = item.genres;
         }
 
         // If this copy is installed, prioritize installed state and launch paths
@@ -323,6 +353,7 @@ class LibraryEngine {
             sourceDirectory: existing.sourceDirectory || current.sourceDirectory,
             hidden: Boolean(existing.hidden),
             favorite: Boolean(existing.favorite),
+            releaseDate: existing.releaseDate || current.releaseDate || '',
           });
         }
       }
@@ -330,7 +361,7 @@ class LibraryEngine {
 
     let mergedLibrary = Array.from(unifiedMap.values());
 
-    // Enrich titles lacking media
+    // Enrich titles lacking media, categories, or release dates
     try {
       const needsEnrichment = mergedLibrary.some(
         (g) =>
@@ -339,7 +370,10 @@ class LibraryEngine {
           g.media.coverUrl.includes('placeholder.com') ||
           !g.categories ||
           g.categories.length === 0 ||
-          (g.categories.length <= 2 && g.categories.includes('Action'))
+          (g.categories.length <= 2 && g.categories.includes('Action')) ||
+          !g.releaseDate ||
+          g.releaseDate.trim() === '' ||
+          /^(invalid date|null|undefined|nan)$/i.test(g.releaseDate)
       );
       if (needsEnrichment) {
         const { games: enrichedGames } = await steamdbImageService.enrichLibrary(mergedLibrary);
@@ -492,7 +526,9 @@ class LibraryEngine {
       if (changed) {
         if (media) games[idx].media = media;
         if (categories) games[idx].categories = categories;
-        if (releaseDate && !games[idx].releaseDate) games[idx].releaseDate = releaseDate;
+        if (releaseDate && (!games[idx].releaseDate || /^(invalid date|null|undefined|nan|tba)$/i.test(games[idx].releaseDate))) {
+          games[idx].releaseDate = releaseDate;
+        }
         if (isSoftware !== undefined) games[idx].isSoftware = isSoftware;
         fs.writeFileSync(this.gamesPath, JSON.stringify(games, null, 2), 'utf8');
       }

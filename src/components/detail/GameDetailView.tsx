@@ -32,6 +32,22 @@ export function formatReleaseDate(dateString?: string): string {
 
   if (/^\d{4}$/.test(clean)) return clean;
 
+  // Handle YYYY-MM-DD or YYYY-MM explicitly to prevent UTC timezone rollback
+  const ymdMatch = clean.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/);
+  if (ymdMatch) {
+    const year = parseInt(ymdMatch[1], 10);
+    const month = parseInt(ymdMatch[2], 10) - 1;
+    const day = ymdMatch[3] ? parseInt(ymdMatch[3], 10) : 1;
+    const localDate = new Date(year, month, day);
+    if (!isNaN(localDate.getTime())) {
+      return localDate.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        ...(ymdMatch[3] ? { day: 'numeric' } : {}),
+      });
+    }
+  }
+
   const timestamp = Date.parse(clean);
   if (isNaN(timestamp)) {
     const match = clean.match(/\b(19\d\d|20\d\d)\b/);
@@ -108,11 +124,17 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
   };
 
   useEffect(() => {
-    // If game has missing images, attempt automatic media enrichment with SteamDB
-    if (!game.media?.coverUrl || !game.media?.heroUrl) {
+    // If game has missing images or missing release date, attempt automatic enrichment with SteamDB
+    if (
+      !game.media?.coverUrl ||
+      !game.media?.heroUrl ||
+      !game.releaseDate ||
+      game.releaseDate.trim() === '' ||
+      /^(invalid date|null|undefined|nan|tba)$/i.test(game.releaseDate)
+    ) {
       enrichGameMedia(game.id);
     }
-  }, [game.id]);
+  }, [game.id, game.releaseDate]);
 
   useEffect(() => {
     // Automatically fetch real achievements if empty or on initial open

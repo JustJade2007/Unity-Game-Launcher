@@ -73,7 +73,8 @@ dist/
 dist-electron/
 release/
 build/
-data/
+/data/
+!electron/data/
 *.exe
 *.dll
 *.pdb

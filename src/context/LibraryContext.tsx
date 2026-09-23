@@ -248,9 +248,13 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (window.electronAPI?.enrichGameMedia) {
       try {
         const res = await window.electronAPI.enrichGameMedia(gameId);
-        if (res.success && res.media) {
+        if (res.success && (res.game || res.media)) {
           setGames((prev) =>
-            prev.map((g) => (g.id === gameId ? { ...g, media: res.media! } : g))
+            prev.map((g) => {
+              if (g.id !== gameId) return g;
+              if (res.game) return { ...g, ...res.game };
+              return { ...g, media: res.media! };
+            })
           );
           return Boolean(res.changed);
         }

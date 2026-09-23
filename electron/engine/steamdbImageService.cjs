@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const https = require('https');
 const { resolveGameCategories, SOFTWARE_TITLE_PATTERNS, isSoftwareItem } = require('./categoryService.cjs');
 
@@ -28,6 +30,19 @@ const KNOWN_STORE_IDS = {
   'sea of thieves': '9P2N57MC619K',
   starfield: '9NCGNJ5VKQ10',
   'microsoft flight simulator': '9NRBDJX2W1TX',
+};
+
+const KNOWN_NON_STEAM_METADATA = {
+  'starcraft ii': { releaseDate: '2010-07-27', developer: 'Blizzard Entertainment', publisher: 'Blizzard Entertainment', genres: ['RTS', 'Strategy'] },
+  'starcraft 2': { releaseDate: '2010-07-27', developer: 'Blizzard Entertainment', publisher: 'Blizzard Entertainment', genres: ['RTS', 'Strategy'] },
+  'minecraft': { releaseDate: '2011-11-18', developer: 'Mojang Studios', publisher: 'Xbox Game Studios', genres: ['Sandbox', 'Survival', 'Adventure'] },
+  'minecraft for windows': { releaseDate: '2015-07-29', developer: 'Mojang Studios', publisher: 'Xbox Game Studios', genres: ['Sandbox', 'Survival', 'Adventure'] },
+  'minecraft launcher': { releaseDate: '2021-11-02', developer: 'Mojang Studios', publisher: 'Xbox Game Studios', genres: ['Utilities', 'Software'] },
+  'world of warcraft': { releaseDate: '2004-11-23', developer: 'Blizzard Entertainment', publisher: 'Blizzard Entertainment', genres: ['MMORPG', 'RPG'] },
+  'diablo iv': { releaseDate: '2023-06-05', developer: 'Blizzard Entertainment', publisher: 'Blizzard Entertainment', genres: ['Action RPG', 'Hack and Slash'] },
+  'overwatch 2': { releaseDate: '2022-10-04', developer: 'Blizzard Entertainment', publisher: 'Blizzard Entertainment', genres: ['Hero Shooter', 'FPS'] },
+  'hearthstone': { releaseDate: '2014-03-11', developer: 'Blizzard Entertainment', publisher: 'Blizzard Entertainment', genres: ['Card Game', 'Strategy'] },
+  'heroes of the storm': { releaseDate: '2015-06-02', developer: 'Blizzard Entertainment', publisher: 'Blizzard Entertainment', genres: ['MOBA', 'Strategy'] },
 };
 
 /**
@@ -182,6 +197,45 @@ class SteamDBImageService {
     this.appDetailsCache = new Map();
     this.titleSearchCache = new Map();
     this.verifiedUrlsCache = new Map();
+    this.cacheFilePath = path.join(__dirname, '../data/storeDetailsCache.json');
+    this.loadPersistentCache();
+  }
+
+  loadPersistentCache() {
+    try {
+      if (fs.existsSync(this.cacheFilePath)) {
+        const raw = fs.readFileSync(this.cacheFilePath, 'utf8');
+        const data = JSON.parse(raw);
+        for (const [appId, details] of Object.entries(data)) {
+          if (details && typeof details === 'object') {
+            this.appDetailsCache.set(String(appId), details);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[SteamDBImageService] Failed to load persistent store cache:', err);
+    }
+  }
+
+  savePersistentCache() {
+    try {
+      if (this.cacheFilePath.includes('app.asar')) {
+        return; // Packaged asar is read-only
+      }
+      const data = {};
+      for (const [appId, details] of this.appDetailsCache.entries()) {
+        if (details) {
+          data[appId] = details;
+        }
+      }
+      const dir = path.dirname(this.cacheFilePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(this.cacheFilePath, JSON.stringify(data, null, 2), 'utf8');
+    } catch (err) {
+      console.warn('[SteamDBImageService] Failed to save persistent store cache:', err);
+    }
   }
 
   /**
@@ -306,6 +360,7 @@ class SteamDBImageService {
             : [],
         };
         this.appDetailsCache.set(cleanId, details);
+        this.savePersistentCache();
         return details;
       }
     } catch (err) {
@@ -390,10 +445,17 @@ class SteamDBImageService {
       (SOFTWARE_TITLE_PATTERNS.test(game.title) || /dedicated server/i.test(game.title));
 
     const needsCategoryEnrichment = isGenericCategories || isSoftwareWithAction;
+    const needsDateEnrichment = !game.releaseDate || String(game.releaseDate).trim() === '' || /^(invalid date|null|undefined|nan|tba)$/i.test(game.releaseDate);
 
-    // If game already has verified cover, verified hero, and accurate categories, skip heavy search
-    if (coverWorking && heroWorking && !needsCategoryEnrichment) {
-      return { changed, media: currentMedia, categories: existingCats };
+    // If game already has verified cover, verified hero, accurate categories, and valid release date, skip heavy search
+    if (coverWorking && heroWorking && !needsCategoryEnrichment && !needsDateEnrichment) {
+      return {
+        changed,
+        media: currentMedia,
+        categories: existingCats,
+        releaseDate: game.releaseDate || '',
+        isSoftware: game.isSoftware !== undefined ? game.isSoftware : isSoftwareItem(game),
+      };
     }
 
     // Determine target Steam AppID:
@@ -516,9 +578,18 @@ class SteamDBImageService {
 
     // --- Resolve Release Date ---
     let finalReleaseDate = game.releaseDate || '';
-    if (!finalReleaseDate && storeDetails?.releaseDate) {
+    if ((!finalReleaseDate || /^(invalid date|null|undefined|nan|tba)$/i.test(finalReleaseDate)) && storeDetails?.releaseDate) {
       finalReleaseDate = storeDetails.releaseDate;
       changed = true;
+    } else if (!finalReleaseDate && storeDetails?.comingSoon) {
+      finalReleaseDate = 'Coming Soon';
+      changed = true;
+    } else if (!finalReleaseDate || /^(invalid date|null|undefined|nan|tba)$/i.test(finalReleaseDate)) {
+      const cleanKey = cleanGameTitle(game.title || '').toLowerCase();
+      if (cleanKey in KNOWN_NON_STEAM_METADATA) {
+        finalReleaseDate = KNOWN_NON_STEAM_METADATA[cleanKey].releaseDate;
+        changed = true;
+      }
     }
 
     return {

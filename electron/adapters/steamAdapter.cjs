@@ -17,6 +17,26 @@ const IGNORED_STEAM_APPIDS = new Set([
   '2801650', // Steam Linux Runtime 3.0
 ]);
 
+let storeDetailsCache = null;
+function getCachedStoreDetails(appId) {
+  if (!storeDetailsCache) {
+    storeDetailsCache = new Map();
+    try {
+      const cachePath = path.join(__dirname, '../data/storeDetailsCache.json');
+      if (fs.existsSync(cachePath)) {
+        const raw = fs.readFileSync(cachePath, 'utf8');
+        const json = JSON.parse(raw);
+        for (const [k, v] of Object.entries(json)) {
+          storeDetailsCache.set(String(k), v);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return storeDetailsCache.get(String(appId)) || null;
+}
+
 class SteamAdapter extends BaseAdapter {
   constructor() {
     super('Steam', 'Steam');
@@ -178,6 +198,7 @@ class SteamAdapter extends BaseAdapter {
             const sizeGb = Math.round((sizeBytes / (1024 * 1024 * 1024)) * 10) / 10;
             const lastUpdated = state.LastUpdated || state.lastupdated;
             const lastPlayedTs = state.LastPlayed || state.lastplayed;
+            const cachedDetails = getCachedStoreDetails(appid);
 
             installedGames.push({
               id: `steam_${appid}`,
@@ -185,10 +206,12 @@ class SteamAdapter extends BaseAdapter {
               title: name,
               tagline: `Steam Title`,
               description: `Installed locally on ${folder}`,
-              developer: 'Steam Developer',
-              publisher: 'Steam Publisher',
-              releaseDate: '',
-              categories: resolveGameCategories({ title: name, appId: appid }),
+              developer: cachedDetails?.developers?.[0] || 'Steam Developer',
+              publisher: cachedDetails?.publishers?.[0] || 'Steam Publisher',
+              releaseDate: cachedDetails?.releaseDate || '',
+              genres: cachedDetails?.genres || [],
+              categories: resolveGameCategories({ title: name, appId: appid }, cachedDetails),
+              isSoftware: cachedDetails?.isSoftware !== undefined ? cachedDetails.isSoftware : undefined,
               launcher: 'Steam',
               installed: true,
               installPath,
@@ -265,16 +288,20 @@ class SteamAdapter extends BaseAdapter {
                 ? `https://media.steampowered.com/steamcommunity/public/images/apps/${appid}/${g.img_icon_url}.jpg`
                 : `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/header.jpg`;
 
+              const cachedDetails = getCachedStoreDetails(appid);
+
               result.push({
                 id: `steam_${appid}`,
                 appId: appid,
                 title: g.name || `Steam Game ${appid}`,
                 tagline: `Owned on Steam`,
                 description: `Steam library game`,
-                developer: 'Valve / Steam',
-                publisher: 'Steam Publisher',
-                releaseDate: '',
-                categories: resolveGameCategories({ title: g.name, appId: appid }),
+                developer: cachedDetails?.developers?.[0] || 'Valve / Steam',
+                publisher: cachedDetails?.publishers?.[0] || 'Steam Publisher',
+                releaseDate: cachedDetails?.releaseDate || '',
+                genres: cachedDetails?.genres || [],
+                categories: resolveGameCategories({ title: g.name, appId: appid }, cachedDetails),
+                isSoftware: cachedDetails?.isSoftware !== undefined ? cachedDetails.isSoftware : undefined,
                 launcher: 'Steam',
                 installed: false, // Ingestion engine will reconcile with installed items
                 playtime: {

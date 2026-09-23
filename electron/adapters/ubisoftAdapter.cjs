@@ -10,6 +10,7 @@ const {
   calculateDirSizeGb,
   findGameExecutable,
 } = require('./registryHelper.cjs');
+const { resolveGameCategories } = require('../engine/categoryService.cjs');
 
 // Comprehensive mapping of known Ubisoft product IDs to game metadata & Steam App IDs
 const KNOWN_UBI_GAMES = [
@@ -463,7 +464,7 @@ class UbisoftAdapter extends BaseAdapter {
         developer: 'Ubisoft',
         publisher: 'Ubisoft',
         releaseDate: '',
-        categories: ['Ubisoft', 'Action'],
+        categories: resolveGameCategories({ title }),
         launcher: 'Ubisoft',
         installed: true,
         installPath: installDir,
@@ -710,7 +711,7 @@ class UbisoftAdapter extends BaseAdapter {
         developer: 'Ubisoft',
         publisher: 'Ubisoft',
         releaseDate: '',
-        categories: ['Ubisoft', 'Action'],
+        categories: resolveGameCategories({ title }),
         launcher: 'Ubisoft',
         installed: isInstalled,
         installPath: installPath || undefined,

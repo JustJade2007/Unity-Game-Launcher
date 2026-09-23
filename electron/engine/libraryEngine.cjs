@@ -331,7 +331,13 @@ class LibraryEngine {
     // Enrich titles lacking media
     try {
       const needsEnrichment = mergedLibrary.some(
-        (g) => !g.media?.coverUrl || !g.media?.heroUrl || g.media.coverUrl.includes('placeholder.com')
+        (g) =>
+          !g.media?.coverUrl ||
+          !g.media?.heroUrl ||
+          g.media.coverUrl.includes('placeholder.com') ||
+          !g.categories ||
+          g.categories.length === 0 ||
+          (g.categories.length <= 2 && g.categories.includes('Action'))
       );
       if (needsEnrichment) {
         const { games: enrichedGames } = await steamdbImageService.enrichLibrary(mergedLibrary);
@@ -480,9 +486,10 @@ class LibraryEngine {
         return { success: false, error: `Game with id ${gameId} not found` };
       }
 
-      const { changed, media } = await steamdbImageService.enrichGameMedia(games[idx]);
+      const { changed, media, categories } = await steamdbImageService.enrichGameMedia(games[idx]);
       if (changed) {
-        games[idx].media = media;
+        if (media) games[idx].media = media;
+        if (categories) games[idx].categories = categories;
         fs.writeFileSync(this.gamesPath, JSON.stringify(games, null, 2), 'utf8');
       }
 

@@ -4,6 +4,7 @@ const https = require('https');
 const { shell } = require('electron');
 const BaseAdapter = require('./baseAdapter.cjs');
 const { parseVDF } = require('./vdfParser.cjs');
+const { resolveGameCategories } = require('../engine/categoryService.cjs');
 
 // Common tool app IDs on Steam to ignore
 const IGNORED_STEAM_APPIDS = new Set([
@@ -187,7 +188,7 @@ class SteamAdapter extends BaseAdapter {
               developer: 'Steam Developer',
               publisher: 'Steam Publisher',
               releaseDate: '',
-              categories: ['Steam', 'Action'],
+              categories: resolveGameCategories({ title: name, appId: appid }),
               launcher: 'Steam',
               installed: true,
               installPath,
@@ -273,7 +274,7 @@ class SteamAdapter extends BaseAdapter {
                 developer: 'Valve / Steam',
                 publisher: 'Steam Publisher',
                 releaseDate: '',
-                categories: ['Steam'],
+                categories: resolveGameCategories({ title: g.name, appId: appid }),
                 launcher: 'Steam',
                 installed: false, // Ingestion engine will reconcile with installed items
                 playtime: {

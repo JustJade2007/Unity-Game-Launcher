@@ -8,6 +8,7 @@ const {
   calculateDirSizeGb,
   findGameExecutable,
 } = require('./registryHelper.cjs');
+const { resolveGameCategories } = require('../engine/categoryService.cjs');
 
 const KNOWN_EA_GAMES = [
   {
@@ -331,7 +332,7 @@ class EaAdapter extends BaseAdapter {
         developer: known?.developer || 'Electronic Arts',
         publisher: known?.publisher || 'Electronic Arts',
         releaseDate: '',
-        categories: known?.categories || ['EA', 'Action'],
+        categories: resolveGameCategories({ title: item.title }, { genres: known?.categories }),
         launcher: 'EA',
         installed: true,
         installPath,
@@ -550,7 +551,7 @@ class EaAdapter extends BaseAdapter {
         developer: known?.developer || 'Electronic Arts',
         publisher: known?.publisher || 'Electronic Arts',
         releaseDate: '',
-        categories: known?.categories || ['EA', 'Action'],
+        categories: resolveGameCategories({ title }, { genres: known?.categories }),
         launcher: 'EA',
         installed: isInstalled,
         installPath: installPath || undefined,

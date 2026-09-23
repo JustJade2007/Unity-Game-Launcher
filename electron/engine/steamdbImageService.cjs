@@ -1,4 +1,5 @@
 const https = require('https');
+const { resolveGameCategories, SOFTWARE_TITLE_PATTERNS } = require('./categoryService.cjs');
 
 const KNOWN_TITLE_APP_IDS = {
   uno: '470220',
@@ -288,6 +289,12 @@ class SteamDBImageService {
       if (json && json[cleanId] && json[cleanId].success && json[cleanId].data) {
         const data = json[cleanId].data;
         const details = {
+          type: data.type || 'game',
+          genres: Array.isArray(data.genres) ? data.genres.map((g) => g.description) : [],
+          categories: Array.isArray(data.categories) ? data.categories.map((c) => c.description) : [],
+          developers: data.developers || [],
+          publishers: data.publishers || [],
+          shortDescription: data.short_description || '',
           headerImage: data.header_image,
           capsuleImage: data.capsule_image,
           background: data.background || data.background_raw,
@@ -369,9 +376,21 @@ class SteamDBImageService {
       heroWorking = await this.checkUrl(currentMedia.heroUrl);
     }
 
-    // If game already has both a verified reachable cover and hero backdrop, skip heavy network searches
-    if (coverWorking && heroWorking) {
-      return { changed, media: currentMedia };
+    const existingCats = Array.isArray(game.categories) ? game.categories : [];
+    const isGenericCategories =
+      existingCats.length === 0 ||
+      (existingCats.length === 1 && (existingCats[0] === 'Steam' || existingCats[0] === 'Action' || existingCats[0] === 'Custom')) ||
+      (existingCats.length === 2 && existingCats.includes('Action') && (existingCats.includes('Steam') || existingCats.includes('Custom') || existingCats.includes('Xbox') || existingCats.includes('Ubisoft') || existingCats.includes('GOG') || existingCats.includes('Epic Games')));
+
+    const isSoftwareWithAction =
+      existingCats.includes('Action') &&
+      (SOFTWARE_TITLE_PATTERNS.test(game.title) || /dedicated server/i.test(game.title));
+
+    const needsCategoryEnrichment = isGenericCategories || isSoftwareWithAction;
+
+    // If game already has verified cover, verified hero, and accurate categories, skip heavy search
+    if (coverWorking && heroWorking && !needsCategoryEnrichment) {
+      return { changed, media: currentMedia, categories: existingCats };
     }
 
     // Determine target Steam AppID:
@@ -388,9 +407,11 @@ class SteamDBImageService {
       }
     }
 
+    let storeDetails = null;
+
     if (targetAppId) {
       const candidates = this.getCandidateUrls(targetAppId);
-      const storeDetails = await this.fetchStoreDetails(targetAppId);
+      storeDetails = await this.fetchStoreDetails(targetAppId);
 
       // --- Resolve Cover ---
       if (!coverWorking) {
@@ -468,7 +489,21 @@ class SteamDBImageService {
       heroWorking = true;
     }
 
-    return { changed, media: currentMedia };
+    // --- Resolve Accurate Categories ---
+    let finalCategories = existingCats;
+    const resolvedCats = resolveGameCategories(game, storeDetails);
+    if (resolvedCats && resolvedCats.length > 0) {
+      const isDiff =
+        resolvedCats.length !== existingCats.length ||
+        resolvedCats.some((c, i) => c !== existingCats[i]);
+
+      if (isDiff && (needsCategoryEnrichment || existingCats.includes('Action'))) {
+        finalCategories = resolvedCats;
+        changed = true;
+      }
+    }
+
+    return { changed, media: currentMedia, categories: finalCategories };
   }
 
   /**
@@ -492,11 +527,12 @@ class SteamDBImageService {
         slice.map(async (game, sliceIdx) => {
           const globalIdx = i + sliceIdx;
           try {
-            const { changed, media } = await this.enrichGameMedia(game);
+            const { changed, media, categories } = await this.enrichGameMedia(game);
             if (changed) {
               enrichedList[globalIdx] = {
                 ...game,
-                media,
+                media: media || game.media,
+                categories: categories || game.categories,
               };
               updatedCount++;
             }

@@ -8,6 +8,7 @@ const {
   calculateDirSizeGb,
   findGameExecutable,
 } = require('./registryHelper.cjs');
+const { resolveGameCategories } = require('../engine/categoryService.cjs');
 
 class EpicAdapter extends BaseAdapter {
   constructor() {
@@ -139,7 +140,7 @@ class EpicAdapter extends BaseAdapter {
             developer: 'Epic Partner',
             publisher: 'Epic Games',
             releaseDate: '',
-            categories: ['Epic Games', 'Action'],
+            categories: resolveGameCategories({ title: item.DisplayName }),
             launcher: 'Epic Games',
             installed: true,
             installPath: item.InstallLocation,

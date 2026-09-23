@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const steamdbImageService = require('./steamdbImageService.cjs');
+const { resolveGameCategories } = require('./categoryService.cjs');
 
 // Executables that should be ignored during directory scanning
 const IGNORED_EXE_PATTERNS = [
@@ -167,7 +168,7 @@ class BinaryMetadataParser {
         iconUrl: iconDataUrl,
         screenshots: [],
       },
-      categories: ['Custom', 'Action'],
+      categories: resolveGameCategories({ title: inferredTitle }),
     };
 
     // Query SteamDB fallback lookup for enriched artwork and description
@@ -177,11 +178,16 @@ class BinaryMetadataParser {
         if (appId) {
           result.appId = String(appId);
           const storeDetails = await steamdbImageService.fetchStoreDetails(appId);
-          const { media } = await steamdbImageService.enrichGameMedia({
+          const { media, categories } = await steamdbImageService.enrichGameMedia({
             title: inferredTitle,
             appId,
             media: result.media,
+            categories: result.categories,
           });
+
+          if (categories && categories.length > 0) {
+            result.categories = categories;
+          }
 
           if (media?.coverUrl) result.media.coverUrl = media.coverUrl;
           if (media?.heroUrl) result.media.heroUrl = media.heroUrl;

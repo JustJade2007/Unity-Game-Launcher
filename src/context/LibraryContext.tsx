@@ -433,12 +433,14 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       });
   }, [games, filters]);
 
-  // Aggregate categories
+  // Aggregate categories (excluding launcher names from genres list)
   const allCategories = useMemo(() => {
     const counts: Record<string, number> = {};
     const visible = games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden));
+    const LAUNCHER_NAMES = new Set(['Steam', 'Epic Games', 'GOG', 'EA', 'Ubisoft', 'Xbox', 'Battle.net', 'Local', 'Custom']);
     visible.forEach((g) => {
       g.categories.forEach((cat) => {
+        if (!cat || LAUNCHER_NAMES.has(cat)) return;
         counts[cat] = (counts[cat] || 0) + 1;
       });
     });

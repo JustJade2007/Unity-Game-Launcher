@@ -10,6 +10,7 @@ const {
   calculateDirSizeGb,
   findGameExecutable,
 } = require('./registryHelper.cjs');
+const { resolveGameCategories } = require('../engine/categoryService.cjs');
 
 class GogAdapter extends BaseAdapter {
   constructor() {
@@ -229,7 +230,7 @@ class GogAdapter extends BaseAdapter {
         developer: 'GOG Partner',
         publisher: 'GOG.com',
         releaseDate: '',
-        categories: ['GOG', 'Action'],
+        categories: resolveGameCategories({ title: item.title }),
         launcher: 'GOG',
         installed: true,
         installPath,
@@ -429,7 +430,7 @@ class GogAdapter extends BaseAdapter {
           developer: developers,
           publisher: publishers,
           releaseDate,
-          categories: ['GOG', ...genres],
+          categories: resolveGameCategories({ title: cleanTitle }, { genres }),
           coverUrl,
           heroUrl,
           logoUrl,

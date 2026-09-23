@@ -8,6 +8,7 @@ const {
   calculateDirSizeGb,
   findGameExecutable,
 } = require('./registryHelper.cjs');
+const { resolveGameCategories } = require('../engine/categoryService.cjs');
 
 const BLIZZARD_GAMES = {
   s2: {
@@ -362,7 +363,7 @@ class BattleNetAdapter extends BaseAdapter {
         developer: info?.developer || 'Blizzard Entertainment',
         publisher: info?.publisher || 'Blizzard Entertainment',
         releaseDate: '',
-        categories: info?.categories || ['Battle.net', 'Action'],
+        categories: resolveGameCategories({ title: item.title || info?.title || code }, { genres: info?.categories }),
         launcher: 'Battle.net',
         installed: true,
         installPath,
@@ -505,7 +506,7 @@ class BattleNetAdapter extends BaseAdapter {
         developer: info?.developer || 'Blizzard Entertainment',
         publisher: info?.publisher || 'Blizzard Entertainment',
         releaseDate: '',
-        categories: info?.categories || ['Battle.net', 'Action'],
+        categories: resolveGameCategories({ title }, { genres: info?.categories }),
         launcher: 'Battle.net',
         installed: isInstalled,
         installPath: installPath || undefined,

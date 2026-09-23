@@ -4,6 +4,7 @@ const https = require('https');
 const { shell } = require('electron');
 const BaseAdapter = require('./baseAdapter.cjs');
 const { calculateDirSizeGb, findGameExecutable } = require('./registryHelper.cjs');
+const { resolveGameCategories } = require('../engine/categoryService.cjs');
 
 // Known Microsoft Store / Xbox Product IDs for high-res art resolution
 const KNOWN_STORE_IDS = {
@@ -247,7 +248,7 @@ class XboxAdapter extends BaseAdapter {
               developer: 'Xbox Game Studios',
               publisher: 'Xbox Game Studios',
               releaseDate: '',
-              categories: ['Xbox', 'Action'],
+              categories: resolveGameCategories({ title: manifestTitle || sub }),
               launcher: 'Xbox',
               installed: true,
               installPath: fullPath,

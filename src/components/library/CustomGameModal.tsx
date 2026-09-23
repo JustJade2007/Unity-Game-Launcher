@@ -95,7 +95,7 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
       setDescription('');
       setDeveloper('');
       setPublisher('');
-      setCategoriesText('Custom, Action');
+      setCategoriesText('Custom');
       setReleaseDate(new Date().toISOString().split('T')[0]);
       setExecutablePath('');
       setLaunchArguments('');

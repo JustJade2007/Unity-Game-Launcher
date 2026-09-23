@@ -255,6 +255,268 @@ class GogAdapter extends BaseAdapter {
     return games;
   }
 
+  /**
+   * Scan all owned GOG titles from the local GOG Galaxy SQLite database (galaxy-2.0.db).
+   * Extracts rich metadata, ratings, developer, publisher, and native GOG CDN artwork.
+   * @returns {Promise<Array<object>>}
+   */
+  async scanOwnedGames() {
+    if (!fs.existsSync(this.storageDb)) return [];
+
+    let DatabaseSync;
+    try {
+      DatabaseSync = require('node:sqlite').DatabaseSync;
+    } catch (e) {
+      console.warn('[GogAdapter] node:sqlite is not available:', e);
+      return [];
+    }
+
+    const ownedGames = [];
+    let db;
+    try {
+      db = new DatabaseSync(this.storageDb, { readOnly: true });
+
+      const releaseRows = db.prepare(`
+        SELECT DISTINCT lr.releaseKey
+        FROM LibraryReleases lr
+        WHERE lr.releaseKey LIKE 'gog_%'
+      `).all();
+
+      if (!releaseRows || releaseRows.length === 0) {
+        return [];
+      }
+
+      const stmtPieces = db.prepare(`
+        SELECT gpt.type, gp.value
+        FROM GamePieces gp
+        JOIN GamePieceTypes gpt ON gp.gamePieceTypeId = gpt.id
+        WHERE gp.releaseKey = ?
+      `);
+
+      // Registry and disk paths to check installed status
+      const installedMap = new Map();
+      const regRoots = [
+        'HKLM\\SOFTWARE\\WOW6432Node\\GOG.com\\Games',
+        'HKLM\\SOFTWARE\\GOG.com\\Games',
+        'HKCU\\Software\\GOG.com\\Games',
+      ];
+      for (const root of regRoots) {
+        const subkeys = queryRegSubkeys(root);
+        for (const sub of subkeys) {
+          const gId = sub.split('\\').pop();
+          const vals = queryRegKeyValues(sub);
+          const p = vals.path ? path.normalize(vals.path.replace(/\//g, '\\')) : '';
+          if (p && fs.existsSync(p)) {
+            installedMap.set(gId, {
+              installPath: p,
+              executable: vals.exe && fs.existsSync(vals.exe) ? vals.exe : findGameExecutable(p),
+            });
+          }
+        }
+      }
+
+      const commonGogFolders = ['C:\\GOG Games', 'D:\\GOG Games', 'E:\\GOG Games'];
+      const rawEntries = [];
+
+      for (const { releaseKey } of releaseRows) {
+        const gogId = releaseKey.replace('gog_', '');
+        const pieces = stmtPieces.all(releaseKey);
+        const pieceMap = {};
+        for (const p of pieces) {
+          try {
+            pieceMap[p.type] = JSON.parse(p.value);
+          } catch {
+            pieceMap[p.type] = p.value;
+          }
+        }
+
+        const rawTitle = pieceMap.title?.title || pieceMap.originalTitle?.title;
+        if (!rawTitle) continue;
+
+        const isPrimePromo = /-\s*Amazon Prime/i.test(rawTitle);
+        const cleanTitle = rawTitle.replace(/\s*-\s*Amazon Prime/i, '').trim();
+
+        // GOG artwork resolution
+        let coverUrl = '';
+        let heroUrl = '';
+        let logoUrl = '';
+        const screenshots = [];
+
+        if (pieceMap.originalImages?.verticalCover) {
+          coverUrl = pieceMap.originalImages.verticalCover;
+        } else if (pieceMap.storeImages?.verticalCover) {
+          coverUrl = pieceMap.storeImages.verticalCover.replace('{formatter}', 'glx_vertical_cover');
+        }
+
+        if (pieceMap.originalImages?.background) {
+          heroUrl = pieceMap.originalImages.background;
+        } else if (pieceMap.storeImages?.horizontalCover) {
+          heroUrl = pieceMap.storeImages.horizontalCover.replace('{formatter}', 'glx_bg_top_480');
+        }
+
+        if (pieceMap.storeImages?.logo) {
+          logoUrl = pieceMap.storeImages.logo;
+        }
+
+        if (Array.isArray(pieceMap.media?.artworks)) {
+          screenshots.push(...pieceMap.media.artworks);
+        }
+        if (Array.isArray(pieceMap.media?.screenshots)) {
+          screenshots.push(...pieceMap.media.screenshots);
+        }
+
+        // Cross-platform release identifiers
+        let steamAppId = null;
+        if (Array.isArray(pieceMap.allGameReleases?.releases)) {
+          for (const rel of pieceMap.allGameReleases.releases) {
+            if (rel.startsWith('steam_')) {
+              steamAppId = rel.replace('steam_', '');
+              break;
+            }
+          }
+        }
+
+        if (!coverUrl && steamAppId) {
+          coverUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${steamAppId}/library_600x900.jpg`;
+        }
+        if (!heroUrl && steamAppId) {
+          heroUrl = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${steamAppId}/library_hero.jpg`;
+        }
+
+        const meta = pieceMap.meta || pieceMap.originalMeta || {};
+        const developers = meta.developers?.join(', ') || 'GOG Partner';
+        const publishers = meta.publishers?.join(', ') || 'GOG.com';
+        const genres = meta.genres || ['GOG', 'Adventure'];
+
+        let releaseDate = '';
+        if (meta.releaseDate && typeof meta.releaseDate === 'number') {
+          releaseDate = new Date(meta.releaseDate * 1000).toISOString().split('T')[0];
+        }
+
+        // Check installed on disk
+        let isInstalled = false;
+        let installPath = undefined;
+        let executable = undefined;
+        let sizeGb = undefined;
+
+        if (installedMap.has(gogId)) {
+          const inst = installedMap.get(gogId);
+          isInstalled = true;
+          installPath = inst.installPath;
+          executable = inst.executable;
+          sizeGb = calculateDirSizeGb(installPath);
+        } else {
+          for (const base of commonGogFolders) {
+            if (!fs.existsSync(base)) continue;
+            const cand = path.join(base, cleanTitle);
+            if (fs.existsSync(cand)) {
+              isInstalled = true;
+              installPath = cand;
+              executable = findGameExecutable(cand);
+              sizeGb = calculateDirSizeGb(cand);
+              break;
+            }
+          }
+        }
+
+        rawEntries.push({
+          releaseKey,
+          gogId,
+          steamAppId,
+          title: cleanTitle,
+          rawTitle,
+          isPrimePromo,
+          developer: developers,
+          publisher: publishers,
+          releaseDate,
+          categories: ['GOG', ...genres],
+          coverUrl,
+          heroUrl,
+          logoUrl,
+          screenshots: screenshots.slice(0, 5),
+          summary: pieceMap.summary?.summary ? pieceMap.summary.summary.replace(/<[^>]+>/g, '').slice(0, 350) : '',
+          isInstalled,
+          installPath,
+          executable,
+          sizeGb: sizeGb && sizeGb > 0 ? sizeGb : undefined,
+        });
+      }
+
+      // Group and deduplicate: prefer base releases over promo variants
+      const dedupMap = new Map();
+      for (const entry of rawEntries) {
+        const normKey = entry.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const existing = dedupMap.get(normKey);
+
+        if (!existing) {
+          dedupMap.set(normKey, entry);
+        } else {
+          // If existing is promo and new entry is non-promo or has richer artwork, replace
+          if (existing.isPrimePromo && !entry.isPrimePromo) {
+            dedupMap.set(normKey, entry);
+          } else if (!existing.coverUrl && entry.coverUrl) {
+            dedupMap.set(normKey, {
+              ...existing,
+              coverUrl: entry.coverUrl,
+              heroUrl: entry.heroUrl || existing.heroUrl,
+              logoUrl: entry.logoUrl || existing.logoUrl,
+              screenshots: entry.screenshots.length > 0 ? entry.screenshots : existing.screenshots,
+            });
+          }
+        }
+      }
+
+      for (const item of dedupMap.values()) {
+        ownedGames.push({
+          id: item.releaseKey,
+          appId: item.gogId,
+          title: item.title,
+          tagline: 'GOG Galaxy Title',
+          description: item.summary || (item.isInstalled
+            ? `Installed via GOG Galaxy at ${item.installPath}`
+            : 'Owned in GOG Galaxy library'),
+          developer: item.developer,
+          publisher: item.publisher,
+          releaseDate: item.releaseDate,
+          categories: item.categories,
+          launcher: 'GOG',
+          installed: item.isInstalled,
+          installPath: item.installPath,
+          executable: item.executable,
+          sizeGb: item.sizeGb,
+          playtime: {
+            totalMinutes: 0,
+          },
+          media: {
+            coverUrl: item.coverUrl,
+            heroUrl: item.heroUrl,
+            logoUrl: item.logoUrl,
+            iconUrl: item.coverUrl,
+            screenshots: item.screenshots,
+          },
+          achievements: [],
+          friends: [],
+          launchUri: `goggalaxy://openGameView/${item.gogId}`,
+          installUri: `goggalaxy://openGameView/${item.gogId}`,
+          ownershipSources: [
+            {
+              launcher: 'GOG',
+              gameId: item.gogId,
+              installed: item.isInstalled,
+              installPath: item.installPath,
+              launchUri: `goggalaxy://openGameView/${item.gogId}`,
+              installUri: `goggalaxy://openGameView/${item.gogId}`,
+            },
+          ],
+        });
+      }
+    } catch (err) {
+      console.error('[GogAdapter] Error scanning owned games from galaxy-2.0.db:', err);
+    }
+
+    return ownedGames;
+  }
+
   async launchGame(game) {
     const gameId = game.appId || game.id.replace('gog_', '');
     const uri = game.launchUri || `goggalaxy://openGameView/${gameId}`;

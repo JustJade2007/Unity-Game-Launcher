@@ -171,39 +171,94 @@ function calculateDirSizeGb(dirPath, maxDepth = 4) {
 function findGameExecutable(dirPath, preferredNames = []) {
   if (!dirPath || !fs.existsSync(dirPath)) return null;
 
-  // Check preferred names first
+  // 1. Check preferred names directly or as relative paths
   for (const name of preferredNames) {
     const direct = path.join(dirPath, name);
     if (fs.existsSync(direct)) return direct;
   }
 
+  // 2. Check common game binary subdirectories first
+  const commonSubdirs = [
+    'Binaries\\Win64',
+    'bin\\x64',
+    'bin\\Win64',
+    'bin',
+    'Binaries',
+    'SwGame\\Binaries\\Win64',
+    'Haze1\\Binaries\\Win64',
+    'Game\\Bin',
+    'Content',
+  ];
+  for (const cs of commonSubdirs) {
+    const p = path.join(dirPath, cs);
+    if (fs.existsSync(p)) {
+      for (const name of preferredNames) {
+        const subDirect = path.join(p, name);
+        if (fs.existsSync(subDirect)) return subDirect;
+      }
+      try {
+        const files = fs.readdirSync(p);
+        const valid = files.filter((f) => {
+          const l = f.toLowerCase();
+          return (
+            l.endsWith('.exe') &&
+            !l.startsWith('unins') &&
+            !l.includes('crash') &&
+            !l.includes('report') &&
+            !l.includes('update') &&
+            !l.includes('cleanup') &&
+            !l.includes('setup') &&
+            !l.includes('install') &&
+            !l.includes('redist')
+          );
+        });
+        if (valid.length > 0) {
+          return path.join(p, valid[0]);
+        }
+      } catch {}
+    }
+  }
+
+  // 3. Scan root folder executables
   try {
     const files = fs.readdirSync(dirPath);
-    const exes = files.filter(f => f.toLowerCase().endsWith('.exe'));
+    const exes = files.filter((f) => f.toLowerCase().endsWith('.exe'));
 
-    // Filter out common installers, updaters, crash reporters, unins
-    const filtered = exes.filter(f => {
+    const filtered = exes.filter((f) => {
       const lower = f.toLowerCase();
-      return !lower.startsWith('unins') &&
-             !lower.includes('crash') &&
-             !lower.includes('report') &&
-             !lower.includes('update') &&
-             !lower.includes('setup') &&
-             !lower.includes('install') &&
-             !lower.includes('helper') &&
-             !lower.includes('redist');
+      return (
+        !lower.startsWith('unins') &&
+        !lower.includes('crash') &&
+        !lower.includes('report') &&
+        !lower.includes('update') &&
+        !lower.includes('setup') &&
+        !lower.includes('cleanup') &&
+        !lower.includes('install') &&
+        !lower.includes('helper') &&
+        !lower.includes('redist')
+      );
     });
 
     if (filtered.length > 0) {
       return path.join(dirPath, filtered[0]);
     }
 
-    if (exes.length > 0) {
-      return path.join(dirPath, exes[0]);
-    }
+    // 4. Check subdirectories excluding installer/redist/engine directories
+    const ignoredSubdirs = new Set([
+      '__installer',
+      '__redist',
+      'directx',
+      'redist',
+      'support',
+      'installer',
+      'engine',
+      'crashreport',
+      'tools',
+      'docs',
+    ]);
 
-    // Check one level deep (e.g. Binaries/Win64, bin, x64)
-    const subdirs = files.filter(f => {
+    const subdirs = files.filter((f) => {
+      if (ignoredSubdirs.has(f.toLowerCase())) return false;
       try {
         return fs.statSync(path.join(dirPath, f)).isDirectory();
       } catch {
@@ -215,13 +270,24 @@ function findGameExecutable(dirPath, preferredNames = []) {
       const subPath = path.join(dirPath, sub);
       try {
         const subFiles = fs.readdirSync(subPath);
-        const subExes = subFiles.filter(f => {
+        for (const name of preferredNames) {
+          if (subFiles.some((f) => f.toLowerCase() === name.toLowerCase())) {
+            return path.join(subPath, name);
+          }
+        }
+        const subExes = subFiles.filter((f) => {
           const lower = f.toLowerCase();
-          return lower.endsWith('.exe') &&
-                 !lower.startsWith('unins') &&
-                 !lower.includes('crash') &&
-                 !lower.includes('report') &&
-                 !lower.includes('update');
+          return (
+            lower.endsWith('.exe') &&
+            !lower.startsWith('unins') &&
+            !lower.includes('crash') &&
+            !lower.includes('report') &&
+            !lower.includes('update') &&
+            !lower.includes('cleanup') &&
+            !lower.includes('setup') &&
+            !lower.includes('install') &&
+            !lower.includes('redist')
+          );
         });
         if (subExes.length > 0) {
           return path.join(subPath, subExes[0]);

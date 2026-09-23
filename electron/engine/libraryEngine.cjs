@@ -10,12 +10,17 @@ const BattleNetAdapter = require('../adapters/battlenetAdapter.cjs');
 
 function normalizeTitle(title) {
   if (!title) return '';
-  return title
+  const norm = title
     .toLowerCase()
     .replace(/[™®©]/g, '')
     .replace(/[:\-_'’"]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+
+  if (norm === 'minecraft for windows' || norm === 'minecraft launcher' || norm === 'minecraft uwp') {
+    return 'minecraft';
+  }
+  return norm;
 }
 
 class LibraryEngine {
@@ -51,11 +56,19 @@ class LibraryEngine {
         let count = currentLibrary.filter((g) => g.launcher === id || g.ownershipSources?.some((s) => s.launcher === id)).length;
 
         // If library store hasn't been synced for this installed launcher, get count from adapter
-        if (count === 0 && installed && typeof adapter.scanInstalledGames === 'function') {
+        if (count === 0 && installed) {
           try {
-            const detected = await adapter.scanInstalledGames();
-            if (Array.isArray(detected)) {
-              count = detected.length;
+            if (typeof adapter.scanOwnedGames === 'function') {
+              const owned = await adapter.scanOwnedGames();
+              if (Array.isArray(owned) && owned.length > 0) {
+                count = owned.length;
+              }
+            }
+            if (count === 0 && typeof adapter.scanInstalledGames === 'function') {
+              const detected = await adapter.scanInstalledGames();
+              if (Array.isArray(detected)) {
+                count = detected.length;
+              }
             }
           } catch {}
         }
@@ -117,7 +130,7 @@ class LibraryEngine {
       }
     }
 
-    // 2. Scan owned games from platforms with cloud libraries (e.g. Steam Web API)
+    // 2. Scan owned games from platforms with cloud/local databases (Steam, Ubisoft, GOG, Battle.net, EA)
     try {
       const steamAdapter = this.adapters.Steam;
       if (await steamAdapter.isInstalled()) {
@@ -126,6 +139,46 @@ class LibraryEngine {
       }
     } catch (err) {
       console.error('[LibraryEngine] Error scanning owned Steam games:', err);
+    }
+
+    try {
+      const ubiAdapter = this.adapters.Ubisoft;
+      if (ubiAdapter && (await ubiAdapter.isInstalled()) && typeof ubiAdapter.scanOwnedGames === 'function') {
+        const ownedUbiGames = await ubiAdapter.scanOwnedGames();
+        scannedGames.push(...ownedUbiGames);
+      }
+    } catch (err) {
+      console.error('[LibraryEngine] Error scanning owned Ubisoft games:', err);
+    }
+
+    try {
+      const gogAdapter = this.adapters.GOG;
+      if (gogAdapter && (await gogAdapter.isInstalled()) && typeof gogAdapter.scanOwnedGames === 'function') {
+        const ownedGogGames = await gogAdapter.scanOwnedGames();
+        scannedGames.push(...ownedGogGames);
+      }
+    } catch (err) {
+      console.error('[LibraryEngine] Error scanning owned GOG games:', err);
+    }
+
+    try {
+      const bnetAdapter = this.adapters['Battle.net'];
+      if (bnetAdapter && (await bnetAdapter.isInstalled()) && typeof bnetAdapter.scanOwnedGames === 'function') {
+        const ownedBnetGames = await bnetAdapter.scanOwnedGames();
+        scannedGames.push(...ownedBnetGames);
+      }
+    } catch (err) {
+      console.error('[LibraryEngine] Error scanning owned Battle.net games:', err);
+    }
+
+    try {
+      const eaAdapter = this.adapters.EA;
+      if (eaAdapter && (await eaAdapter.isInstalled()) && typeof eaAdapter.scanOwnedGames === 'function') {
+        const ownedEaGames = await eaAdapter.scanOwnedGames();
+        scannedGames.push(...ownedEaGames);
+      }
+    } catch (err) {
+      console.error('[LibraryEngine] Error scanning owned EA games:', err);
     }
 
     // 3. Deduplicate and merge titles
@@ -182,6 +235,16 @@ class LibraryEngine {
           });
         }
 
+        // Ensure categories include launcher platform
+        if (item.launcher && !existing.categories.includes(item.launcher)) {
+          existing.categories.push(item.launcher);
+        }
+
+        // If existing title is a launcher utility and item is the actual game, upgrade title
+        if (existing.title.toLowerCase().endsWith(' launcher') && !item.title.toLowerCase().endsWith(' launcher')) {
+          existing.title = item.title;
+        }
+
         // If this copy is installed, prioritize installed state and launch paths
         if (item.installed) {
           const wasNotInstalled = !existing.installed;
@@ -224,15 +287,18 @@ class LibraryEngine {
         if (!existing.media.logoUrl && item.media?.logoUrl) {
           existing.media.logoUrl = item.media.logoUrl;
         }
+        if ((!existing.media.screenshots || existing.media.screenshots.length === 0) && item.media?.screenshots?.length > 0) {
+          existing.media.screenshots = item.media.screenshots;
+        }
       }
     }
 
     let mergedLibrary = Array.from(unifiedMap.values());
 
-    // Enrich titles lacking media (non-Steam games or Steam apps without standard 600x900 covers)
+    // Enrich titles lacking media
     try {
       const needsEnrichment = mergedLibrary.some(
-        (g) => !g.media?.coverUrl || g.launcher !== 'Steam'
+        (g) => !g.media?.coverUrl || !g.media?.heroUrl || g.media.coverUrl.includes('placeholder.com')
       );
       if (needsEnrichment) {
         const { games: enrichedGames } = await steamdbImageService.enrichLibrary(mergedLibrary);

@@ -336,7 +336,12 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
 
         if (filters.selectedLauncher) {
-          if (game.launcher !== filters.selectedLauncher) return false;
+          const selected = filters.selectedLauncher.toLowerCase();
+          const matchesLauncher = game.launcher.toLowerCase() === selected;
+          const matchesOwnership = game.ownershipSources?.some(
+            (s) => s.launcher?.toLowerCase() === selected
+          );
+          if (!matchesLauncher && !matchesOwnership) return false;
         }
 
         if (filters.onlyFavorites && !game.favorite) return false;
@@ -388,9 +393,19 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       Local: 0,
     };
     games.forEach((g: Game) => {
-      if (counts[g.launcher] !== undefined) {
-        counts[g.launcher] = (counts[g.launcher] || 0) + 1;
+      const launchersForGame = new Set<string>();
+      if (g.launcher) launchersForGame.add(g.launcher);
+      if (Array.isArray(g.ownershipSources)) {
+        g.ownershipSources.forEach((s) => {
+          if (s.launcher) launchersForGame.add(s.launcher);
+        });
       }
+      launchersForGame.forEach((l) => {
+        const key = l as LauncherType;
+        if (counts[key] !== undefined) {
+          counts[key] = (counts[key] || 0) + 1;
+        }
+      });
     });
     return (Object.entries(counts) as [LauncherType, number][])
       .filter(([, count]) => count > 0)

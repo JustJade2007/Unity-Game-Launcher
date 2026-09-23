@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getLauncherStatus: () => ipcRenderer.invoke('launcher-get-status'),
   syncLaunchers: (options) => ipcRenderer.invoke('launcher-sync-all', options),
   launchGame: (game, launcher) => ipcRenderer.invoke('launcher-launch-game', { game, launcher }),
+  installGame: (game, launcher) => ipcRenderer.invoke('launcher-install-game', { game, launcher }),
   getAchievements: (gameId, launcher, appId) => ipcRenderer.invoke('launcher-get-achievements', { gameId, launcher, appId }),
   enrichGameMedia: (gameId) => ipcRenderer.invoke('launcher-enrich-media', { gameId }),
   enrichAllMedia: () => ipcRenderer.invoke('launcher-enrich-all-media'),

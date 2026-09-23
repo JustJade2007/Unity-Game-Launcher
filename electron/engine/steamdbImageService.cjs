@@ -1,5 +1,34 @@
 const https = require('https');
 
+const KNOWN_TITLE_APP_IDS = {
+  uno: '470220',
+  'watch dogs legion': '2239550',
+  'watch dogs legion of the dead': '2239550',
+  'ghost recon breakpoint': '2231380',
+  'tom clancy s ghost recon breakpoint': '2231380',
+  'rainbow six siege': '359550',
+  'tom clancy s rainbow six siege': '359550',
+  'rainbow six siege test server': '623990',
+  'tom clancy s rainbow six siege test server': '623990',
+  'watch dogs': '243470',
+  'watch dogs 2': '447040',
+  'star trek bridge crew': '527100',
+  'minecraft': null, // Bedrock is non-Steam; use Microsoft Catalog
+  'minecraft for windows': null,
+};
+
+const KNOWN_STORE_IDS = {
+  'minecraft for windows': '9NBLGGH2JHXJ',
+  minecraft: '9NBLGGH2JHXJ',
+  'minecraft uwp': '9NBLGGH2JHXJ',
+  'forza horizon 5': '9NJX550424DJ',
+  'forza horizon 4': '9PNJXGHTDG57',
+  'halo infinite': '9PP5G1F0C2B6',
+  'sea of thieves': '9P2N57MC619K',
+  starfield: '9NCGNJ5VKQ10',
+  'microsoft flight simulator': '9NRBDJX2W1TX',
+};
+
 /**
  * Clean a game title to improve Steam catalog matching.
  * @param {string} title
@@ -9,7 +38,7 @@ function cleanGameTitle(title) {
   if (!title) return '';
   return title
     .replace(/[™®©]/g, '')
-    .replace(/\b(GOTY|Game of the Year|Deluxe|Standard|Collector's|Definitive|Enhanced|Gold|Ultimate|Special)\s*(Edition|Bundle)?\b/gi, '')
+    .replace(/\b(for Windows|Win10|PC|Edition|GOTY|Game of the Year|Deluxe|Standard|Collector's|Definitive|Enhanced|Gold|Ultimate|Special)\s*(Edition|Bundle)?\b/gi, '')
     .replace(/[:\-_'’"]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
@@ -108,11 +137,50 @@ function httpsGetJson(url, timeoutMs = 5000) {
   });
 }
 
+/**
+ * Fetch official artwork from Microsoft Store Display Catalog API.
+ * @param {string} productId
+ * @returns {Promise<{ coverUrl: string, heroUrl: string, logoUrl: string, screenshots: string[] }|null>}
+ */
+function fetchMicrosoftStoreArt(productId) {
+  return new Promise((resolve) => {
+    if (!productId) return resolve(null);
+    try {
+      const url = `https://displaycatalog.mp.microsoft.com/v7/products/${productId}?market=US&languages=en-US`;
+      httpsGetJson(url, 4500).then((data) => {
+        if (!data || !data.Product) return resolve(null);
+        const images = data.Product?.LocalizedProperties?.[0]?.Images || [];
+        const poster =
+          images.find((i) => i.ImagePurpose === 'Poster') ||
+          images.find((i) => i.ImagePurpose === 'BrandedKeyArt') ||
+          images.find((i) => i.ImagePurpose === 'BoxArt');
+        const hero =
+          images.find((i) => i.ImagePurpose === 'SuperHeroArt') ||
+          images.find((i) => i.ImagePurpose === 'TitledHeroArt') ||
+          images.find((i) => i.ImagePurpose === 'Hero');
+        const logo = images.find((i) => i.ImagePurpose === 'Logo');
+        const screenshots = images
+          .filter((i) => i.ImagePurpose === 'Screenshot')
+          .map((i) => (i.Uri.startsWith('http') ? i.Uri : `https:${i.Uri}`));
+
+        resolve({
+          coverUrl: poster ? (poster.Uri.startsWith('http') ? poster.Uri : `https:${poster.Uri}`) : '',
+          heroUrl: hero ? (hero.Uri.startsWith('http') ? hero.Uri : `https:${hero.Uri}`) : '',
+          logoUrl: logo ? (logo.Uri.startsWith('http') ? logo.Uri : `https:${logo.Uri}`) : '',
+          screenshots,
+        });
+      }).catch(() => resolve(null));
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
 class SteamDBImageService {
   constructor() {
     this.appDetailsCache = new Map();
     this.titleSearchCache = new Map();
-    this.verifiedUrlsCache = new Map(); // url -> boolean
+    this.verifiedUrlsCache = new Map();
   }
 
   /**
@@ -169,8 +237,13 @@ class SteamDBImageService {
     const clean = cleanGameTitle(title);
     if (!clean) return null;
 
-    if (this.titleSearchCache.has(clean.toLowerCase())) {
-      return this.titleSearchCache.get(clean.toLowerCase());
+    const normKey = clean.toLowerCase();
+    if (normKey in KNOWN_TITLE_APP_IDS) {
+      return KNOWN_TITLE_APP_IDS[normKey];
+    }
+
+    if (this.titleSearchCache.has(normKey)) {
+      return this.titleSearchCache.get(normKey);
     }
 
     try {
@@ -178,22 +251,21 @@ class SteamDBImageService {
       const data = await httpsGetJson(url);
       const items = data?.items || [];
       if (items.length > 0) {
-        // Pick the top matching item
         const best = items[0];
         const appId = String(best.id);
-        this.titleSearchCache.set(clean.toLowerCase(), appId);
+        this.titleSearchCache.set(normKey, appId);
         return appId;
       }
     } catch (err) {
       console.error(`[SteamDBImageService] Search failed for "${title}":`, err);
     }
 
-    this.titleSearchCache.set(clean.toLowerCase(), null);
+    this.titleSearchCache.set(normKey, null);
     return null;
   }
 
   /**
-   * Fetch official store metadata (with exact CDN hashes) from Steam.
+   * Fetch official store metadata from Steam.
    * @param {string} appId
    * @returns {Promise<object|null>}
    */
@@ -245,7 +317,6 @@ class SteamDBImageService {
 
   /**
    * Enriches media for a single game object.
-   * Resolves valid cover, hero banner, logo, and screenshots using SteamDB & Steam static CDNs.
    * @param {object} game
    * @returns {Promise<{ changed: boolean, media: object }>}
    */
@@ -255,33 +326,59 @@ class SteamDBImageService {
     const currentMedia = { ...(game.media || {}) };
     let changed = false;
 
-    // 1. Determine target Steam AppID (either existing or by searching title)
-    let targetAppId = game.appId || (game.id?.startsWith('steam_') ? game.id.replace('steam_', '') : null);
-
-    if (!targetAppId && game.title) {
-      targetAppId = await this.findAppIdByTitle(game.title);
-      if (targetAppId) {
-        changed = true;
+    // Check if Xbox or Microsoft Store game needs artwork
+    const isXbox = game.launcher === 'Xbox' || game.id?.startsWith('xbox_');
+    if (isXbox && (!currentMedia.coverUrl || !currentMedia.heroUrl)) {
+      const storeIdKey = game.title?.toLowerCase().trim();
+      const storeId = KNOWN_STORE_IDS[storeIdKey] || KNOWN_STORE_IDS[cleanGameTitle(game.title).toLowerCase()];
+      if (storeId) {
+        const catalogArt = await fetchMicrosoftStoreArt(storeId);
+        if (catalogArt) {
+          if (!currentMedia.coverUrl && catalogArt.coverUrl) {
+            currentMedia.coverUrl = catalogArt.coverUrl;
+            changed = true;
+          }
+          if (!currentMedia.heroUrl && catalogArt.heroUrl) {
+            currentMedia.heroUrl = catalogArt.heroUrl;
+            changed = true;
+          }
+          if (!currentMedia.logoUrl && catalogArt.logoUrl) {
+            currentMedia.logoUrl = catalogArt.logoUrl;
+            changed = true;
+          }
+          if ((!currentMedia.screenshots || currentMedia.screenshots.length === 0) && catalogArt.screenshots?.length > 0) {
+            currentMedia.screenshots = catalogArt.screenshots;
+            changed = true;
+          }
+        }
       }
     }
 
-    // 2. Test current cover image validity
-    let coverWorking = false;
-    if (currentMedia.coverUrl && !currentMedia.coverUrl.includes('placeholder.com')) {
-      coverWorking = await this.checkUrl(currentMedia.coverUrl);
+    const hasCover = Boolean(currentMedia.coverUrl && !currentMedia.coverUrl.includes('placeholder.com'));
+    const hasHero = Boolean(currentMedia.heroUrl && !currentMedia.heroUrl.includes('placeholder.com'));
+
+    // If game already has both a cover and hero backdrop, skip heavy network searches
+    if (hasCover && hasHero) {
+      return { changed, media: currentMedia };
     }
 
-    let heroWorking = false;
-    if (currentMedia.heroUrl) {
-      heroWorking = await this.checkUrl(currentMedia.heroUrl);
+    // Determine target Steam AppID:
+    // Only use game.appId if this is genuinely a Steam game.
+    let targetAppId = null;
+    if (game.launcher === 'Steam' || game.id?.startsWith('steam_')) {
+      targetAppId = game.appId || (game.id ? game.id.replace('steam_', '') : null);
+    } else if (game.title) {
+      const cleanKey = cleanGameTitle(game.title).toLowerCase();
+      if (cleanKey in KNOWN_TITLE_APP_IDS) {
+        targetAppId = KNOWN_TITLE_APP_IDS[cleanKey];
+      } else {
+        targetAppId = await this.findAppIdByTitle(game.title);
+      }
     }
 
-    // If both cover and hero are already working and screenshots exist, no enrichment needed
-    if (coverWorking && heroWorking && currentMedia.screenshots?.length > 0) {
-      return { changed: false, media: currentMedia };
-    }
+    let coverWorking = hasCover;
+    let heroWorking = hasHero;
 
-    // 3. If we have a target AppID, query SteamDB candidates & store details
     if (targetAppId) {
       const candidates = this.getCandidateUrls(targetAppId);
       const storeDetails = await this.fetchStoreDetails(targetAppId);
@@ -369,17 +466,21 @@ class SteamDBImageService {
           try {
             const { changed, media } = await this.enrichGameMedia(game);
             if (changed) {
-              enrichedList[globalIdx] = { ...game, media };
+              enrichedList[globalIdx] = {
+                ...game,
+                media,
+              };
               updatedCount++;
             }
           } catch (err) {
-            console.error(`[SteamDBImageService] Error enriching game "${game.title}":`, err);
+            console.warn(`[SteamDBImageService] Failed to enrich game "${game.title}":`, err.message);
           }
         })
       );
 
       if (typeof onProgress === 'function') {
-        onProgress(Math.min(i + concurrency, enrichedList.length), enrichedList.length);
+        const pct = Math.round((Math.min(i + concurrency, enrichedList.length) / enrichedList.length) * 100);
+        onProgress(pct, enrichedList.length);
       }
     }
 

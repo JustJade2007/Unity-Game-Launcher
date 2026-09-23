@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Game } from '../../types/game';
 import { useLibrary } from '../../context/LibraryContext';
-import { Clock, Star, Play, Download, Gamepad2 } from 'lucide-react';
+import { Clock, Star, Play, Download, Gamepad2, FolderCode, EyeOff } from 'lucide-react';
 
 interface GameCardProps {
   game: Game;
@@ -72,7 +72,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, onOpenDetail }) => {
         isSelected
           ? 'border-indigo-500 shadow-lg shadow-indigo-500/20 ring-1 ring-indigo-500/50'
           : 'border-white/5 hover:border-indigo-500/50 hover:shadow-xl hover:shadow-black/60'
-      }`}
+      } ${game.hidden ? 'opacity-65 saturate-[0.65]' : ''}`}
     >
       {/* Poster Image (2:3 aspect ratio) */}
       <div className="relative aspect-[2/3] w-full overflow-hidden bg-[#0d0e14]">
@@ -107,9 +107,24 @@ export const GameCard: React.FC<GameCardProps> = ({ game, onOpenDetail }) => {
         {/* Top Badges */}
         <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
           <div className="flex items-center gap-1">
-            <span className="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white border border-white/10 shadow-sm">
-              {game.launcher}
-            </span>
+            {game.isCustom || game.launcher === 'Local' ? (
+              <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-md bg-gradient-to-r from-violet-600 to-indigo-600 text-white border border-violet-400/40 shadow-sm flex items-center gap-1">
+                <FolderCode className="w-2.5 h-2.5" />
+                <span>Custom</span>
+              </span>
+            ) : (
+              <span className="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-white border border-white/10 shadow-sm">
+                {game.launcher}
+              </span>
+            )}
+
+            {game.hidden && (
+              <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 backdrop-blur-md flex items-center gap-1">
+                <EyeOff className="w-2.5 h-2.5" />
+                <span>Hidden</span>
+              </span>
+            )}
+
             {otherLaunchers.map((source) => (
               <span
                 key={source.launcher}

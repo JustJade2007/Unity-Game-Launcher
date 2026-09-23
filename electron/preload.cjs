@@ -40,5 +40,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('library-updated', handler);
     return () => ipcRenderer.removeListener('library-updated', handler);
   },
+  selectExecutable: () => ipcRenderer.invoke('dialog-select-executable'),
+  selectDirectory: () => ipcRenderer.invoke('dialog-select-directory'),
+  parseCustomGame: (filePath) => ipcRenderer.invoke('custom-game-parse', { filePath }),
+  scanDirectoryForGames: (dirPath) => ipcRenderer.invoke('custom-game-scan-directory', { dirPath }),
+  rescanCustomGame: (game) => ipcRenderer.invoke('custom-game-rescan', { game }),
+  deleteGame: (gameId) => ipcRenderer.invoke('library-delete-game', { gameId }),
   isElectron: true,
 });

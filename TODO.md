@@ -74,23 +74,23 @@
 
 ---
 
-## ⚪ Issue #4: Local Directory and Custom Game Management
+## 🟢 Issue #4: Local Directory and Custom Game Management
 
 ### 🛠️ Local & Manual Game Entry Tooling
-- [ ] Add native file and directory selection dialogs
-- [ ] Support custom executable paths, arguments, and working directory entries
-- [ ] Build local binary metadata parser (icons, version headers, file properties)
+- [x] Add native file and directory selection dialogs
+- [x] Support custom executable paths, arguments, and working directory entries
+- [x] Build local binary metadata parser (icons, version headers, file properties)
 - [x] Integrate SteamDB fallback lookup for metadata enrichment
 
 ### 📁 Custom Library Item Maintenance
-- [ ] Implement manual entry edit forms and directory rescanning
-- [ ] Support deletion and soft-hide for custom titles
-- [ ] Add distinct UI badges/indicators to differentiate custom titles from launcher imports
+- [x] Implement manual entry edit forms and directory rescanning
+- [x] Support deletion and soft-hide for custom titles
+- [x] Add distinct UI badges/indicators to differentiate custom titles from launcher imports
 
 > #### 🎯 Acceptance Criteria
-> - [ ] Users can manually add, edit, rescan, and remove custom games without friction.
-> - [ ] Parsing/lookup errors fail gracefully with actionable feedback.
-> - [ ] Custom entries retain metadata attribution and remain reliably launchable.
+> - [x] Users can manually add, edit, rescan, and remove custom games without friction.
+> - [x] Parsing/lookup errors fail gracefully with actionable feedback.
+> - [x] Custom entries retain metadata attribution and remain reliably launchable.
 
 ---
 

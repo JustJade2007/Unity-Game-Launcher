@@ -6,6 +6,8 @@ import {
   Compass,
   FilterX,
   Sparkles,
+  EyeOff,
+  Plus,
 } from 'lucide-react';
 import { useLibrary } from '../../context/LibraryContext';
 
@@ -13,9 +15,10 @@ import { LauncherType } from '../../types/game';
 
 interface SidebarProps {
   onOpenLaunchers?: () => void;
+  onOpenAddGame?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame }) => {
   const {
     filters,
     setSelectedCategory,
@@ -25,6 +28,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers }) => {
     allCategories,
     allLaunchers,
     totalGamesCount,
+    hiddenGamesCount,
+    toggleShowHidden,
     setSearchQuery,
   } = useLibrary();
 
@@ -34,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers }) => {
     setSearchQuery('');
     if (filters.onlyFavorites) toggleFavoritesOnly();
     if (filters.onlyInstalled) toggleInstalledOnly();
+    if (filters.showHidden) toggleShowHidden();
   };
 
   const hasActiveFilters =
@@ -41,6 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers }) => {
     filters.selectedLauncher !== null ||
     filters.onlyFavorites ||
     filters.onlyInstalled ||
+    filters.showHidden ||
     filters.searchQuery.trim().length > 0;
 
   return (
@@ -59,7 +66,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers }) => {
       </div>
 
       {/* Navigation & Filters scrollable area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+        {/* Add Game Quick Action */}
+        {onOpenAddGame && (
+          <button
+            onClick={onOpenAddGame}
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-gradient-to-r from-violet-600/30 to-indigo-600/30 hover:from-violet-600/50 hover:to-indigo-600/50 text-indigo-300 hover:text-white border border-indigo-500/30 text-xs font-semibold transition-all shadow-sm group"
+          >
+            <Plus className="w-3.5 h-3.5 text-indigo-400 group-hover:rotate-90 transition-transform" />
+            <span>Add Custom Game</span>
+          </button>
+        )}
+
         {/* Main Views */}
         <div>
           <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 px-3 mb-2">
@@ -115,6 +133,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers }) => {
                 <span>Installed</span>
               </div>
             </button>
+
+            {hiddenGamesCount > 0 && (
+              <button
+                onClick={toggleShowHidden}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  filters.showHidden
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <EyeOff className="w-4 h-4 text-amber-400" />
+                  <span>Hidden Games</span>
+                </div>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400">
+                  {hiddenGamesCount}
+                </span>
+              </button>
+            )}
           </div>
         </div>
 

@@ -7,6 +7,7 @@ const EaAdapter = require('../adapters/eaAdapter.cjs');
 const UbisoftAdapter = require('../adapters/ubisoftAdapter.cjs');
 const XboxAdapter = require('../adapters/xboxAdapter.cjs');
 const BattleNetAdapter = require('../adapters/battlenetAdapter.cjs');
+const LocalAdapter = require('../adapters/localAdapter.cjs');
 
 function normalizeTitle(title) {
   if (!title) return '';
@@ -34,6 +35,7 @@ class LibraryEngine {
       Ubisoft: new UbisoftAdapter(),
       Xbox: new XboxAdapter(),
       'Battle.net': new BattleNetAdapter(),
+      Local: new LocalAdapter(),
     };
   }
 
@@ -195,6 +197,12 @@ class LibraryEngine {
         const merged = {
           ...item,
           favorite: prior ? Boolean(prior.favorite) : false,
+          hidden: prior ? Boolean(prior.hidden) : false,
+          isCustom: prior ? Boolean(prior.isCustom) : false,
+          executablePath: prior?.executablePath || item.executablePath,
+          launchArguments: prior?.launchArguments || item.launchArguments,
+          workingDirectory: prior?.workingDirectory || item.workingDirectory,
+          sourceDirectory: prior?.sourceDirectory || item.sourceDirectory,
           ownershipSources: [
             {
               launcher: item.launcher,
@@ -293,6 +301,31 @@ class LibraryEngine {
       }
     }
 
+    // 4. Preserve all custom and locally added titles that were not part of launcher scans
+    for (const existing of existingGames) {
+      if (existing.isCustom || existing.launcher === 'Local') {
+        const norm = normalizeTitle(existing.title);
+        const matchKey = norm || existing.id;
+        if (!unifiedMap.has(matchKey) && !unifiedMap.has(existing.id)) {
+          unifiedMap.set(existing.id, existing);
+        } else {
+          // If a launcher scan matched this title, ensure user-configured custom paths and state persist
+          const targetKey = unifiedMap.has(matchKey) ? matchKey : existing.id;
+          const current = unifiedMap.get(targetKey);
+          unifiedMap.set(targetKey, {
+            ...current,
+            isCustom: true,
+            executablePath: existing.executablePath || current.executablePath,
+            launchArguments: existing.launchArguments || current.launchArguments,
+            workingDirectory: existing.workingDirectory || current.workingDirectory,
+            sourceDirectory: existing.sourceDirectory || current.sourceDirectory,
+            hidden: Boolean(existing.hidden),
+            favorite: Boolean(existing.favorite),
+          });
+        }
+      }
+    }
+
     let mergedLibrary = Array.from(unifiedMap.values());
 
     // Enrich titles lacking media
@@ -327,8 +360,8 @@ class LibraryEngine {
   }
 
   async launchGame(game, requestedLauncher) {
-    const launcherName = requestedLauncher || game.launcher;
-    const adapter = this.adapters[launcherName];
+    const launcherName = requestedLauncher || (game.isCustom || game.launcher === 'Local' ? 'Local' : game.launcher);
+    const adapter = this.adapters[launcherName] || (game.executablePath ? this.adapters.Local : null);
     if (!adapter) {
       throw new Error(`Launcher adapter "${launcherName}" is not available.`);
     }

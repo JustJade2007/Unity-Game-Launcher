@@ -16,7 +16,13 @@ interface LibraryContextType {
   setSorting: (field: SortField, direction: SortDirection) => void;
   toggleFavorite: (gameId: string) => void;
   addGame: (game: Game) => void;
+  updateGame: (game: Game) => void;
   removeGame: (gameId: string) => void;
+  deleteGame: (gameId: string) => Promise<boolean>;
+  toggleHideGame: (gameId: string) => void;
+  rescanGame: (gameId: string) => Promise<{ success: boolean; game?: Game; error?: string }>;
+  toggleShowHidden: () => void;
+  hiddenGamesCount: number;
   filteredGames: Game[];
   allCategories: { name: string; count: number }[];
   allLaunchers: { name: LauncherType; count: number }[];
@@ -70,6 +76,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     selectedLauncher: null,
     onlyFavorites: false,
     onlyInstalled: false,
+    showHidden: false,
     sortField: 'lastPlayed',
     sortDirection: 'desc',
   });
@@ -311,18 +318,77 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
   };
 
+  const toggleHideGame = (gameId: string) => {
+    setGames((prev) =>
+      prev.map((g) => (g.id === gameId ? { ...g, hidden: !g.hidden } : g))
+    );
+  };
+
   const addGame = (game: Game) => {
     setGames((prev) => [...prev.filter((g) => g.id !== game.id), game]);
+  };
+
+  const updateGame = (updated: Game) => {
+    setGames((prev) => prev.map((g) => (g.id === updated.id ? updated : g)));
   };
 
   const removeGame = (gameId: string) => {
     setGames((prev) => prev.filter((g) => g.id !== gameId));
   };
 
+  const deleteGame = async (gameId: string): Promise<boolean> => {
+    if (window.electronAPI?.deleteGame) {
+      try {
+        await window.electronAPI.deleteGame(gameId);
+      } catch (err) {
+        console.error('Failed to delete game via Electron API:', err);
+      }
+    }
+    setGames((prev) => prev.filter((g) => g.id !== gameId));
+    if (selectedGameId === gameId) {
+      setSelectedGameId(null);
+    }
+    return true;
+  };
+
+  const rescanGame = async (gameId: string): Promise<{ success: boolean; game?: Game; error?: string }> => {
+    const target = games.find((g) => g.id === gameId);
+    if (!target) return { success: false, error: 'Game not found in library' };
+
+    if (window.electronAPI?.rescanCustomGame) {
+      try {
+        const res = await window.electronAPI.rescanCustomGame(target);
+        if (res.success && res.game) {
+          setGames((prev) => prev.map((g) => (g.id === gameId ? res.game! : g)));
+          return { success: true, game: res.game };
+        }
+        return { success: false, error: res.error || 'Failed to rescan executable' };
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Unknown rescan error';
+        return { success: false, error: msg };
+      }
+    }
+    return { success: false, error: 'Rescan API unavailable' };
+  };
+
+  const toggleShowHidden = () => {
+    setFilters((prev) => ({ ...prev, showHidden: !prev.showHidden }));
+  };
+
+  const hiddenGamesCount = useMemo(() => games.filter((g) => g.hidden).length, [games]);
+
   // Filter and sort games
   const filteredGames = useMemo(() => {
     return games
       .filter((game) => {
+        // Soft-hide filter: If in normal mode, hide games marked hidden.
+        // If in showHidden mode, display only hidden games.
+        if (filters.showHidden) {
+          if (!game.hidden) return false;
+        } else {
+          if (game.hidden) return false;
+        }
+
         if (filters.searchQuery.trim()) {
           const q = filters.searchQuery.toLowerCase();
           const matchTitle = game.title.toLowerCase().includes(q);
@@ -370,7 +436,8 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Aggregate categories
   const allCategories = useMemo(() => {
     const counts: Record<string, number> = {};
-    games.forEach((g) => {
+    const visible = games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden));
+    visible.forEach((g) => {
       g.categories.forEach((cat) => {
         counts[cat] = (counts[cat] || 0) + 1;
       });
@@ -378,7 +445,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return Object.entries(counts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-  }, [games]);
+  }, [games, filters.showHidden]);
 
   // Aggregate launchers
   const allLaunchers = useMemo(() => {
@@ -392,9 +459,11 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       'Battle.net': 0,
       Local: 0,
     };
-    games.forEach((g: Game) => {
+    const visible = games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden));
+    visible.forEach((g: Game) => {
       const launchersForGame = new Set<string>();
       if (g.launcher) launchersForGame.add(g.launcher);
+      if (g.isCustom) launchersForGame.add('Local');
       if (Array.isArray(g.ownershipSources)) {
         g.ownershipSources.forEach((s) => {
           if (s.launcher) launchersForGame.add(s.launcher);
@@ -410,12 +479,16 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return (Object.entries(counts) as [LauncherType, number][])
       .filter(([, count]) => count > 0)
       .map(([name, count]) => ({ name, count }));
-  }, [games]);
+  }, [games, filters.showHidden]);
 
   const totalPlaytimeHours = useMemo(() => {
     const totalMinutes = games.reduce((acc, g) => acc + g.playtime.totalMinutes, 0);
     return Math.round((totalMinutes / 60) * 10) / 10;
   }, [games]);
+
+  const totalGamesCount = useMemo(() => {
+    return games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden)).length;
+  }, [games, filters.showHidden]);
 
   return (
     <LibraryContext.Provider
@@ -434,12 +507,18 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setSorting,
         toggleFavorite,
         addGame,
+        updateGame,
         removeGame,
+        deleteGame,
+        toggleHideGame,
+        rescanGame,
+        toggleShowHidden,
+        hiddenGamesCount,
         filteredGames,
         allCategories,
         allLaunchers,
         totalPlaytimeHours,
-        totalGamesCount: games.length,
+        totalGamesCount,
         launcherStatuses,
         isSyncing,
         syncError,

@@ -16,18 +16,23 @@ import {
   Layers,
   Image as ImageIcon,
   RefreshCw,
+  Edit3,
+  Eye,
+  EyeOff,
+  Trash2,
 } from 'lucide-react';
 import { LauncherType } from '../../types/game';
 
 interface GameDetailViewProps {
   game: Game;
   onClose: () => void;
+  onEditGame?: (game: Game) => void;
 }
 
 type TabType = 'overview' | 'achievements' | 'friends';
 
-export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGame, onClose }) => {
-  const { games, toggleFavorite, launchGame, installGame, fetchAchievements, enrichGameMedia } = useLibrary();
+export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGame, onClose, onEditGame }) => {
+  const { games, toggleFavorite, toggleHideGame, rescanGame, deleteGame, launchGame, installGame, fetchAchievements, enrichGameMedia } = useLibrary();
   const game = games.find((g) => g.id === initialGame.id) || initialGame;
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -36,6 +41,8 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
   const [selectedLauncher, setSelectedLauncher] = useState<LauncherType>(game.launcher);
   const [isLaunching, setIsLaunching] = useState(false);
   const [isFetchingAchievements, setIsFetchingAchievements] = useState(false);
+  const [isRescanning, setIsRescanning] = useState(false);
+  const [actionStatus, setActionStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const targetAppId = game.appId || (game.id?.startsWith('steam_') ? game.id.replace('steam_', '') : null);
 
@@ -214,6 +221,73 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
                   <Star className={`w-5 h-5 ${game.favorite ? 'fill-current' : ''}`} />
                 </button>
 
+                {onEditGame && (
+                  <button
+                    onClick={() => onEditGame(game)}
+                    className="p-3 rounded-xl border border-white/10 bg-black/50 text-gray-300 hover:text-white hover:bg-white/10 backdrop-blur-md transition-all flex items-center gap-1.5 text-xs font-semibold"
+                    title="Edit Game Parameters"
+                  >
+                    <Edit3 className="w-4 h-4 text-indigo-400" />
+                    <span className="hidden sm:inline">Edit</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    toggleHideGame(game.id);
+                    setActionStatus({
+                      type: 'success',
+                      message: game.hidden ? 'Game unhidden' : 'Game hidden from active library',
+                    });
+                    setTimeout(() => setActionStatus(null), 3000);
+                  }}
+                  className={`p-3 rounded-xl border backdrop-blur-md transition-all ${
+                    game.hidden
+                      ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
+                      : 'bg-black/50 border-white/10 text-gray-300 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={game.hidden ? 'Unhide Game' : 'Hide Game'}
+                >
+                  {game.hidden ? <Eye className="w-4 h-4 text-emerald-400" /> : <EyeOff className="w-4 h-4 text-amber-400" />}
+                </button>
+
+                {(game.isCustom || game.executablePath) && (
+                  <button
+                    onClick={async () => {
+                      setIsRescanning(true);
+                      const res = await rescanGame(game.id);
+                      setIsRescanning(false);
+                      if (res.success) {
+                        setActionStatus({ type: 'success', message: 'Binary verified on disk!' });
+                      } else {
+                        setActionStatus({ type: 'error', message: res.error || 'Executable not found on disk.' });
+                      }
+                      setTimeout(() => setActionStatus(null), 4000);
+                    }}
+                    disabled={isRescanning}
+                    className="p-3 rounded-xl border border-white/10 bg-black/50 text-gray-300 hover:text-white hover:bg-white/10 backdrop-blur-md transition-all disabled:opacity-50"
+                    title="Rescan Executable on Disk"
+                  >
+                    <RefreshCw className={`w-4 h-4 text-cyan-400 ${isRescanning ? 'animate-spin' : ''}`} />
+                  </button>
+                )}
+
+                {game.isCustom && (
+                  <button
+                    onClick={async () => {
+                      const confirmed = window.confirm(`Permanently delete "${game.title}" from library?`);
+                      if (confirmed) {
+                        await deleteGame(game.id);
+                        onClose();
+                      }
+                    }}
+                    className="p-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 backdrop-blur-md transition-all"
+                    title="Delete Custom Game"
+                  >
+                    <Trash2 className="w-4 h-4 text-rose-400" />
+                  </button>
+                )}
+
                 <button
                   onClick={async () => {
                     setIsLaunching(true);
@@ -251,6 +325,25 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
               </div>
             </div>
           </div>
+
+          {/* Action Status Banner */}
+          {actionStatus && (
+            <div
+              className={`px-6 py-2.5 text-xs flex items-center justify-between border-y ${
+                actionStatus.type === 'success'
+                  ? 'bg-emerald-950/70 border-emerald-500/30 text-emerald-300'
+                  : 'bg-rose-950/70 border-rose-500/30 text-rose-300'
+              }`}
+            >
+              <span>{actionStatus.message}</span>
+              <button
+                onClick={() => setActionStatus(null)}
+                className="text-gray-400 hover:text-white text-xs ml-4"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
 
           {/* Quick Info Grid Bar */}
           <div className="px-6 py-3 bg-[#11131c] border-y border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
@@ -401,10 +494,51 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
 
                     <div>
                       <div className="text-gray-400 text-[11px]">Platform</div>
-                      <div className="font-semibold text-white mt-0.5">{game.launcher}</div>
+                      <div className="font-semibold text-white mt-0.5 flex items-center gap-1.5">
+                        <span>{game.launcher}</span>
+                        {(game.isCustom || game.launcher === 'Local') && (
+                          <span className="text-[10px] px-1.5 py-0.2 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30 font-normal">
+                            Custom Title
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    {game.installPath && (
+                    {game.sizeGb !== undefined && game.sizeGb > 0 && (
+                      <div>
+                        <div className="text-gray-400 text-[11px]">Size on Disk</div>
+                        <div className="font-semibold text-white mt-0.5">{game.sizeGb} GB</div>
+                      </div>
+                    )}
+
+                    {game.executablePath && (
+                      <div>
+                        <div className="text-gray-400 text-[11px]">Executable Path</div>
+                        <div className="font-mono text-[10px] text-gray-300 mt-0.5 break-all bg-black/30 p-1.5 rounded border border-white/5">
+                          {game.executablePath}
+                        </div>
+                      </div>
+                    )}
+
+                    {game.workingDirectory && (
+                      <div>
+                        <div className="text-gray-400 text-[11px]">Working Directory</div>
+                        <div className="font-mono text-[10px] text-gray-300 mt-0.5 break-all bg-black/30 p-1.5 rounded border border-white/5">
+                          {game.workingDirectory}
+                        </div>
+                      </div>
+                    )}
+
+                    {game.launchArguments && (
+                      <div>
+                        <div className="text-gray-400 text-[11px]">Launch Arguments</div>
+                        <div className="font-mono text-[10px] text-indigo-300 mt-0.5 break-all bg-black/30 p-1.5 rounded border border-white/5">
+                          {game.launchArguments}
+                        </div>
+                      </div>
+                    )}
+
+                    {game.installPath && !game.executablePath && (
                       <div>
                         <div className="text-gray-400 text-[11px]">Install Path</div>
                         <div className="font-mono text-[10px] text-gray-300 mt-0.5 break-all">

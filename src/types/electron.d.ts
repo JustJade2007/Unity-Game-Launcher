@@ -69,6 +69,32 @@ export interface ElectronAPI {
   onSessionStarted: (callback: (session: { gameId: string; gameTitle: string }) => void) => () => void;
   onSessionEnded: (callback: (session: { gameId: string; gameTitle: string; durationMinutes: number; endedAt: string }) => void) => () => void;
   onLibraryUpdated?: (callback: (games: Game[]) => void) => () => void;
+  selectExecutable: () => Promise<string | null>;
+  selectDirectory: () => Promise<string | null>;
+  parseCustomGame: (filePath: string) => Promise<{
+    success: boolean;
+    metadata?: Partial<Game>;
+    error?: string;
+  }>;
+  scanDirectoryForGames: (dirPath: string) => Promise<{
+    success: boolean;
+    games: Array<{
+      title: string;
+      fileName: string;
+      executablePath: string;
+      workingDirectory: string;
+      sizeGb: number;
+      iconDataUrl?: string;
+      sourceDirectory?: string;
+    }>;
+    error?: string;
+  }>;
+  rescanCustomGame: (game: Game) => Promise<{
+    success: boolean;
+    game?: Game;
+    error?: string;
+  }>;
+  deleteGame: (gameId: string) => Promise<{ success: boolean; error?: string }>;
   isElectron?: boolean;
 }
 

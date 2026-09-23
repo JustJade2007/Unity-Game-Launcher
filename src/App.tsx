@@ -8,11 +8,14 @@ import { GameDetailView } from './components/detail/GameDetailView';
 import { Game } from './types/game';
 import { TitleBar } from './components/layout/TitleBar';
 import { LaunchersModal } from './components/layout/LaunchersModal';
+import { CustomGameModal } from './components/library/CustomGameModal';
 
 const MainLayout: React.FC = () => {
   const { filters, filteredGames } = useLibrary();
   const [detailGame, setDetailGame] = useState<Game | null>(null);
   const [isLaunchersModalOpen, setIsLaunchersModalOpen] = useState(false);
+  const [isAddGameModalOpen, setIsAddGameModalOpen] = useState(false);
+  const [editingGame, setEditingGame] = useState<Game | null>(null);
 
   return (
     <div className="flex flex-col h-screen w-screen bg-[#08090c] text-gray-100 overflow-hidden font-sans">
@@ -21,11 +24,23 @@ const MainLayout: React.FC = () => {
 
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar Navigation */}
-        <Sidebar />
+        <Sidebar
+          onOpenLaunchers={() => setIsLaunchersModalOpen(true)}
+          onOpenAddGame={() => {
+            setEditingGame(null);
+            setIsAddGameModalOpen(true);
+          }}
+        />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#0a0b10]">
-          <Navbar onOpenLaunchers={() => setIsLaunchersModalOpen(true)} />
+          <Navbar
+            onOpenLaunchers={() => setIsLaunchersModalOpen(true)}
+            onOpenAddGame={() => {
+              setEditingGame(null);
+              setIsAddGameModalOpen(true);
+            }}
+          />
 
         {/* Scrollable Viewport */}
         <main className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
@@ -36,7 +51,9 @@ const MainLayout: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h3 className="text-base font-bold text-white tracking-tight">
-                {filters.selectedCategory
+                {filters.showHidden
+                  ? 'Hidden Games'
+                  : filters.selectedCategory
                   ? `${filters.selectedCategory} Games`
                   : filters.selectedLauncher
                   ? `${filters.selectedLauncher} Library`
@@ -69,6 +86,10 @@ const MainLayout: React.FC = () => {
         <GameDetailView
           game={detailGame}
           onClose={() => setDetailGame(null)}
+          onEditGame={(target) => {
+            setEditingGame(target);
+            setIsAddGameModalOpen(true);
+          }}
         />
       )}
 
@@ -76,6 +97,16 @@ const MainLayout: React.FC = () => {
       <LaunchersModal
         isOpen={isLaunchersModalOpen}
         onClose={() => setIsLaunchersModalOpen(false)}
+      />
+
+      {/* Add / Edit Custom Game Modal */}
+      <CustomGameModal
+        isOpen={isAddGameModalOpen}
+        onClose={() => {
+          setIsAddGameModalOpen(false);
+          setEditingGame(null);
+        }}
+        editingGame={editingGame}
       />
     </div>
   );

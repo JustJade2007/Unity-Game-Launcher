@@ -79,6 +79,13 @@ export interface Game {
   achievements: Achievement[];
   friends: FriendActivity[];
   favorite?: boolean;
+  hidden?: boolean;
+  isCustom?: boolean;
+  executablePath?: string;
+  launchArguments?: string;
+  workingDirectory?: string;
+  sourceDirectory?: string;
+  version?: string;
   ownershipSources?: OwnershipSource[];
   needsCloudUpload?: boolean;
 }
@@ -94,6 +101,7 @@ export interface FilterState {
   selectedLauncher: LauncherType | null;
   onlyFavorites: boolean;
   onlyInstalled: boolean;
+  showHidden: boolean;
   sortField: SortField;
   sortDirection: SortDirection;
 }

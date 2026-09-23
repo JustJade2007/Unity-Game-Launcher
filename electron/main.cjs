@@ -1,6 +1,7 @@
-const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, shell, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const binaryMetadataParser = require('./engine/binaryMetadataParser.cjs');
 
 // Check for electron-builder portable environment
 const isPortable = Boolean(process.env.PORTABLE_EXECUTABLE_DIR);
@@ -334,6 +335,108 @@ ipcMain.handle('session-stop', async (_event, { gameId }) => {
 
 ipcMain.handle('session-get-active', () => {
   return processTracker.getActiveSessions();
+});
+
+// Custom Game & Local Tooling Handlers
+ipcMain.handle('dialog-select-executable', async () => {
+  const res = await dialog.showOpenDialog(mainWindow, {
+    title: 'Select Game Executable',
+    filters: [
+      { name: 'Executables (*.exe, *.bat, *.cmd)', extensions: ['exe', 'bat', 'cmd'] },
+      { name: 'All Files (*.*)', extensions: ['*'] },
+    ],
+    properties: ['openFile'],
+  });
+  if (res.canceled || !res.filePaths || res.filePaths.length === 0) {
+    return null;
+  }
+  return res.filePaths[0];
+});
+
+ipcMain.handle('dialog-select-directory', async () => {
+  const res = await dialog.showOpenDialog(mainWindow, {
+    title: 'Select Game Directory or Installation Folder',
+    properties: ['openDirectory'],
+  });
+  if (res.canceled || !res.filePaths || res.filePaths.length === 0) {
+    return null;
+  }
+  return res.filePaths[0];
+});
+
+ipcMain.handle('custom-game-parse', async (_event, { filePath }) => {
+  try {
+    const metadata = await binaryMetadataParser.parseExecutable(filePath, app);
+    return { success: true, metadata };
+  } catch (err) {
+    console.error('Failed to parse executable:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('custom-game-scan-directory', async (_event, { dirPath }) => {
+  try {
+    const games = await binaryMetadataParser.scanDirectoryForGames(dirPath, app);
+    return { success: true, games };
+  } catch (err) {
+    console.error('Failed to scan directory for games:', err);
+    return { success: false, games: [], error: err.message };
+  }
+});
+
+ipcMain.handle('custom-game-rescan', async (_event, { game }) => {
+  try {
+    const execPath = game?.executablePath || game?.installPath;
+    if (!execPath) {
+      return { success: false, error: 'No executable path configured for this game.' };
+    }
+    if (!fs.existsSync(execPath)) {
+      return {
+        success: false,
+        error: `Executable file was not found at "${execPath}". Please update the executable path in Edit Game.`,
+      };
+    }
+    const metadata = await binaryMetadataParser.parseExecutable(execPath, app);
+    const { gamesPath } = getConfigFilePaths();
+    if (fs.existsSync(gamesPath)) {
+      const games = JSON.parse(fs.readFileSync(gamesPath, 'utf8'));
+      const idx = games.findIndex((g) => g.id === game.id);
+      if (idx !== -1) {
+        games[idx] = {
+          ...games[idx],
+          sizeGb: metadata.sizeGb || games[idx].sizeGb,
+          installed: true,
+          workingDirectory: metadata.workingDirectory || games[idx].workingDirectory,
+          version: metadata.version || games[idx].version,
+        };
+        if (!games[idx].media?.coverUrl && metadata.media?.coverUrl) {
+          games[idx].media.coverUrl = metadata.media.coverUrl;
+        }
+        fs.writeFileSync(gamesPath, JSON.stringify(games, null, 2), 'utf8');
+        return { success: true, game: games[idx] };
+      }
+    }
+    return { success: true, game: { ...game, sizeGb: metadata.sizeGb, installed: true } };
+  } catch (err) {
+    console.error('Failed to rescan custom game:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('library-delete-game', async (_event, { gameId }) => {
+  try {
+    const { gamesPath } = getConfigFilePaths();
+    if (fs.existsSync(gamesPath)) {
+      const games = JSON.parse(fs.readFileSync(gamesPath, 'utf8'));
+      const updated = games.filter((g) => g.id !== gameId);
+      fs.writeFileSync(gamesPath, JSON.stringify(updated, null, 2), 'utf8');
+      return { success: true };
+    }
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to delete game from library:', err);
+    return { success: false, error: err.message };
+  }
 });
 
 app.whenReady().then(async () => {

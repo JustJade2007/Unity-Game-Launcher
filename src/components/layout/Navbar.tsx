@@ -1,12 +1,13 @@
 import React from 'react';
-import { Search, LayoutGrid, Rows3, Sparkles, ArrowUpDown, Clock, Gamepad2 } from 'lucide-react';
+import { Search, LayoutGrid, Rows3, Sparkles, ArrowUpDown, Clock, Gamepad2, Plus } from 'lucide-react';
 import { useLibrary } from '../../context/LibraryContext';
 
 interface NavbarProps {
   onOpenLaunchers?: () => void;
+  onOpenAddGame?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers, onOpenAddGame }) => {
   const {
     filters,
     setSearchQuery,
@@ -77,6 +78,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers }) => {
             {hasPendingCloudUploads && (
               <span className="w-2 h-2 rounded-full bg-blue-400 absolute -top-0.5 -right-0.5 animate-pulse" />
             )}
+          </button>
+        )}
+
+        {onOpenAddGame && (
+          <button
+            onClick={onOpenAddGame}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 px-3 py-1.5 rounded-full text-white text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all hover:shadow-indigo-600/50"
+            title="Add Custom Game / Scan Executables"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Game</span>
           </button>
         )}
       </div>

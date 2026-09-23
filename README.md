@@ -34,6 +34,12 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 | Live Steam Web API achievement synchronization | ✅ Implemented |
 | SteamDB Image Enrichment & Fallback System | ✅ Implemented |
 | Cross-launcher duplicate reconciliation & installed state prioritization | ✅ Implemented |
+| Local directory & custom game management | ✅ Implemented |
+| Native executable picker & directory scanner | ✅ Implemented |
+| Windows binary metadata parser (PE headers & icons) | ✅ Implemented |
+| Custom launch arguments & working directories | ✅ Implemented |
+| Manual entry edit forms & library maintenance | ✅ Implemented |
+| Title deletion & soft-hide mechanism | ✅ Implemented |
 | Cloud storage sync indicator (Supabase) | ✅ Implemented |
 | Account management | 🗓️ Planned |
 | Automatic updates | 🗓️ Planned |

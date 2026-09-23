@@ -18,6 +18,8 @@ import {
   Search,
   Volume2,
   VolumeX,
+  EyeOff,
+  Undo2,
 } from 'lucide-react';
 
 interface RandomGameModalProps {
@@ -118,7 +120,6 @@ const MOOD_PRESETS: MoodPreset[] = [
       'rocket league',
       'brawlhalla',
       'smash',
-      'team',
       'mmo',
       'battle royale',
     ],
@@ -132,6 +133,127 @@ const MOOD_PRESETS: MoodPreset[] = [
     maxPlaytimeHours: 10,
   },
 ];
+
+// Helper to determine if a game has verified multiplayer, co-op, or party capability
+export function isMultiplayerGame(game: Game): boolean {
+  const title = (game.title || '').toLowerCase();
+  const desc = (game.description || '').toLowerCase();
+  const tagline = (game.tagline || '').toLowerCase();
+  const cats = game.categories.map((c) => c.toLowerCase());
+  const tags = (game.tags || []).map((t) => t.toLowerCase());
+
+  // 1. Direct category or custom tag match
+  const multiTags = [
+    'multiplayer',
+    'multi-player',
+    'co-op',
+    'coop',
+    'party',
+    'party game',
+    'pvp',
+    'online pvp',
+    'online co-op',
+    'local co-op',
+    'local multiplayer',
+    'massively multiplayer',
+    'mmo',
+    'battle royale',
+    'friend slop',
+    'friendslop',
+  ];
+  if (cats.some((c) => multiTags.includes(c)) || tags.some((t) => multiTags.includes(t))) {
+    return true;
+  }
+
+  // 2. Specific curated party / friend-slop / multiplayer titles
+  const multiplayerTitles = [
+    'peak',
+    'repo',
+    'lethal company',
+    'content warning',
+    'among us',
+    'jackbox',
+    'jack in the box',
+    'overcooked',
+    'gang beasts',
+    'fall guys',
+    'human: fall flat',
+    'human fall flat',
+    'duck game',
+    'stick fight',
+    'tabletop simulator',
+    'it takes two',
+    'a way out',
+    'rainbow six siege',
+    'rainbow six',
+    'battlefield',
+    'counter-strike',
+    'cs:go',
+    'cs2',
+    'destiny 2',
+    'helldivers',
+    'deep rock galactic',
+    'sea of thieves',
+    'phasmophobia',
+    'valheim',
+    'terraria',
+    'minecraft',
+    'rust',
+    'ark: survival',
+    'the forest',
+    'sons of the forest',
+    'left 4 dead',
+    'payday',
+    'borderlands',
+    'speedrunners',
+    'golf with your friends',
+    'pummel party',
+    'rocket league',
+    'brawlhalla',
+    'super smash bros',
+    'warframe',
+    'apex legends',
+    'fortnite',
+    'pubg',
+    'overwatch',
+    'team fortress',
+    'dead by daylight',
+    'palworld',
+    'chained together',
+    'party animals',
+    'bread & fred',
+    'unrailed',
+    'plateup',
+    'keep talking and nobody explodes',
+    'golf it',
+    'ultimate chicken horse',
+    'move or die',
+    'rounds',
+    'lovers in a dangerous spacetime',
+    'magicka',
+    'castle crashers',
+    'battleblock theater',
+    'for the king',
+    'risk of rain',
+    'barotrauma',
+    'project zomboid',
+    'dont starve together',
+    "don't starve together",
+    'heckdeck',
+  ];
+
+  if (multiplayerTitles.some((t) => title.includes(t))) {
+    return true;
+  }
+
+  // 3. Whole-word regex matching in title or description
+  const multiplayerRegex = /\b(multiplayer|multi-player|co-op|coop|pvp|party game|battle royale|friend slop|friendslop)\b/i;
+  if (multiplayerRegex.test(title) || multiplayerRegex.test(tagline) || multiplayerRegex.test(desc)) {
+    return true;
+  }
+
+  return false;
+}
 
 // High-fidelity synthesized audio generator using Web Audio API
 class WheelAudioEngine {
@@ -243,6 +365,56 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
   const [naturalQuery, setNaturalQuery] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
+  // Wheel type exclusion list: maps wheel preset or general to an array of game IDs
+  const [wheelExclusions, setWheelExclusions] = useState<Record<string, string[]>>(() => {
+    try {
+      const saved = localStorage.getItem('unity_wheel_exclusions');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const activeWheelKey = selectedMood || 'general';
+  const currentExclusions = useMemo(() => {
+    return wheelExclusions[activeWheelKey] || [];
+  }, [wheelExclusions, activeWheelKey]);
+
+  const handleExcludeGameFromWheel = (gameId: string) => {
+    setWheelExclusions((prev) => {
+      const existing = prev[activeWheelKey] || [];
+      if (existing.includes(gameId)) return prev;
+      const updated = {
+        ...prev,
+        [activeWheelKey]: [...existing, gameId],
+      };
+      try {
+        localStorage.setItem('unity_wheel_exclusions', JSON.stringify(updated));
+      } catch {
+        // Ignore storage errors
+      }
+      return updated;
+    });
+    // If the excluded game is currently the selected winner, clear it
+    if (winnerGame?.id === gameId) {
+      setWinnerGame(null);
+      setWinnerRationale('');
+    }
+  };
+
+  const handleResetExclusionsForWheel = () => {
+    setWheelExclusions((prev) => {
+      const updated = { ...prev };
+      delete updated[activeWheelKey];
+      try {
+        localStorage.setItem('unity_wheel_exclusions', JSON.stringify(updated));
+      } catch {
+        // Ignore storage errors
+      }
+      return updated;
+    });
+  };
+
   // Spinning wheel state
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [wheelRotation, setWheelRotation] = useState<number>(0);
@@ -271,6 +443,9 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
       // Exclude hidden games
       if (game.hidden) return false;
 
+      // Exclude titles user explicitly hid from this specific wheel type
+      if (currentExclusions.includes(game.id)) return false;
+
       // Installed constraint
       if (onlyInstalled && !game.installed) return false;
 
@@ -289,23 +464,18 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
       if (selectedMood) {
         const mood = MOOD_PRESETS.find((m) => m.id === selectedMood);
         if (mood) {
-          const gameTitleLower = (game.title || '').toLowerCase();
-          const gameCategoriesLower = game.categories.map((c) => c.toLowerCase()).join(' ');
-          const gameTagsLower = (game.tags || []).map((t) => t.toLowerCase()).join(' ');
-          const gameTaglineLower = (game.tagline || '').toLowerCase();
-          const gameDescLower = (game.description || '').toLowerCase();
-
-          const combinedText = `${gameTitleLower} ${gameCategoriesLower} ${gameTagsLower} ${gameTaglineLower} ${gameDescLower}`;
-
-          // Special check for 'coop' / 'Play with Friends':
-          // Must match friend slop, multiplayer, party, or co-op keywords in title, tags, or description
+          // Special strict check for 'coop' / 'Play with Friends':
+          // MUST be a verified multiplayer/co-op/party/friend-slop game
           if (mood.id === 'coop') {
-            const matchesFriendSlop = mood.keywords.some((kw) => {
-              // Word boundary or substring matching
-              return combinedText.includes(kw);
-            });
-            if (!matchesFriendSlop) return false;
+            if (!isMultiplayerGame(game)) return false;
           } else {
+            const gameTitleLower = (game.title || '').toLowerCase();
+            const gameCategoriesLower = game.categories.map((c) => c.toLowerCase()).join(' ');
+            const gameTagsLower = (game.tags || []).map((t) => t.toLowerCase()).join(' ');
+            const gameTaglineLower = (game.tagline || '').toLowerCase();
+            const gameDescLower = (game.description || '').toLowerCase();
+            const combinedText = `${gameTitleLower} ${gameCategoriesLower} ${gameTagsLower} ${gameTaglineLower} ${gameDescLower}`;
+
             const matchesKeyword = mood.keywords.some((kw) => combinedText.includes(kw));
             if (!matchesKeyword) return false;
           }
@@ -327,6 +497,9 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
           if (token === 'unplayed' && (game.playtime.totalMinutes || 0) > 0) return false;
           if (token === 'installed' && !game.installed) return false;
           if (token === 'favorite' && !game.favorite) return false;
+          if ((token === 'multiplayer' || token === 'coop' || token === 'co-op') && !isMultiplayerGame(game)) {
+            return false;
+          }
         }
 
         // Generic search against title, tags, description
@@ -340,7 +513,7 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
 
       return true;
     });
-  }, [games, onlyInstalled, onlyUnplayed, selectedTag, selectedMood, naturalQuery]);
+  }, [games, onlyInstalled, onlyUnplayed, selectedTag, selectedMood, naturalQuery, currentExclusions]);
 
 
   // Aggregate candidate tags for filter dropdown
@@ -679,12 +852,32 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
               </div>
             </div>
 
-            {/* Pool Statistics summary */}
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-black/40 border border-white/5 text-xs">
-              <span className="text-gray-400">Eligible candidate games:</span>
-              <span className="font-bold text-amber-400">
-                {eligiblePool.length} {eligiblePool.length === 1 ? 'game' : 'games'} in pool
-              </span>
+            {/* Pool Statistics summary & Exclusions reset */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-black/40 border border-white/5 text-xs">
+                <span className="text-gray-400">Eligible candidate games:</span>
+                <span className="font-bold text-amber-400">
+                  {eligiblePool.length} {eligiblePool.length === 1 ? 'game' : 'games'} in pool
+                </span>
+              </div>
+
+              {currentExclusions.length > 0 && (
+                <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[11px] text-rose-300">
+                  <span className="flex items-center gap-1.5">
+                    <EyeOff className="w-3.5 h-3.5 text-rose-400" />
+                    <span>
+                      {currentExclusions.length} {currentExclusions.length === 1 ? 'game hidden' : 'games hidden'} from {selectedMood ? 'this category' : 'wheel'}
+                    </span>
+                  </span>
+                  <button
+                    onClick={handleResetExclusionsForWheel}
+                    className="hover:underline flex items-center gap-1 text-white font-medium hover:text-rose-200 transition-colors"
+                  >
+                    <Undo2 className="w-3 h-3" />
+                    <span>Reset</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -751,7 +944,7 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
                       "{winnerRationale}"
                     </p>
 
-                    <div className="flex items-center gap-2 mt-3">
+                    <div className="flex items-center flex-wrap gap-2 mt-3">
                       {winnerGame.installed ? (
                         <button
                           onClick={() => {
@@ -776,6 +969,15 @@ export const RandomGameModal: React.FC<RandomGameModalProps> = ({
                           View Details
                         </button>
                       )}
+
+                      <button
+                        onClick={() => handleExcludeGameFromWheel(winnerGame.id)}
+                        title={`Hide ${winnerGame.title} from ${selectedMood ? 'this category wheel' : 'the wheel'}`}
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 hover:text-rose-200 text-xs font-medium transition-all ml-auto"
+                      >
+                        <EyeOff className="w-3.5 h-3.5" />
+                        <span>Hide from this wheel</span>
+                      </button>
                     </div>
                   </div>
                 </div>

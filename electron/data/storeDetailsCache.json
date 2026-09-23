@@ -249,7 +249,9 @@
     "appId": "250900",
     "title": "The Binding of Isaac: Rebirth",
     "releaseDate": "Nov 4, 2014",
-    "genres": [],
+    "genres": [
+      "Action"
+    ],
     "categories": [
       "Action"
     ],
@@ -390,7 +392,9 @@
     "appId": "377160",
     "title": "Fallout 4",
     "releaseDate": "2015-11-09",
-    "genres": [],
+    "genres": [
+      "RPG"
+    ],
     "categories": [
       "Indie"
     ],
@@ -410,7 +414,9 @@
     "appId": "379720",
     "title": "DOOM",
     "releaseDate": "2016-05-12",
-    "genres": [],
+    "genres": [
+      "Action"
+    ],
     "categories": [
       "Indie"
     ],
@@ -420,7 +426,11 @@
     "appId": "392160",
     "title": "X4: Foundations",
     "releaseDate": "2018-11-30",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -430,7 +440,10 @@
     "appId": "396750",
     "title": "EVERSPACE™",
     "releaseDate": "2017-05-25",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -440,7 +453,11 @@
     "appId": "410900",
     "title": "Forts",
     "releaseDate": "2017-04-19",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -450,7 +467,11 @@
     "appId": "413150",
     "title": "Stardew Valley",
     "releaseDate": "2016-02-26",
-    "genres": [],
+    "genres": [
+      "Indie",
+      "RPG",
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -471,7 +492,9 @@
     "appId": "450390",
     "title": "The Lab",
     "releaseDate": "2016-04-05",
-    "genres": [],
+    "genres": [
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -481,7 +504,10 @@
     "appId": "457140",
     "title": "Oxygen Not Included",
     "releaseDate": "2019-07-30",
-    "genres": [],
+    "genres": [
+      "Indie",
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -501,7 +527,12 @@
     "appId": "471710",
     "title": "Rec Room",
     "releaseDate": "2021-09-02",
-    "genres": [],
+    "genres": [
+      "Adventure",
+      "Casual",
+      "Massively Multiplayer",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -531,7 +562,12 @@
     "appId": "503560",
     "title": "911 Operator",
     "releaseDate": "2017-02-24",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -561,7 +597,9 @@
     "appId": "544610",
     "title": "Battlestar Galactica Deadlock",
     "releaseDate": "2017-08-31",
-    "genres": [],
+    "genres": [
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -594,7 +632,9 @@
     "appId": "573090",
     "title": "Stormworks: Build and Rescue",
     "releaseDate": "2020-09-17",
-    "genres": [],
+    "genres": [
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -638,7 +678,11 @@
     "appId": "588430",
     "title": "Fallout Shelter",
     "releaseDate": "2017-03-29",
-    "genres": [],
+    "genres": [
+      "RPG",
+      "Simulation",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -648,7 +692,10 @@
     "appId": "597170",
     "title": "Clone Drone in the Danger Zone",
     "releaseDate": "2021-07-27",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -670,7 +717,13 @@
     "appId": "605740",
     "title": "Flashing Lights",
     "releaseDate": "2023-05-15",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie",
+      "Massively Multiplayer",
+      "RPG",
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -703,7 +756,11 @@
     "appId": "641990",
     "title": "The Escapists 2",
     "releaseDate": "2017-08-21",
-    "genres": [],
+    "genres": [
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -713,7 +770,10 @@
     "appId": "648350",
     "title": "Jurassic World Evolution",
     "releaseDate": "2018-06-11",
-    "genres": [],
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -723,7 +783,11 @@
     "appId": "677620",
     "title": "Splitgate",
     "releaseDate": "2019-05-24",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Free To Play",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -733,7 +797,13 @@
     "appId": "700330",
     "title": "SCP: Secret Laboratory",
     "releaseDate": "2017-12-29",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie",
+      "RPG",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -743,7 +813,14 @@
     "appId": "727130",
     "title": "Between the Stars",
     "releaseDate": "2024-03-07",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG",
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -763,7 +840,12 @@
     "appId": "738520",
     "title": "Breathedge",
     "releaseDate": "2021-02-25",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -773,7 +855,11 @@
     "appId": "739630",
     "title": "Phasmophobia",
     "releaseDate": "2020-09-18",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie",
+      "Early Access"
+    ],
     "categories": [
       "Indie"
     ],
@@ -783,7 +869,11 @@
     "appId": "823130",
     "title": "Totally Accurate Battlegrounds",
     "releaseDate": "2018-06-05",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -793,7 +883,12 @@
     "appId": "823500",
     "title": "BONEWORKS",
     "releaseDate": "2019-12-10",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -803,7 +898,10 @@
     "appId": "848450",
     "title": "Subnautica: Below Zero",
     "releaseDate": "2021-05-13",
-    "genres": [],
+    "genres": [
+      "Adventure",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -813,7 +911,9 @@
     "appId": "863550",
     "title": "HITMAN™ 2",
     "releaseDate": "2018-11-13",
-    "genres": [],
+    "genres": [
+      "Action"
+    ],
     "categories": [
       "Indie"
     ],
@@ -823,7 +923,11 @@
     "appId": "871720",
     "title": "Ultimate Custom Night",
     "releaseDate": "2018-06-27",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Free To Play",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -833,7 +937,11 @@
     "appId": "886250",
     "title": "Vegas Infinite by PokerStars",
     "releaseDate": "2023-11-10",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Strategy",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -843,7 +951,12 @@
     "appId": "905370",
     "title": "Game Migrated to Another Steam Page",
     "releaseDate": "2019-05-30",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Massively Multiplayer",
+      "Strategy",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -853,7 +966,9 @@
     "appId": "945360",
     "title": "Among Us",
     "releaseDate": "2018-11-16",
-    "genres": [],
+    "genres": [
+      "Casual"
+    ],
     "categories": [
       "Indie"
     ],
@@ -863,7 +978,12 @@
     "appId": "986130",
     "title": "Shadows of Doubt",
     "releaseDate": "2024-09-26",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG"
+    ],
     "categories": [
       "Indie"
     ],
@@ -896,7 +1016,11 @@
     "appId": "1085660",
     "title": "Destiny 2",
     "releaseDate": "2019-10-01",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -930,7 +1054,11 @@
     "appId": "1096710",
     "title": "Hello Neighbor Alpha 4",
     "releaseDate": "2019-10-19",
-    "genres": [],
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -940,7 +1068,13 @@
     "appId": "1170970",
     "title": "Marbles on Stream",
     "releaseDate": "2019-11-06",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Massively Multiplayer",
+      "Racing",
+      "Simulation",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1026,7 +1160,13 @@
     "appId": "1241100",
     "title": "POLYGON",
     "releaseDate": "2020-03-06",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie",
+      "Massively Multiplayer",
+      "Free To Play",
+      "Early Access"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1036,7 +1176,12 @@
     "appId": "1243830",
     "title": "Overcooked! All You Can Eat",
     "releaseDate": "2021-03-23",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1046,7 +1191,10 @@
     "appId": "1268750",
     "title": "Starship Troopers: Extermination",
     "releaseDate": "2024-10-10",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1068,7 +1216,9 @@
     "appId": "1361000",
     "title": "In Silence",
     "releaseDate": "2021-10-29",
-    "genres": [],
+    "genres": [
+      "Action"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1089,7 +1239,11 @@
     "appId": "1364960",
     "title": "Hello Neighbor 2 Alpha 1.5",
     "releaseDate": "2020-07-23",
-    "genres": [],
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1110,7 +1264,9 @@
     "appId": "1422450",
     "title": "Deadlock",
     "releaseDate": "To be announced",
-    "genres": [],
+    "genres": [
+      "Action"
+    ],
     "categories": [
       "Action"
     ],
@@ -1141,7 +1297,10 @@
     "appId": "1465470",
     "title": "The Crust",
     "releaseDate": "2026-09-10",
-    "genres": [],
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1151,7 +1310,12 @@
     "appId": "1473060",
     "title": "Reality Break",
     "releaseDate": "2025-02-10",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1161,7 +1325,12 @@
     "appId": "1485080",
     "title": "Just Act Natural",
     "releaseDate": "2022-03-25",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1194,7 +1363,11 @@
     "appId": "1517290",
     "title": "Battlefield™ 2042",
     "releaseDate": "2021-11-19",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Casual"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1214,7 +1387,11 @@
     "appId": "1592190",
     "title": "BONELAB",
     "releaseDate": "2022-09-29",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1236,7 +1413,12 @@
     "appId": "1623730",
     "title": "Palworld",
     "releaseDate": "2026-07-09",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1246,7 +1428,12 @@
     "appId": "1625450",
     "title": "Muck",
     "releaseDate": "2021-06-05",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Free To Play",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1277,7 +1464,10 @@
     "appId": "1708520",
     "title": "F1® Manager 2022",
     "releaseDate": "2022-08-30",
-    "genres": [],
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1287,7 +1477,12 @@
     "appId": "1755300",
     "title": "Smart Factory Tycoon",
     "releaseDate": "2022-03-26",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1309,7 +1504,13 @@
     "appId": "1782210",
     "title": "Crab Game",
     "releaseDate": "2021-10-29",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Casual",
+      "Free To Play",
+      "Indie",
+      "Racing"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1319,7 +1520,13 @@
     "appId": "1815780",
     "title": "Asphalt Legends ",
     "releaseDate": "2022-08-02",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Racing",
+      "Sports",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1329,7 +1536,10 @@
     "appId": "1850570",
     "title": "DEATH STRANDING DIRECTOR'S CUT",
     "releaseDate": "2022-03-30",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1339,7 +1549,12 @@
     "appId": "1902490",
     "title": "Aperture Desk Job",
     "releaseDate": "2022-03-01",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Casual",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1349,7 +1564,12 @@
     "appId": "1949970",
     "title": "J-Jump Arena",
     "releaseDate": "2025-10-23",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1359,7 +1579,12 @@
     "appId": "1961460",
     "title": "Project Playtime",
     "releaseDate": "2022-12-12",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Indie",
+      "Free To Play",
+      "Early Access"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1369,7 +1594,12 @@
     "appId": "1966720",
     "title": "Lethal Company",
     "releaseDate": "2023-10-23",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "Early Access"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1379,7 +1609,11 @@
     "appId": "1990740",
     "title": "Barro GT",
     "releaseDate": "2022-05-19",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Indie",
+      "Racing"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1389,7 +1623,10 @@
     "appId": "2019620",
     "title": "GERONIMO",
     "releaseDate": "Jul 10, 2026",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Early Access"
+    ],
     "categories": [
       "Action"
     ],
@@ -1409,7 +1646,10 @@
     "appId": "2073850",
     "title": "THE FINALS",
     "releaseDate": "2023-12-07",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1419,7 +1659,10 @@
     "appId": "2108330",
     "title": "F1® 23",
     "releaseDate": "2023-06-15",
-    "genres": [],
+    "genres": [
+      "Racing",
+      "Sports"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1429,7 +1672,10 @@
     "appId": "2231380",
     "title": "Ghost Recon Breakpoint",
     "releaseDate": "2023-01-23",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1479,7 +1725,10 @@
     "appId": "2357570",
     "title": "Overwatch®",
     "releaseDate": "Aug 10, 2023",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Free To Play"
+    ],
     "categories": [
       "Action"
     ],
@@ -1513,7 +1762,11 @@
     "appId": "2426960",
     "title": "Summoners War",
     "releaseDate": "2024-01-07",
-    "genres": [],
+    "genres": [
+      "RPG",
+      "Strategy",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1534,7 +1787,12 @@
     "appId": "2507950",
     "title": "Delta Force",
     "releaseDate": "2024-12-04",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Massively Multiplayer",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1544,7 +1802,12 @@
     "appId": "2567870",
     "title": "Chained Together",
     "releaseDate": "2024-06-19",
-    "genres": [],
+    "genres": [
+      "Adventure",
+      "Casual",
+      "Indie",
+      "Simulation"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1554,7 +1817,10 @@
     "appId": "2591280",
     "title": "F1® Manager 2024",
     "releaseDate": "2024-07-23",
-    "genres": [],
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1564,7 +1830,11 @@
     "appId": "2708450",
     "title": "Oh Deer",
     "releaseDate": "2024-06-27",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1574,7 +1844,12 @@
     "appId": "2709570",
     "title": "Supermarket Together",
     "releaseDate": "2024-08-09",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Free To Play"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1584,7 +1859,11 @@
     "appId": "2881650",
     "title": "Content Warning",
     "releaseDate": "2024-04-01",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1604,7 +1883,11 @@
     "appId": "2904000",
     "title": "The Spell Brigade",
     "releaseDate": "2026-04-29",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1614,7 +1897,11 @@
     "appId": "3146520",
     "title": "WEBFISHING",
     "releaseDate": "2024-10-11",
-    "genres": [],
+    "genres": [
+      "Casual",
+      "Indie",
+      "Massively Multiplayer"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1624,7 +1911,11 @@
     "appId": "3240220",
     "title": "Grand Theft Auto V Enhanced",
     "releaseDate": "2025-03-04",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Racing"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1634,7 +1925,10 @@
     "appId": "3241660",
     "title": "R.E.P.O.",
     "releaseDate": "26 Feb, 2025",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Early Access"
+    ],
     "categories": [
       "Action"
     ],
@@ -1733,7 +2027,15 @@
     "appId": "3504780",
     "title": "Wildgate",
     "releaseDate": "2025-07-22",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Casual",
+      "Massively Multiplayer",
+      "Racing",
+      "RPG",
+      "Strategy"
+    ],
     "categories": [
       "Indie"
     ],
@@ -1743,7 +2045,11 @@
     "appId": "3527290",
     "title": "PEAK",
     "releaseDate": "2025-06-16",
-    "genres": [],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie"
+    ],
     "categories": [
       "Indie"
     ],

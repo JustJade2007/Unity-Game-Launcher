@@ -11,6 +11,10 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [0.3.0] - 2026-09-23
 
 ### Added
+- **Genre Accuracy & Removal of Erroneous "Indie" Classifications**:
+  - **Accurate Categorization for Minecraft & Major Titles**: Resolved issue where Minecraft was incorrectly labeled as "Indie". Mapped curated genres in `categoryService.cjs` for Minecraft (`['Sandbox', 'Survival', 'Adventure']`), StarCraft II (`['Strategy', 'RTS']`), Fallout 4 (`['RPG', 'Action', 'Open World']`), DOOM (`['Action', 'Shooter', 'FPS']`), Destiny 2, Battlefield 2042, The Sims 4, Death Stranding, and other major games.
+  - **Eliminated Forced "Indie" Fallbacks**: Removed aggressive fallback in `categoryService.cjs` that coerced standalone `Action` tags and non-Steam games into "Indie". Real action and genre titles now retain their authentic store and catalog categories.
+  - **Complete Store Genre Ingestion**: Integrated official Steam store genres across `storeDetailsCache.json` and healed all local databases (`release/data/games.json`, `%APPDATA%\Unity Game Launcher\games.json`, `%APPDATA%\unity-game-launcher\games.json`), restoring true multi-genre tags (Action, Simulation, Adventure, Strategy, Casual, Shooter, RPG, Sandbox, Survival).
 - **Persistent Release Date Preservation & Store Details Architecture**:
   - **Fixed Destructive Overwrites in `syncAll`**: Resolved critical bug in `libraryEngine.cjs` where scanned items from launcher adapters with empty strings overwrote existing authentic release dates in `games.json`. Unified deduplication and merge logic now strictly preserves prior `releaseDate`, `description`, `developer`, `publisher`, `genres`, and `media`.
   - **Persistent Offline Store Details Cache**: Implemented disk-backed cache (`electron/data/storeDetailsCache.json`) loaded at engine startup and consulted directly by `steamAdapter.cjs`. Installed and owned games now receive authentic release dates, application types, and verified genres immediately upon scan with zero network latency and complete immunity to API rate-limiting.

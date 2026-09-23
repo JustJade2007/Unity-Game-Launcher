@@ -10,13 +10,13 @@
 |:---|:---|:---|:---:|:---|
 | **Phase 1** | [Core Framework & Desktop Shell](#-phase-1-core-framework--desktop-shell-complete) | Core App | 🟢 Complete | v0.2.0 |
 | **#3** | [Launcher Integration & Library Syncing](#-issue-3-launcher-integration-and-library-syncing-core-foundation) | Data Ingestion | 🟢 Complete | v0.2.0 |
-| **#4** | [Local Directory & Custom Game Management](#-issue-4-local-directory-and-custom-game-management) | Library Tools | ⚪ Planned | Next Sprint |
+| **#4** | [Local Directory & Custom Game Management](#-issue-4-local-directory-and-custom-game-management) | Library Tools | 🟢 Complete | v0.2.0 |
 | **#5** | [User Profiles & Federated Authentication](#-issue-5-user-profiles-and-federated-authentication) | Identity & Auth | ⚪ Planned | Sprint 3 |
 | **#7** | [Library Organization & Game Discovery](#-issue-7-library-organization-and-game-discovery) | Catalog & UX | ⚪ Planned | Sprint 3 |
 | **#8** | [Theme System & Community Customization](#-issue-8-theme-system-and-community-customization) | Styling & UI | ⚪ Planned | Sprint 4 |
 | **#6** | [Platform Maintenance, Moderation & Diagnostics](#-issue-6-platform-maintenance-moderation-and-diagnostics) | Ops & Settings | ⚪ Planned | Sprint 4 |
 | **#9** | [Security Policy & Wiki Documentation](#-issue-9-security-policy-and-wiki-documentation) | Governance | ⚪ Planned | Pre-Release |
-| **#2** | [Main Features Integration & Release Readiness](#-issue-2-main-features-integration-and-release-readiness) | QA & Release | ⚪ Planned | v1.0.0 GA |
+| **#2** | [Main Features Integration & Release Readiness](#-issue-2-main-features-integration-and-release-readiness) | QA & Release | ⚪ Planned | v0.8.0 |
 
 ---
 

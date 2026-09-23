@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { Game, LauncherType, ViewMode, SortField, SortDirection, FilterState, LauncherStatus, Achievement } from '../types/game';
+import { isSoftwareGame, isSoftwareCategory } from '../utils/softwareClassifier';
 
 interface LibraryContextType {
   games: Game[];
@@ -13,6 +14,7 @@ interface LibraryContextType {
   setSelectedLauncher: (launcher: LauncherType | null) => void;
   toggleFavoritesOnly: () => void;
   toggleInstalledOnly: () => void;
+  toggleSoftwareOnly: () => void;
   setSorting: (field: SortField, direction: SortDirection) => void;
   toggleFavorite: (gameId: string) => void;
   addGame: (game: Game) => void;
@@ -28,6 +30,7 @@ interface LibraryContextType {
   allLaunchers: { name: LauncherType; count: number }[];
   totalPlaytimeHours: number;
   totalGamesCount: number;
+  totalSoftwareCount: number;
   // Launcher integration & syncing
   launcherStatuses: LauncherStatus[];
   isSyncing: boolean;
@@ -76,6 +79,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     selectedLauncher: null,
     onlyFavorites: false,
     onlyInstalled: false,
+    onlySoftware: false,
     showHidden: false,
     sortField: 'lastPlayed',
     sortDirection: 'desc',
@@ -277,13 +281,6 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     localStorage.setItem(PENDING_UPLOAD_KEY, 'false');
   };
 
-  const selectedGame = useMemo(() => {
-    if (!selectedGameId) {
-      return games.length > 0 ? games[0] : null;
-    }
-    return games.find((g) => g.id === selectedGameId) || (games.length > 0 ? games[0] : null);
-  }, [games, selectedGameId]);
-
   const setSelectedGame = (game: Game | null) => {
     setSelectedGameId(game ? game.id : null);
   };
@@ -301,11 +298,21 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const toggleFavoritesOnly = () => {
-    setFilters((prev) => ({ ...prev, onlyFavorites: !prev.onlyFavorites }));
+    setFilters((prev) => ({ ...prev, onlyFavorites: !prev.onlyFavorites, onlySoftware: false }));
   };
 
   const toggleInstalledOnly = () => {
-    setFilters((prev) => ({ ...prev, onlyInstalled: !prev.onlyInstalled }));
+    setFilters((prev) => ({ ...prev, onlyInstalled: !prev.onlyInstalled, onlySoftware: false }));
+  };
+
+  const toggleSoftwareOnly = () => {
+    setFilters((prev) => ({
+      ...prev,
+      onlySoftware: !prev.onlySoftware,
+      selectedCategory: null,
+      onlyFavorites: false,
+      onlyInstalled: false,
+    }));
   };
 
   const setSorting = (sortField: SortField, sortDirection: SortDirection) => {
@@ -389,6 +396,16 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (game.hidden) return false;
         }
 
+        // Software separation filter:
+        // By default (onlySoftware === false), software items are completely invisible in game views.
+        // When onlySoftware === true, show exclusively software & tools.
+        const isSoft = isSoftwareGame(game);
+        if (filters.onlySoftware) {
+          if (!isSoft) return false;
+        } else {
+          if (isSoft) return false;
+        }
+
         if (filters.searchQuery.trim()) {
           const q = filters.searchQuery.toLowerCase();
           const matchTitle = game.title.toLowerCase().includes(q);
@@ -426,28 +443,49 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
           const dateB = b.playtime.lastPlayed ? new Date(b.playtime.lastPlayed).getTime() : 0;
           compare = dateA - dateB;
         } else if (filters.sortField === 'releaseDate') {
-          compare = new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime();
+          const timeA = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
+          const timeB = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
+          compare = (isNaN(timeA) ? 0 : timeA) - (isNaN(timeB) ? 0 : timeB);
         }
 
         return filters.sortDirection === 'asc' ? compare : -compare;
       });
   }, [games, filters]);
 
-  // Aggregate categories (excluding launcher names from genres list)
+  const selectedGame = useMemo(() => {
+    if (selectedGameId) {
+      const match = games.find((g) => g.id === selectedGameId);
+      if (match) return match;
+    }
+    if (filteredGames.length > 0) {
+      return filteredGames[0];
+    }
+    const fallback = filters.onlySoftware
+      ? games.find((g) => isSoftwareGame(g))
+      : games.find((g) => !isSoftwareGame(g));
+    return fallback || (games.length > 0 ? games[0] : null);
+  }, [games, selectedGameId, filteredGames, filters.onlySoftware]);
+
+  // Aggregate categories (excluding launcher names and software-specific genres from games list)
   const allCategories = useMemo(() => {
     const counts: Record<string, number> = {};
-    const visible = games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden));
+    const visible = games.filter((g) => {
+      const hiddenMatch = filters.showHidden ? g.hidden : !g.hidden;
+      if (!hiddenMatch) return false;
+      return filters.onlySoftware ? isSoftwareGame(g) : !isSoftwareGame(g);
+    });
     const LAUNCHER_NAMES = new Set(['Steam', 'Epic Games', 'GOG', 'EA', 'Ubisoft', 'Xbox', 'Battle.net', 'Local', 'Custom']);
     visible.forEach((g) => {
       g.categories.forEach((cat) => {
         if (!cat || LAUNCHER_NAMES.has(cat)) return;
+        if (!filters.onlySoftware && isSoftwareCategory(cat)) return;
         counts[cat] = (counts[cat] || 0) + 1;
       });
     });
     return Object.entries(counts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-  }, [games, filters.showHidden]);
+  }, [games, filters.showHidden, filters.onlySoftware]);
 
   // Aggregate launchers
   const allLaunchers = useMemo(() => {
@@ -489,7 +527,11 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [games]);
 
   const totalGamesCount = useMemo(() => {
-    return games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden)).length;
+    return games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden) && !isSoftwareGame(g)).length;
+  }, [games, filters.showHidden]);
+
+  const totalSoftwareCount = useMemo(() => {
+    return games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden) && isSoftwareGame(g)).length;
   }, [games, filters.showHidden]);
 
   return (
@@ -506,6 +548,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setSelectedLauncher,
         toggleFavoritesOnly,
         toggleInstalledOnly,
+        toggleSoftwareOnly,
         setSorting,
         toggleFavorite,
         addGame,
@@ -521,6 +564,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         allLaunchers,
         totalPlaytimeHours,
         totalGamesCount,
+        totalSoftwareCount,
         launcherStatuses,
         isSyncing,
         syncError,

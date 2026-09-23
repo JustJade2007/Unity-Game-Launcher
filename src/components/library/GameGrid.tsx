@@ -2,7 +2,7 @@ import React from 'react';
 import { useLibrary } from '../../context/LibraryContext';
 import { GameCard } from './GameCard';
 import { Game, Achievement, FriendActivity } from '../../types/game';
-import { Gamepad2, Clock, Trophy, Play, Download } from 'lucide-react';
+import { Gamepad2, Clock, Trophy, Play, Download, AppWindow } from 'lucide-react';
 
 interface GameGridProps {
   onOpenDetail?: (game: Game) => void;
@@ -73,9 +73,9 @@ const GameListThumbnail: React.FC<{ game: Game }> = ({ game }) => {
 };
 
 export const GameGrid: React.FC<GameGridProps> = ({ onOpenDetail }) => {
-  const { filteredGames, viewMode, selectedGame, setSelectedGame, totalGamesCount, launchGame, installGame } = useLibrary();
+  const { filteredGames, viewMode, selectedGame, setSelectedGame, totalGamesCount, filters, launchGame, installGame } = useLibrary();
 
-  if (totalGamesCount === 0) {
+  if (totalGamesCount === 0 && !filters.onlySoftware) {
     return (
       <div className="py-24 flex flex-col items-center justify-center text-center">
         <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400 shadow-lg shadow-indigo-500/10">
@@ -90,6 +90,20 @@ export const GameGrid: React.FC<GameGridProps> = ({ onOpenDetail }) => {
   }
 
   if (filteredGames.length === 0) {
+    if (filters.onlySoftware) {
+      return (
+        <div className="py-24 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-violet-400">
+            <AppWindow className="w-8 h-8" />
+          </div>
+          <h3 className="text-lg font-bold text-white mb-1.5">No software applications found</h3>
+          <p className="text-xs text-gray-400 max-w-sm">
+            Utilities and non-game software are kept separate from your main game library. You can add custom tools using "Add Custom Game" and selecting "Classify as software/tool".
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="py-24 flex flex-col items-center justify-center text-center">
         <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 text-gray-400">

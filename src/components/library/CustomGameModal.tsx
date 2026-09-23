@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Game } from '../../types/game';
 import { useLibrary } from '../../context/LibraryContext';
+import { isSoftwareGame } from '../../utils/softwareClassifier';
 import {
   X,
   FolderOpen,
@@ -49,6 +50,7 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
   const [heroUrl, setHeroUrl] = useState('');
   const [iconUrl, setIconUrl] = useState('');
   const [sizeGb, setSizeGb] = useState<number>(0);
+  const [isSoftware, setIsSoftware] = useState(false);
 
   // Status & feedback
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
@@ -88,6 +90,7 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
       setHeroUrl(editingGame.media?.heroUrl || '');
       setIconUrl(editingGame.media?.iconUrl || '');
       setSizeGb(editingGame.sizeGb || 0);
+      setIsSoftware(Boolean(editingGame.isSoftware || isSoftwareGame(editingGame)));
       setActiveTab('form');
     } else {
       setTitle('');
@@ -104,6 +107,7 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
       setHeroUrl('');
       setIconUrl('');
       setSizeGb(0);
+      setIsSoftware(false);
       setActiveTab('form');
       setScannedCandidates([]);
       setScannedDir('');
@@ -315,6 +319,10 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
 
     const gameId = editingGame ? editingGame.id : `custom_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
 
+    if (isSoftware && !categories.includes('Software')) {
+      categories.push('Software', 'Utilities');
+    }
+
     const customGame: Game = {
       id: gameId,
       title: title.trim(),
@@ -332,6 +340,7 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
       workingDirectory: workingDirectory.trim() || undefined,
       sizeGb: sizeGb > 0 ? sizeGb : undefined,
       isCustom: true,
+      isSoftware,
       hidden: editingGame ? Boolean(editingGame.hidden) : false,
       favorite: editingGame ? Boolean(editingGame.favorite) : false,
       playtime: editingGame?.playtime || { totalMinutes: 0 },
@@ -699,6 +708,23 @@ export const CustomGameModal: React.FC<CustomGameModalProps> = ({
                     className="w-full bg-[#141620] border border-white/10 rounded-lg px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
+              </div>
+
+              {/* Software / Utility Toggle */}
+              <div className="bg-[#121420] p-3 rounded-xl border border-white/5 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-semibold text-white">Application Type</div>
+                  <div className="text-[11px] text-gray-400">Classify as software/tool instead of game (hidden from games list by default)</div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isSoftware}
+                    onChange={(e) => setIsSoftware(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
               </div>
 
               {/* Description */}

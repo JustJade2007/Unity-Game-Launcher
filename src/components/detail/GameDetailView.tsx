@@ -3,6 +3,7 @@ import { Game } from '../../types/game';
 import { useLibrary } from '../../context/LibraryContext';
 import { AchievementCard } from './AchievementCard';
 import { FriendsPlayingList } from './FriendsPlayingList';
+import { isSoftwareGame } from '../../utils/softwareClassifier';
 import {
   X,
   Play,
@@ -22,6 +23,31 @@ import {
   Trash2,
 } from 'lucide-react';
 import { LauncherType } from '../../types/game';
+
+export function formatReleaseDate(dateString?: string): string {
+  if (!dateString || typeof dateString !== 'string') return 'TBA';
+  const clean = dateString.trim();
+  if (!clean || /^(invalid date|null|undefined|nan)$/i.test(clean)) return 'TBA';
+  if (/^(tba|coming soon|to be announced)$/i.test(clean)) return 'Coming Soon';
+
+  if (/^\d{4}$/.test(clean)) return clean;
+
+  const timestamp = Date.parse(clean);
+  if (isNaN(timestamp)) {
+    const match = clean.match(/\b(19\d\d|20\d\d)\b/);
+    if (match) return match[1];
+    return 'TBA';
+  }
+
+  const d = new Date(timestamp);
+  if (isNaN(d.getTime())) return 'TBA';
+
+  return d.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
 interface GameDetailViewProps {
   game: Game;
@@ -313,7 +339,7 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
                   {(game.ownershipSources?.find((s) => s.launcher === selectedLauncher)?.installed ?? game.installed) ? (
                     <>
                       <Play className="w-4 h-4 fill-current" />
-                      <span>{isLaunching ? 'Starting...' : 'Launch Game'}</span>
+                      <span>{isLaunching ? 'Starting...' : (isSoftwareGame(game) ? 'Launch Application' : 'Launch Game')}</span>
                     </>
                   ) : (
                     <>
@@ -380,11 +406,7 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
               <div>
                 <div className="text-gray-400 text-[10px]">Release Date</div>
                 <div className="font-semibold text-white">
-                  {new Date(game.releaseDate).toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
+                  {formatReleaseDate(game.releaseDate)}
                 </div>
               </div>
             </div>

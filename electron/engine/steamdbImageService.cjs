@@ -1,5 +1,5 @@
 const https = require('https');
-const { resolveGameCategories, SOFTWARE_TITLE_PATTERNS } = require('./categoryService.cjs');
+const { resolveGameCategories, SOFTWARE_TITLE_PATTERNS, isSoftwareItem } = require('./categoryService.cjs');
 
 const KNOWN_TITLE_APP_IDS = {
   uno: '470220',
@@ -290,10 +290,13 @@ class SteamDBImageService {
         const data = json[cleanId].data;
         const details = {
           type: data.type || 'game',
+          isSoftware: data.type === 'software' || data.type === 'tool',
           genres: Array.isArray(data.genres) ? data.genres.map((g) => g.description) : [],
           categories: Array.isArray(data.categories) ? data.categories.map((c) => c.description) : [],
           developers: data.developers || [],
           publishers: data.publishers || [],
+          releaseDate: data.release_date?.date ? String(data.release_date.date).trim() : '',
+          comingSoon: Boolean(data.release_date?.coming_soon),
           shortDescription: data.short_description || '',
           headerImage: data.header_image,
           capsuleImage: data.capsule_image,
@@ -503,7 +506,28 @@ class SteamDBImageService {
       }
     }
 
-    return { changed, media: currentMedia, categories: finalCategories };
+    // --- Resolve Software Flag ---
+    const softwareCalculated = Boolean(game.isSoftware || isSoftwareItem(game) || storeDetails?.isSoftware);
+    let finalIsSoftware = game.isSoftware;
+    if (softwareCalculated && !game.isSoftware) {
+      finalIsSoftware = true;
+      changed = true;
+    }
+
+    // --- Resolve Release Date ---
+    let finalReleaseDate = game.releaseDate || '';
+    if (!finalReleaseDate && storeDetails?.releaseDate) {
+      finalReleaseDate = storeDetails.releaseDate;
+      changed = true;
+    }
+
+    return {
+      changed,
+      media: currentMedia,
+      categories: finalCategories,
+      releaseDate: finalReleaseDate,
+      isSoftware: finalIsSoftware,
+    };
   }
 
   /**
@@ -527,12 +551,14 @@ class SteamDBImageService {
         slice.map(async (game, sliceIdx) => {
           const globalIdx = i + sliceIdx;
           try {
-            const { changed, media, categories } = await this.enrichGameMedia(game);
+            const { changed, media, categories, releaseDate, isSoftware } = await this.enrichGameMedia(game);
             if (changed) {
               enrichedList[globalIdx] = {
                 ...game,
                 media: media || game.media,
                 categories: categories || game.categories,
+                releaseDate: releaseDate || game.releaseDate || '',
+                isSoftware: isSoftware !== undefined ? isSoftware : game.isSoftware,
               };
               updatedCount++;
             }

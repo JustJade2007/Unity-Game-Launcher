@@ -11,6 +11,17 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [0.3.0] - 2026-09-23
 
 ### Added
+- **Software & Tools Category Isolation (Invisible by Default in Game List)**:
+  - **Complete Separation of Software from Games**: Implemented strict separation of non-game software, desktop companions, servers, and utilities (`Mouse X`, `Scope X`, `Crosshair X`, `tiny desktop pals`, `VoiceAttack`, `Soundpad Demo`, `Lossless Scaling`, `VRoid Studio`, `Insurgency: Sandstorm Dedicated Server`, `Tom Clancy's Rainbow Six Siege - Test Server`, `tModLoader`) into a dedicated "Software & Tools" category.
+  - **Invisible by Default**: By default, software items are excluded from "All Games", "Favorites", "Installed", and all genre views. The hero banner showcase strictly displays authentic games.
+  - **Dedicated Sidebar View & Navigation**: Added "Software & Tools" navigation item in the Sidebar with dedicated icon (`AppWindow`) and badge counter (`totalSoftwareCount`), allowing users to browse and launch their tools separately from their gaming collection.
+  - **Custom Executable Software Flag**: Added an "Application Type" toggle in `CustomGameModal.tsx` allowing user-added executables, scripts, and utilities to be designated as software.
+  - **Intelligent Category Classifier & Pattern Matcher**: Created `softwareClassifier.ts` on the frontend and updated `categoryService.cjs` on the backend with comprehensive patterns and curated lookup for instant detection.
+- **Release Date Resolution & Zero "Invalid Date" Guarantee**:
+  - **Safe Date Formatter**: Implemented `formatReleaseDate` in `GameDetailView.tsx` and across the frontend, eliminating all occurrences of `"Invalid Date"` and gracefully falling back to clean formatted dates, year strings, or `"Coming Soon"` / `"TBA"`.
+  - **Safe Sorting**: Protected library sorting by release date against empty or unparseable timestamps.
+  - **Steam Store Release Date Enrichment**: Upgraded `steamdbImageService.cjs` and `libraryEngine.cjs` to fetch and persist official store release dates from Steam store details API.
+  - **Active Library Sweep**: Healed all 158 library entries across `%APPDATA%\Unity Game Launcher\games.json` and `%APPDATA%\unity-game-launcher\games.json`, populating authentic release dates for 100% of store games with 0 invalid dates.
 - **Intelligent Category & Genre Classification Engine**:
   - **Accurate Software & Utility Categorization**: Built dedicated categorization engine (`electron/engine/categoryService.cjs`) eliminating misleading `"Action"` tags from software applications, utilities, servers, and non-action games. Software utilities (such as `Crosshair X`, `Scope X`, `Mouse X`, `Lossless Scaling`, `VoiceAttack`, `Soundpad Demo`, `VRoid Studio`) are now accurately categorized as `['Utilities', 'Software']`, `['Tools', 'Server']`, or specialized software tags (e.g. `Audio Production`, `Animation & Modeling`, `Design & Illustration`), with strict exclusion of action/gaming tags.
   - **Dedicated Server & Tool Identification**: Added pattern recognition identifying dedicated server daemons (e.g. `Insurgency: Sandstorm Dedicated Server`) and assigning appropriate `['Tools', 'Server']` tags rather than generic game action genres.

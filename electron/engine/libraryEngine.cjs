@@ -1,5 +1,6 @@
 const fs = require('fs');
 const steamdbImageService = require('./steamdbImageService.cjs');
+const { isSoftwareItem } = require('./categoryService.cjs');
 const SteamAdapter = require('../adapters/steamAdapter.cjs');
 const EpicAdapter = require('../adapters/epicAdapter.cjs');
 const GogAdapter = require('../adapters/gogAdapter.cjs');
@@ -199,6 +200,7 @@ class LibraryEngine {
           favorite: prior ? Boolean(prior.favorite) : false,
           hidden: prior ? Boolean(prior.hidden) : false,
           isCustom: prior ? Boolean(prior.isCustom) : false,
+          isSoftware: prior?.isSoftware !== undefined ? prior.isSoftware : (item.isSoftware !== undefined ? item.isSoftware : isSoftwareItem(item)),
           executablePath: prior?.executablePath || item.executablePath,
           launchArguments: prior?.launchArguments || item.launchArguments,
           workingDirectory: prior?.workingDirectory || item.workingDirectory,
@@ -486,10 +488,12 @@ class LibraryEngine {
         return { success: false, error: `Game with id ${gameId} not found` };
       }
 
-      const { changed, media, categories } = await steamdbImageService.enrichGameMedia(games[idx]);
+      const { changed, media, categories, releaseDate, isSoftware } = await steamdbImageService.enrichGameMedia(games[idx]);
       if (changed) {
         if (media) games[idx].media = media;
         if (categories) games[idx].categories = categories;
+        if (releaseDate && !games[idx].releaseDate) games[idx].releaseDate = releaseDate;
+        if (isSoftware !== undefined) games[idx].isSoftware = isSoftware;
         fs.writeFileSync(this.gamesPath, JSON.stringify(games, null, 2), 'utf8');
       }
 

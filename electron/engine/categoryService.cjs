@@ -38,8 +38,8 @@ const LAUNCHER_NAMES = new Set([
   'Custom',
 ]);
 
-const SOFTWARE_TITLE_PATTERNS = /crosshair|scope x|mouse x|soundpad|voiceattack|lossless scaling|wallpaper engine|dedicated server|benchmark|sdk|utility|driver|virtual desktop|openvr|controller tester|blender|obs studio|git|discord|spotify/i;
-const SERVER_PATTERNS = /dedicated server|server tool|multiplayer server/i;
+const SOFTWARE_TITLE_PATTERNS = /crosshair|scope x|mouse x|soundpad|voiceattack|voice attack|lossless scaling|wallpaper engine|dedicated server|test server|benchmark|sdk|utility|driver|virtual desktop|openvr|controller tester|blender|obs studio|git|discord|spotify|tiny desktop pal|desktop pal|vroid|tmodloader/i;
+const SERVER_PATTERNS = /dedicated server|server tool|multiplayer server|test server/i;
 
 // Curated accurate genres for prominent games and software
 const KNOWN_GAME_CATEGORIES = {
@@ -59,7 +59,6 @@ const KNOWN_GAME_CATEGORIES = {
   'dungeons degenerate gamblers': ['Strategy', 'Casual', 'Indie'],
   'plateup': ['Simulation', 'Casual', 'Co-op'],
   'yu gi oh master duel': ['Strategy', 'Card Game'],
-  'tiny desktop pals': ['Casual', 'Simulation'],
   'peggle deluxe': ['Casual', 'Puzzle'],
   'how to fish': ['Casual', 'Indie', 'Simulation'],
   'meccha chameleon': ['Casual', 'Indie'],
@@ -102,12 +101,16 @@ const KNOWN_GAME_CATEGORIES = {
   'crosshair x': ['Utilities', 'Software'],
   'scope x': ['Utilities', 'Software'],
   'mouse x': ['Utilities', 'Software', 'Design & Illustration'],
+  'tiny desktop pals': ['Utilities', 'Software'],
   'lossless scaling': ['Utilities', 'Software'],
   voiceattack: ['Utilities', 'Software'],
   'soundpad demo': ['Utilities', 'Software', 'Audio Production'],
   soundpad: ['Utilities', 'Software', 'Audio Production'],
   'vroid studio': ['Animation & Modeling', 'Design & Illustration', 'Software'],
   'insurgency sandstorm dedicated server': ['Tools', 'Server'],
+  tmodloader: ['Tools', 'Utilities', 'Software'],
+  'tom clancy s rainbow six siege test server': ['Tools', 'Server'],
+  'rainbow six siege test server': ['Tools', 'Server'],
 };
 
 /**
@@ -214,8 +217,40 @@ function resolveGameCategories(game, storeData = null) {
   return ['Indie'];
 }
 
+/**
+ * Determines if a game item is a software application, utility, or server tool.
+ * @param {object} game
+ * @returns {boolean}
+ */
+function isSoftwareItem(game) {
+  if (!game) return false;
+  if (game.isSoftware === true) return true;
+
+  const title = game.title || '';
+  const norm = normalizeTitle(title);
+
+  if (norm in KNOWN_GAME_CATEGORIES) {
+    const cats = KNOWN_GAME_CATEGORIES[norm];
+    if (cats.some((c) => c === 'Software' || c === 'Utilities' || c === 'Tools' || c === 'Server')) {
+      return true;
+    }
+  }
+
+  if (SOFTWARE_TITLE_PATTERNS.test(title)) {
+    return true;
+  }
+
+  const cats = Array.isArray(game.categories) ? game.categories : [];
+  if (cats.some((c) => SOFTWARE_GENRES.has(c) || c === 'Software' || c === 'Utilities' || c === 'Tools' || c === 'Server')) {
+    return true;
+  }
+
+  return false;
+}
+
 module.exports = {
   resolveGameCategories,
+  isSoftwareItem,
   SOFTWARE_GENRES,
   LAUNCHER_NAMES,
   SOFTWARE_TITLE_PATTERNS,

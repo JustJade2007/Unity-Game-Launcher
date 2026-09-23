@@ -53,6 +53,8 @@ const MainLayout: React.FC = () => {
               <h3 className="text-base font-bold text-white tracking-tight">
                 {filters.showHidden
                   ? 'Hidden Games'
+                  : filters.onlySoftware
+                  ? 'Software & Tools'
                   : filters.selectedCategory
                   ? `${filters.selectedCategory} Games`
                   : filters.selectedLauncher
@@ -70,7 +72,9 @@ const MainLayout: React.FC = () => {
 
             {filteredGames.length > 0 && (
               <span className="text-xs text-gray-400">
-                Click any game for full details & achievements
+                {filters.onlySoftware
+                  ? 'Click any software or utility for options & paths'
+                  : 'Click any game for full details & achievements'}
               </span>
             )}
           </div>

@@ -8,6 +8,7 @@ import {
   Sparkles,
   EyeOff,
   Plus,
+  AppWindow,
 } from 'lucide-react';
 import { useLibrary } from '../../context/LibraryContext';
 
@@ -25,9 +26,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
     setSelectedLauncher,
     toggleFavoritesOnly,
     toggleInstalledOnly,
+    toggleSoftwareOnly,
     allCategories,
     allLaunchers,
     totalGamesCount,
+    totalSoftwareCount,
     hiddenGamesCount,
     toggleShowHidden,
     setSearchQuery,
@@ -39,6 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
     setSearchQuery('');
     if (filters.onlyFavorites) toggleFavoritesOnly();
     if (filters.onlyInstalled) toggleInstalledOnly();
+    if (filters.onlySoftware) toggleSoftwareOnly();
     if (filters.showHidden) toggleShowHidden();
   };
 
@@ -47,6 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
     filters.selectedLauncher !== null ||
     filters.onlyFavorites ||
     filters.onlyInstalled ||
+    filters.onlySoftware ||
     filters.showHidden ||
     filters.searchQuery.trim().length > 0;
 
@@ -90,9 +95,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
                 setSelectedLauncher(null);
                 if (filters.onlyFavorites) toggleFavoritesOnly();
                 if (filters.onlyInstalled) toggleInstalledOnly();
+                if (filters.onlySoftware) toggleSoftwareOnly();
+                if (filters.showHidden) toggleShowHidden();
               }}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                !filters.onlyFavorites && !filters.onlyInstalled && !filters.selectedLauncher && !filters.selectedCategory
+                !filters.onlyFavorites && !filters.onlyInstalled && !filters.onlySoftware && !filters.showHidden && !filters.selectedLauncher && !filters.selectedCategory
                   ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
                   : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
               }`}
@@ -132,6 +139,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
                 <HardDrive className="w-4 h-4 text-emerald-400" />
                 <span>Installed</span>
               </div>
+            </button>
+
+            <button
+              onClick={toggleSoftwareOnly}
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                filters.onlySoftware
+                  ? 'bg-violet-600/20 text-violet-300 border border-violet-500/30'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <AppWindow className="w-4 h-4 text-violet-400" />
+                <span>Software & Tools</span>
+              </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400">
+                {totalSoftwareCount}
+              </span>
             </button>
 
             {hiddenGamesCount > 0 && (

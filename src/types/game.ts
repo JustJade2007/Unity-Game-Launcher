@@ -88,6 +88,7 @@ export interface Game {
   version?: string;
   ownershipSources?: OwnershipSource[];
   needsCloudUpload?: boolean;
+  isSoftware?: boolean;
 }
 
 export type ViewMode = 'grid' | 'detailed' | 'spotlight';
@@ -101,6 +102,7 @@ export interface FilterState {
   selectedLauncher: LauncherType | null;
   onlyFavorites: boolean;
   onlyInstalled: boolean;
+  onlySoftware: boolean;
   showHidden: boolean;
   sortField: SortField;
   sortDirection: SortDirection;

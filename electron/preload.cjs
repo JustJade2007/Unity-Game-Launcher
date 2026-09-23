@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   getAppPaths: () => ipcRenderer.invoke('app-get-paths'),
   openConfigFolder: () => ipcRenderer.invoke('app-open-config-folder'),
+  openExternal: (url) => ipcRenderer.invoke('app-open-external', { url }),
   loadConfig: () => ipcRenderer.invoke('config-load'),
   saveConfig: (config) => ipcRenderer.invoke('config-save', config),
   loadLibrary: () => ipcRenderer.invoke('library-load'),

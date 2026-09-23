@@ -1,13 +1,14 @@
 import React from 'react';
-import { Search, LayoutGrid, Rows3, Sparkles, ArrowUpDown, Clock, Gamepad2, Plus } from 'lucide-react';
+import { Search, LayoutGrid, Rows3, Sparkles, ArrowUpDown, Clock, Gamepad2, Plus, Dices } from 'lucide-react';
 import { useLibrary } from '../../context/LibraryContext';
 
 interface NavbarProps {
   onOpenLaunchers?: () => void;
   onOpenAddGame?: () => void;
+  onOpenRandomSelector?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers, onOpenAddGame }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers, onOpenAddGame, onOpenRandomSelector }) => {
   const {
     filters,
     setSearchQuery,
@@ -26,14 +27,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers, onOpenAddGame }
       case 'lastPlayed-desc':
         setSorting('lastPlayed', 'desc');
         break;
+      case 'lastPlayed-asc':
+        setSorting('lastPlayed', 'asc');
+        break;
       case 'playtime-desc':
         setSorting('playtime', 'desc');
+        break;
+      case 'playtime-asc':
+        setSorting('playtime', 'asc');
         break;
       case 'title-asc':
         setSorting('title', 'asc');
         break;
+      case 'title-desc':
+        setSorting('title', 'desc');
+        break;
       case 'releaseDate-desc':
         setSorting('releaseDate', 'desc');
+        break;
+      case 'releaseDate-asc':
+        setSorting('releaseDate', 'asc');
+        break;
+      case 'dateAdded-desc':
+        setSorting('dateAdded', 'desc');
+        break;
+      case 'dateAdded-asc':
+        setSorting('dateAdded', 'asc');
+        break;
+      case 'genre-asc':
+        setSorting('genre', 'asc');
+        break;
+      case 'launcher-asc':
+        setSorting('launcher', 'asc');
         break;
       default:
         setSorting('lastPlayed', 'desc');
@@ -66,6 +91,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers, onOpenAddGame }
           <Clock className="w-3.5 h-3.5 text-cyan-400" />
           <span>{totalPlaytimeHours.toLocaleString()}h Total Playtime</span>
         </div>
+
+        {/* Random Game Picker / Wheel Button */}
+        {onOpenRandomSelector && (
+          <button
+            onClick={onOpenRandomSelector}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 text-amber-300 hover:text-white px-3 py-1.5 rounded-full border border-amber-500/30 transition-all shadow-sm hover:shadow-amber-500/20 group"
+            title="Random Game Selector (Roulette & Mood Filter)"
+          >
+            <Dices className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-180 transition-transform duration-500" />
+            <span className="font-semibold">Random Picker</span>
+          </button>
+        )}
 
         {onOpenLaunchers && (
           <button
@@ -104,9 +141,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers, onOpenAddGame }
             className="bg-transparent text-xs text-gray-300 focus:outline-none cursor-pointer pr-1"
           >
             <option value="lastPlayed-desc" className="bg-[#161822] text-gray-200">Recently Played</option>
-            <option value="playtime-desc" className="bg-[#161822] text-gray-200">Most Played</option>
-            <option value="title-asc" className="bg-[#161822] text-gray-200">Alphabetical (A-Z)</option>
-            <option value="releaseDate-desc" className="bg-[#161822] text-gray-200">Release Date</option>
+            <option value="lastPlayed-asc" className="bg-[#161822] text-gray-200">Least Recently Played</option>
+            <option value="playtime-desc" className="bg-[#161822] text-gray-200">Playtime (High to Low)</option>
+            <option value="playtime-asc" className="bg-[#161822] text-gray-200">Playtime (Low to High)</option>
+            <option value="title-asc" className="bg-[#161822] text-gray-200">Alphabetical (A - Z)</option>
+            <option value="title-desc" className="bg-[#161822] text-gray-200">Alphabetical (Z - A)</option>
+            <option value="releaseDate-desc" className="bg-[#161822] text-gray-200">Release Date (Newest)</option>
+            <option value="releaseDate-asc" className="bg-[#161822] text-gray-200">Release Date (Oldest)</option>
+            <option value="dateAdded-desc" className="bg-[#161822] text-gray-200">Date Added (Newest)</option>
+            <option value="dateAdded-asc" className="bg-[#161822] text-gray-200">Date Added (Oldest)</option>
+            <option value="genre-asc" className="bg-[#161822] text-gray-200">Genre / Primary Tag</option>
+            <option value="launcher-asc" className="bg-[#161822] text-gray-200">Source Launcher</option>
           </select>
         </div>
 
@@ -150,3 +195,4 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLaunchers, onOpenAddGame }
     </header>
   );
 };
+

@@ -37,7 +37,7 @@ function ensureConfigFiles() {
     // Default configuration file
     if (!fs.existsSync(configPath)) {
       const defaultConfig = {
-        version: '0.3.0',
+        version: '0.3.1',
         theme: 'dark',
         autoLaunchOnStartup: false,
         minimizeToTray: false,
@@ -145,6 +145,19 @@ ipcMain.handle('app-open-config-folder', async () => {
     return { success: true, path: userDataDir };
   } catch (err) {
     console.error('Failed to open config folder:', err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle('app-open-external', async (_event, { url }) => {
+  try {
+    if (url && (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('steam://') || url.startsWith('goggalaxy://'))) {
+      await shell.openExternal(url);
+      return { success: true };
+    }
+    return { success: false, error: 'Invalid URL scheme' };
+  } catch (err) {
+    console.error('Failed to open external url:', err);
     return { success: false, error: err.message };
   }
 });

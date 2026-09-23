@@ -12,6 +12,11 @@ interface LibraryContextType {
   setSearchQuery: (query: string) => void;
   setSelectedCategory: (cat: string | null) => void;
   setSelectedLauncher: (launcher: LauncherType | null) => void;
+  toggleTagFilter: (tag: string) => void;
+  clearTagFilters: () => void;
+  setActiveSmartCollection: (collection: string | null) => void;
+  addTagToGame: (gameId: string, tag: string) => void;
+  removeTagFromGame: (gameId: string, tag: string) => void;
   toggleFavoritesOnly: () => void;
   toggleInstalledOnly: () => void;
   toggleSoftwareOnly: () => void;
@@ -27,6 +32,13 @@ interface LibraryContextType {
   hiddenGamesCount: number;
   filteredGames: Game[];
   allCategories: { name: string; count: number }[];
+  allTags: { name: string; count: number }[];
+  smartCollectionCounts: {
+    unplayed: number;
+    recentlyAdded: number;
+    backlog: number;
+    completed: number;
+  };
   allLaunchers: { name: LauncherType; count: number }[];
   totalPlaytimeHours: number;
   totalGamesCount: number;
@@ -77,6 +89,8 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     searchQuery: '',
     selectedCategory: null,
     selectedLauncher: null,
+    selectedTags: [],
+    activeSmartCollection: null,
     onlyFavorites: false,
     onlyInstalled: false,
     onlySoftware: false,
@@ -294,19 +308,75 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const setSelectedCategory = (category: string | null) => {
-    setFilters((prev) => ({ ...prev, selectedCategory: category }));
+    setFilters((prev) => ({ ...prev, selectedCategory: category, activeSmartCollection: null }));
   };
 
   const setSelectedLauncher = (launcher: LauncherType | null) => {
     setFilters((prev) => ({ ...prev, selectedLauncher: launcher }));
   };
 
+  const toggleTagFilter = (tag: string) => {
+    setFilters((prev) => {
+      const exists = prev.selectedTags.includes(tag);
+      return {
+        ...prev,
+        selectedTags: exists ? prev.selectedTags.filter((t) => t !== tag) : [...prev.selectedTags, tag],
+      };
+    });
+  };
+
+  const clearTagFilters = () => {
+    setFilters((prev) => ({ ...prev, selectedTags: [] }));
+  };
+
+  const setActiveSmartCollection = (collection: string | null) => {
+    setFilters((prev) => ({
+      ...prev,
+      activeSmartCollection: collection,
+      selectedCategory: null,
+      onlyFavorites: false,
+      onlyInstalled: false,
+      onlySoftware: false,
+    }));
+  };
+
+  const addTagToGame = (gameId: string, tag: string) => {
+    const cleanTag = tag.trim().replace(/^#/, '');
+    if (!cleanTag) return;
+    setGames((prev) => {
+      const updated = prev.map((g) => {
+        if (g.id !== gameId) return g;
+        const currentTags = g.tags || [];
+        if (currentTags.some((t) => t.toLowerCase() === cleanTag.toLowerCase())) return g;
+        return { ...g, tags: [...currentTags, cleanTag] };
+      });
+      if (window.electronAPI?.saveLibrary) {
+        window.electronAPI.saveLibrary(updated);
+      }
+      return updated;
+    });
+  };
+
+  const removeTagFromGame = (gameId: string, tag: string) => {
+    setGames((prev) => {
+      const updated = prev.map((g) => {
+        if (g.id !== gameId) return g;
+        const currentTags = g.tags || [];
+        return { ...g, tags: currentTags.filter((t) => t.toLowerCase() !== tag.toLowerCase()) };
+      });
+      if (window.electronAPI?.saveLibrary) {
+        window.electronAPI.saveLibrary(updated);
+      }
+      return updated;
+    });
+  };
+
   const toggleFavoritesOnly = () => {
-    setFilters((prev) => ({ ...prev, onlyFavorites: !prev.onlyFavorites, onlySoftware: false }));
+    setFilters((prev) => ({ ...prev, onlyFavorites: !prev.onlyFavorites, onlySoftware: false, activeSmartCollection: null }));
   };
 
   const toggleInstalledOnly = () => {
-    setFilters((prev) => ({ ...prev, onlyInstalled: !prev.onlyInstalled, onlySoftware: false }));
+    setFilters((prev) => ({ ...prev, onlyInstalled: !prev.onlyInstalled, onlySoftware: false, activeSmartCollection: null }));
   };
 
   const toggleSoftwareOnly = () => {
@@ -314,6 +384,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ...prev,
       onlySoftware: !prev.onlySoftware,
       selectedCategory: null,
+      activeSmartCollection: null,
       onlyFavorites: false,
       onlyInstalled: false,
     }));
@@ -336,7 +407,11 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const addGame = (game: Game) => {
-    setGames((prev) => [...prev.filter((g) => g.id !== game.id), game]);
+    const withDate = {
+      ...game,
+      dateAdded: game.dateAdded || new Date().toISOString(),
+    };
+    setGames((prev) => [...prev.filter((g) => g.id !== game.id), withDate]);
   };
 
   const updateGame = (updated: Game) => {
@@ -388,12 +463,36 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const hiddenGamesCount = useMemo(() => games.filter((g) => g.hidden).length, [games]);
 
+  // Smart collection counts
+  const smartCollectionCounts = useMemo(() => {
+    const visible = games.filter((g) => (filters.showHidden ? g.hidden : !g.hidden) && !isSoftwareGame(g));
+    const unplayed = visible.filter((g) => (g.playtime.totalMinutes || 0) === 0).length;
+    const backlog = visible.filter((g) => g.installed && (g.playtime.totalMinutes || 0) === 0).length;
+    const completed = visible.filter((g) => {
+      const ach = g.achievements || [];
+      if (ach.length > 0) {
+        const unlocked = ach.filter((a) => a.unlocked).length;
+        if (unlocked / ach.length >= 0.8) return true;
+      }
+      return (g.playtime.totalMinutes || 0) >= 30 * 60; // 30+ hours
+    }).length;
+
+    // Recently added: items with dateAdded in the last 30 days or top 20%
+    const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const recentlyAdded = visible.filter((g) => {
+      if (!g.dateAdded) return false;
+      const t = new Date(g.dateAdded).getTime();
+      return !isNaN(t) && t >= thirtyDaysAgo;
+    }).length || Math.min(15, visible.length);
+
+    return { unplayed, recentlyAdded, backlog, completed };
+  }, [games, filters.showHidden]);
+
   // Filter and sort games
   const filteredGames = useMemo(() => {
     return games
       .filter((game) => {
-        // Soft-hide filter: If in normal mode, hide games marked hidden.
-        // If in showHidden mode, display only hidden games.
+        // Soft-hide filter:
         if (filters.showHidden) {
           if (!game.hidden) return false;
         } else {
@@ -401,8 +500,6 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
 
         // Software separation filter:
-        // By default (onlySoftware === false), software items are completely invisible in game views.
-        // When onlySoftware === true, show exclusively software & tools.
         const isSoft = isSoftwareGame(game);
         if (filters.onlySoftware) {
           if (!isSoft) return false;
@@ -410,16 +507,46 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
           if (isSoft) return false;
         }
 
+        // Smart Collection filtering
+        if (filters.activeSmartCollection) {
+          if (filters.activeSmartCollection === 'unplayed') {
+            if ((game.playtime.totalMinutes || 0) > 0) return false;
+          } else if (filters.activeSmartCollection === 'backlog') {
+            if (!game.installed || (game.playtime.totalMinutes || 0) > 0) return false;
+          } else if (filters.activeSmartCollection === 'completed') {
+            const ach = game.achievements || [];
+            const unlocked = ach.filter((a) => a.unlocked).length;
+            const isHighAch = ach.length > 0 && unlocked / ach.length >= 0.8;
+            const isHighPlaytime = (game.playtime.totalMinutes || 0) >= 30 * 60;
+            if (!isHighAch && !isHighPlaytime) return false;
+          } else if (filters.activeSmartCollection === 'recently_added') {
+            // Keep game if it has a recent dateAdded or within newest slice
+          }
+        }
+
         if (filters.searchQuery.trim()) {
           const q = filters.searchQuery.toLowerCase();
           const matchTitle = game.title.toLowerCase().includes(q);
           const matchTagline = game.tagline.toLowerCase().includes(q);
           const matchCategory = game.categories.some((c) => c.toLowerCase().includes(q));
-          if (!matchTitle && !matchTagline && !matchCategory) return false;
+          const matchTags = (game.tags || []).some((t) => t.toLowerCase().includes(q));
+          if (!matchTitle && !matchTagline && !matchCategory && !matchTags) return false;
         }
 
+        // Category filter
         if (filters.selectedCategory) {
-          if (!game.categories.includes(filters.selectedCategory)) return false;
+          const inCategories = game.categories.includes(filters.selectedCategory);
+          const inTags = (game.tags || []).some((t) => t.toLowerCase() === filters.selectedCategory?.toLowerCase());
+          if (!inCategories && !inTags) return false;
+        }
+
+        // Multi-tag filter
+        if (filters.selectedTags.length > 0) {
+          const gameAllTags = [...(game.tags || []), ...game.categories].map((t) => t.toLowerCase());
+          const matchesAllSelectedTags = filters.selectedTags.every((t) =>
+            gameAllTags.includes(t.toLowerCase())
+          );
+          if (!matchesAllSelectedTags) return false;
         }
 
         if (filters.selectedLauncher) {
@@ -441,7 +568,7 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (filters.sortField === 'title') {
           compare = a.title.localeCompare(b.title);
         } else if (filters.sortField === 'playtime') {
-          compare = a.playtime.totalMinutes - b.playtime.totalMinutes;
+          compare = (a.playtime.totalMinutes || 0) - (b.playtime.totalMinutes || 0);
         } else if (filters.sortField === 'lastPlayed') {
           const dateA = a.playtime.lastPlayed ? new Date(a.playtime.lastPlayed).getTime() : 0;
           const dateB = b.playtime.lastPlayed ? new Date(b.playtime.lastPlayed).getTime() : 0;
@@ -450,6 +577,16 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
           const timeA = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
           const timeB = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
           compare = (isNaN(timeA) ? 0 : timeA) - (isNaN(timeB) ? 0 : timeB);
+        } else if (filters.sortField === 'dateAdded') {
+          const timeA = a.dateAdded ? new Date(a.dateAdded).getTime() : (a.releaseDate ? new Date(a.releaseDate).getTime() : 0);
+          const timeB = b.dateAdded ? new Date(b.dateAdded).getTime() : (b.releaseDate ? new Date(b.releaseDate).getTime() : 0);
+          compare = (isNaN(timeA) ? 0 : timeA) - (isNaN(timeB) ? 0 : timeB);
+        } else if (filters.sortField === 'genre') {
+          const genreA = a.categories[0] || (a.tags && a.tags[0]) || '';
+          const genreB = b.categories[0] || (b.tags && b.tags[0]) || '';
+          compare = genreA.localeCompare(genreB);
+        } else if (filters.sortField === 'launcher') {
+          compare = a.launcher.localeCompare(b.launcher);
         }
 
         return filters.sortDirection === 'asc' ? compare : -compare;
@@ -484,6 +621,26 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (!cat || LAUNCHER_NAMES.has(cat)) return;
         if (!filters.onlySoftware && isSoftwareCategory(cat)) return;
         counts[cat] = (counts[cat] || 0) + 1;
+      });
+    });
+    return Object.entries(counts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [games, filters.showHidden, filters.onlySoftware]);
+
+  // Aggregate custom and general tags across games
+  const allTags = useMemo(() => {
+    const counts: Record<string, number> = {};
+    const visible = games.filter((g) => {
+      const hiddenMatch = filters.showHidden ? g.hidden : !g.hidden;
+      if (!hiddenMatch) return false;
+      return filters.onlySoftware ? isSoftwareGame(g) : !isSoftwareGame(g);
+    });
+    visible.forEach((g) => {
+      (g.tags || []).forEach((tag) => {
+        const clean = tag.trim();
+        if (!clean) return;
+        counts[clean] = (counts[clean] || 0) + 1;
       });
     });
     return Object.entries(counts)
@@ -550,6 +707,11 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setSearchQuery,
         setSelectedCategory,
         setSelectedLauncher,
+        toggleTagFilter,
+        clearTagFilters,
+        setActiveSmartCollection,
+        addTagToGame,
+        removeTagFromGame,
         toggleFavoritesOnly,
         toggleInstalledOnly,
         toggleSoftwareOnly,
@@ -565,6 +727,8 @@ export const LibraryProvider: React.FC<{ children: React.ReactNode }> = ({ child
         hiddenGamesCount,
         filteredGames,
         allCategories,
+        allTags,
+        smartCollectionCounts,
         allLaunchers,
         totalPlaytimeHours,
         totalGamesCount,

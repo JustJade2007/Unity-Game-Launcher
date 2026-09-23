@@ -9,12 +9,14 @@ import { Game } from './types/game';
 import { TitleBar } from './components/layout/TitleBar';
 import { LaunchersModal } from './components/layout/LaunchersModal';
 import { CustomGameModal } from './components/library/CustomGameModal';
+import { RandomGameModal } from './components/library/RandomGameModal';
 
 const MainLayout: React.FC = () => {
   const { filters, filteredGames } = useLibrary();
   const [detailGame, setDetailGame] = useState<Game | null>(null);
   const [isLaunchersModalOpen, setIsLaunchersModalOpen] = useState(false);
   const [isAddGameModalOpen, setIsAddGameModalOpen] = useState(false);
+  const [isRandomSelectorOpen, setIsRandomSelectorOpen] = useState(false);
   const [editingGame, setEditingGame] = useState<Game | null>(null);
 
   return (
@@ -40,6 +42,7 @@ const MainLayout: React.FC = () => {
               setEditingGame(null);
               setIsAddGameModalOpen(true);
             }}
+            onOpenRandomSelector={() => setIsRandomSelectorOpen(true)}
           />
 
         {/* Scrollable Viewport */}
@@ -111,6 +114,13 @@ const MainLayout: React.FC = () => {
           setEditingGame(null);
         }}
         editingGame={editingGame}
+      />
+
+      {/* Interactive Random Game Selector (Roulette Wheel) */}
+      <RandomGameModal
+        isOpen={isRandomSelectorOpen}
+        onClose={() => setIsRandomSelectorOpen(false)}
+        onSelectGame={(game) => setDetailGame(game)}
       />
     </div>
   );

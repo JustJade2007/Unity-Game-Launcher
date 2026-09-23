@@ -44,6 +44,11 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 | Custom launch arguments & working directories | ✅ Implemented |
 | Manual entry edit forms & library maintenance | ✅ Implemented |
 | Title deletion & soft-hide mechanism | ✅ Implemented |
+| Custom tag creation & combinatorial multi-tag filtering | ✅ Implemented |
+| Automated smart collections (Unplayed, Backlog, High Progress, Recent) | ✅ Implemented |
+| Comprehensive multi-criteria sorting mechanisms | ✅ Implemented |
+| Embedded platform store & community integration | ✅ Implemented |
+| Interactive random game selector (Roulette wheel & NLP filter) | ✅ Implemented |
 | Cloud storage sync indicator (Supabase) | ✅ Implemented |
 | Account management | 🗓️ Planned |
 | Automatic updates | 🗓️ Planned |

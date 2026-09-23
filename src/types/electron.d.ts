@@ -27,6 +27,7 @@ export interface ElectronAPI {
   onMaximizedState: (callback: (isMax: boolean) => void) => () => void;
   getAppPaths: () => Promise<AppPathsInfo>;
   openConfigFolder: () => Promise<{ success: boolean; path?: string; error?: string }>;
+  openExternal: (url: string) => Promise<{ success: boolean; error?: string }>;
   loadConfig: () => Promise<AppConfig | null>;
   saveConfig: (config: AppConfig) => Promise<{ success: boolean; error?: string }>;
   loadLibrary: () => Promise<Game[]>;

@@ -89,17 +89,31 @@ export interface Game {
   ownershipSources?: OwnershipSource[];
   needsCloudUpload?: boolean;
   isSoftware?: boolean;
+  tags?: string[];
+  dateAdded?: string;
 }
 
 export type ViewMode = 'grid' | 'detailed' | 'spotlight';
 
-export type SortField = 'title' | 'playtime' | 'lastPlayed' | 'releaseDate';
+export type SortField =
+  | 'title'
+  | 'playtime'
+  | 'lastPlayed'
+  | 'releaseDate'
+  | 'dateAdded'
+  | 'genre'
+  | 'launcher';
+
 export type SortDirection = 'asc' | 'desc';
+
+export type SmartCollectionType = 'all' | 'unplayed' | 'recently_added' | 'backlog' | 'completed' | string;
 
 export interface FilterState {
   searchQuery: string;
   selectedCategory: string | null;
   selectedLauncher: LauncherType | null;
+  selectedTags: string[];
+  activeSmartCollection: SmartCollectionType | null;
   onlyFavorites: boolean;
   onlyInstalled: boolean;
   onlySoftware: boolean;
@@ -107,3 +121,4 @@ export interface FilterState {
   sortField: SortField;
   sortDirection: SortDirection;
 }
+

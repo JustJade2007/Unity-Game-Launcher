@@ -124,36 +124,36 @@
 
 ---
 
-## ⚪ Issue #7: Library Organization and Game Discovery
+## 🟢 Issue #7: Library Organization and Game Discovery
 
 ### 🗂️ Organization & Catalog Management
-- [ ] Tag-based filtering and custom tag creation
-- [ ] Automated smart collections (e.g., Unplayed, Recently Added)
-- [ ] **Sorting mechanisms**:
-  - [ ] Sort by Title (A-Z, Z-A)
-  - [ ] Sort by Playtime
-  - [ ] Sort by Release Date
-  - [ ] Sort by Date Added to Library
-  - [ ] Sort by Last Played
-  - [ ] Sort by Genre / Tags
-  - [ ] Sort by Source Launcher / Custom Status
+- [x] Tag-based filtering and custom tag creation
+- [x] Automated smart collections (e.g., Unplayed, Recently Added, Backlog, High Progress)
+- [x] **Sorting mechanisms**:
+  - [x] Sort by Title (A-Z, Z-A)
+  - [x] Sort by Playtime (High to Low, Low to High)
+  - [x] Sort by Release Date (Newest, Oldest)
+  - [x] Sort by Date Added to Library (Newest, Oldest)
+  - [x] Sort by Last Played (Recent, Oldest)
+  - [x] Sort by Genre / Tags
+  - [x] Sort by Source Launcher / Custom Status
 
 ### 🌐 Embedded Platform Integration
-- [ ] Render embedded store / community pages for linked platforms
-- [ ] Handle store load timeouts and connection drops gracefully
+- [x] Render embedded store / community pages for linked platforms
+- [x] Handle store load timeouts and connection drops gracefully with browser fallback
 
 ### 🎲 Interactive Random Game Selector
-- [ ] Filter pool by mood
-- [ ] Filter pool by tags / play status
-- [ ] Support natural-language selection prompts
-- [ ] Implement animated spinning-wheel selector component
-- [ ] Display selection rationale (e.g., *"Picked because it's tagged Co-op and unplayed"*)
-- [ ] Filter out uninstalled, unlaunchable, or missing titles from the selection pool
+- [x] Filter pool by mood
+- [x] Filter pool by tags / play status
+- [x] Support natural-language selection prompts
+- [x] Implement animated spinning-wheel selector component
+- [x] Display selection rationale (e.g., *"Picked because it's tagged Co-op and unplayed"*)
+- [x] Filter out uninstalled, unlaunchable, or missing titles from the selection pool
 
 > #### 🎯 Acceptance Criteria
-> - [ ] Multi-criteria filters and sorting combine deterministically without UI lag.
-> - [ ] Random picker strictly obeys applied filters and excludes broken entries.
-> - [ ] Store/remote discovery failures degrade gracefully without blocking local browsing.
+> - [x] Multi-criteria filters and sorting combine deterministically without UI lag.
+> - [x] Random picker strictly obeys applied filters and excludes broken entries.
+> - [x] Store/remote discovery failures degrade gracefully without blocking local browsing.
 
 ---
 

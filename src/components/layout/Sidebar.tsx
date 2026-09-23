@@ -24,10 +24,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
     filters,
     setSelectedCategory,
     setSelectedLauncher,
+    toggleTagFilter,
+    clearTagFilters,
+    setActiveSmartCollection,
     toggleFavoritesOnly,
     toggleInstalledOnly,
     toggleSoftwareOnly,
     allCategories,
+    allTags,
+    smartCollectionCounts,
     allLaunchers,
     totalGamesCount,
     totalSoftwareCount,
@@ -39,6 +44,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
   const resetAllFilters = () => {
     setSelectedCategory(null);
     setSelectedLauncher(null);
+    clearTagFilters();
+    setActiveSmartCollection(null);
     setSearchQuery('');
     if (filters.onlyFavorites) toggleFavoritesOnly();
     if (filters.onlyInstalled) toggleInstalledOnly();
@@ -49,6 +56,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
   const hasActiveFilters =
     filters.selectedCategory !== null ||
     filters.selectedLauncher !== null ||
+    filters.selectedTags.length > 0 ||
+    filters.activeSmartCollection !== null ||
     filters.onlyFavorites ||
     filters.onlyInstalled ||
     filters.onlySoftware ||
@@ -93,13 +102,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
               onClick={() => {
                 setSelectedCategory(null);
                 setSelectedLauncher(null);
+                clearTagFilters();
+                setActiveSmartCollection(null);
                 if (filters.onlyFavorites) toggleFavoritesOnly();
                 if (filters.onlyInstalled) toggleInstalledOnly();
                 if (filters.onlySoftware) toggleSoftwareOnly();
                 if (filters.showHidden) toggleShowHidden();
               }}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                !filters.onlyFavorites && !filters.onlyInstalled && !filters.onlySoftware && !filters.showHidden && !filters.selectedLauncher && !filters.selectedCategory
+                !filters.onlyFavorites && !filters.onlyInstalled && !filters.onlySoftware && !filters.showHidden && !filters.selectedLauncher && !filters.selectedCategory && !filters.activeSmartCollection && filters.selectedTags.length === 0
                   ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
                   : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
               }`}
@@ -179,6 +190,87 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
           </div>
         </div>
 
+        {/* Smart Collections Section */}
+        <div>
+          <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 px-3 mb-2 flex items-center justify-between">
+            <span>Smart Collections</span>
+            <Sparkles className="w-3 h-3 text-indigo-400" />
+          </div>
+          <div className="space-y-1">
+            <button
+              onClick={() =>
+                setActiveSmartCollection(
+                  filters.activeSmartCollection === 'unplayed' ? null : 'unplayed'
+                )
+              }
+              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                filters.activeSmartCollection === 'unplayed'
+                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <span>⏳ Unplayed</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-gray-400">
+                {smartCollectionCounts.unplayed}
+              </span>
+            </button>
+
+            <button
+              onClick={() =>
+                setActiveSmartCollection(
+                  filters.activeSmartCollection === 'backlog' ? null : 'backlog'
+                )
+              }
+              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                filters.activeSmartCollection === 'backlog'
+                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <span>📥 Backlog (Ready to Play)</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-gray-400">
+                {smartCollectionCounts.backlog}
+              </span>
+            </button>
+
+            <button
+              onClick={() =>
+                setActiveSmartCollection(
+                  filters.activeSmartCollection === 'completed' ? null : 'completed'
+                )
+              }
+              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                filters.activeSmartCollection === 'completed'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <span>🏆 High Progress</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-gray-400">
+                {smartCollectionCounts.completed}
+              </span>
+            </button>
+
+            <button
+              onClick={() =>
+                setActiveSmartCollection(
+                  filters.activeSmartCollection === 'recently_added' ? null : 'recently_added'
+                )
+              }
+              className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                filters.activeSmartCollection === 'recently_added'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+              }`}
+            >
+              <span>🆕 Recently Added</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-white/5 text-gray-400">
+                {smartCollectionCounts.recentlyAdded}
+              </span>
+            </button>
+          </div>
+        </div>
+
         {/* Launchers Section */}
         <div>
           <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 px-3 mb-2 flex items-center justify-between">
@@ -214,6 +306,42 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
             })}
           </div>
         </div>
+
+        {/* Custom Tags Section if any exist */}
+        {allTags.length > 0 && (
+          <div>
+            <div className="text-[11px] uppercase tracking-wider font-semibold text-gray-500 px-3 mb-2 flex items-center justify-between">
+              <span>Custom Tags</span>
+              {filters.selectedTags.length > 0 && (
+                <button
+                  onClick={clearTagFilters}
+                  className="text-[10px] text-indigo-400 hover:text-indigo-300 font-normal"
+                >
+                  Clear ({filters.selectedTags.length})
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1.5 px-1">
+              {allTags.map(({ name, count }: { name: string; count: number }) => {
+                const isSelected = filters.selectedTags.includes(name);
+                return (
+                  <button
+                    key={name}
+                    onClick={() => toggleTagFilter(name)}
+                    className={`text-[11px] px-2.5 py-0.8 rounded-md transition-all flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm ring-1 ring-white/20'
+                        : 'bg-[#151722] text-purple-300 hover:text-white hover:bg-[#1e2130] border border-purple-500/20'
+                    }`}
+                  >
+                    <span>#{name}</span>
+                    <span className="text-[9px] opacity-70">({count})</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Categories / Genres Section */}
         <div>
@@ -258,3 +386,4 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLaunchers, onOpenAddGame
     </aside>
   );
 };
+

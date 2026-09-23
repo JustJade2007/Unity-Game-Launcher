@@ -3,6 +3,7 @@ import { Game } from '../../types/game';
 import { useLibrary } from '../../context/LibraryContext';
 import { AchievementCard } from './AchievementCard';
 import { FriendsPlayingList } from './FriendsPlayingList';
+import { StoreEmbedTab } from './StoreEmbedTab';
 import { isSoftwareGame } from '../../utils/softwareClassifier';
 import {
   X,
@@ -21,6 +22,8 @@ import {
   Eye,
   EyeOff,
   Trash2,
+  Globe,
+  Plus,
 } from 'lucide-react';
 import { LauncherType } from '../../types/game';
 
@@ -71,10 +74,22 @@ interface GameDetailViewProps {
   onEditGame?: (game: Game) => void;
 }
 
-type TabType = 'overview' | 'achievements' | 'friends';
+type TabType = 'overview' | 'store' | 'achievements' | 'friends';
 
 export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGame, onClose, onEditGame }) => {
-  const { games, toggleFavorite, toggleHideGame, rescanGame, deleteGame, launchGame, installGame, fetchAchievements, enrichGameMedia } = useLibrary();
+  const {
+    games,
+    toggleFavorite,
+    toggleHideGame,
+    rescanGame,
+    deleteGame,
+    launchGame,
+    installGame,
+    fetchAchievements,
+    enrichGameMedia,
+    addTagToGame,
+    removeTagFromGame,
+  } = useLibrary();
   const game = games.find((g) => g.id === initialGame.id) || initialGame;
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -85,6 +100,8 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
   const [isFetchingAchievements, setIsFetchingAchievements] = useState(false);
   const [isRescanning, setIsRescanning] = useState(false);
   const [actionStatus, setActionStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [newTagInput, setNewTagInput] = useState('');
+  const [isAddingTag, setIsAddingTag] = useState(false);
 
   const targetAppId = game.appId || (game.id?.startsWith('steam_') ? game.id.replace('steam_', '') : null);
 
@@ -449,6 +466,18 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
             </button>
 
             <button
+              onClick={() => setActiveTab('store')}
+              className={`py-3.5 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+                activeTab === 'store'
+                  ? 'border-indigo-500 text-white'
+                  : 'border-transparent text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              <span>Store & Community</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('achievements')}
               className={`py-3.5 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 ${
                 activeTab === 'achievements'
@@ -592,10 +621,62 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
                     )}
                   </div>
 
-                  {/* Tags */}
+                  {/* Tags & Custom Tags Manager */}
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-400 mb-2">Categories & Tags</h4>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-semibold text-gray-400">Categories & Custom Tags</h4>
+                      <button
+                        onClick={() => setIsAddingTag(!isAddingTag)}
+                        className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Add Tag</span>
+                      </button>
+                    </div>
+
+                    {isAddingTag && (
+                      <div className="flex items-center gap-2 mb-3">
+                        <input
+                          type="text"
+                          value={newTagInput}
+                          onChange={(e) => setNewTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && newTagInput.trim()) {
+                              addTagToGame(game.id, newTagInput.trim());
+                              setNewTagInput('');
+                              setIsAddingTag(false);
+                            }
+                          }}
+                          placeholder="e.g. Backlog, Co-op Night, Steam Deck..."
+                          className="flex-1 bg-black/40 border border-indigo-500/50 rounded-lg px-2.5 py-1 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => {
+                            if (newTagInput.trim()) {
+                              addTagToGame(game.id, newTagInput.trim());
+                              setNewTagInput('');
+                              setIsAddingTag(false);
+                            }
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => {
+                            setNewTagInput('');
+                            setIsAddingTag(false);
+                          }}
+                          className="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 text-xs"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap gap-1.5">
+                      {/* Official Categories */}
                       {game.categories.map((c) => (
                         <span
                           key={c}
@@ -604,9 +685,33 @@ export const GameDetailView: React.FC<GameDetailViewProps> = ({ game: initialGam
                           {c}
                         </span>
                       ))}
+
+                      {/* Custom User Tags */}
+                      {(game.tags || []).map((t) => (
+                        <span
+                          key={t}
+                          className="group text-[11px] px-2 py-0.8 rounded-md bg-purple-950/40 border border-purple-500/30 text-purple-300 flex items-center gap-1.5"
+                        >
+                          <span>#{t}</span>
+                          <button
+                            onClick={() => removeTagFromGame(game.id, t)}
+                            className="text-purple-400/60 hover:text-rose-400 font-bold ml-0.5 transition-colors"
+                            title={`Remove #${t}`}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* STORE & COMMUNITY EMBED TAB */}
+            {activeTab === 'store' && (
+              <div>
+                <StoreEmbedTab game={game} />
               </div>
             )}
 

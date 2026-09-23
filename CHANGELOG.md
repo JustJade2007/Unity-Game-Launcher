@@ -8,6 +8,38 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-09-23
+
+### Added
+- **Interactive Random Game Selector (Roulette Wheel & Natural Language Picker)**:
+  - **Animated Spinning Roulette Canvas Wheel**: Implemented a dynamic canvas-based spinning wheel component with up to 16 slice segments, smooth inertia physics deceleration curve, randomized multi-rotation target calculation, and celebration state upon winner selection.
+  - **Natural-Language Selection Prompt Parser**: Built a fast, local rule-based intent and keyword parser matching phrases such as *"relaxing co-op game under 10 hours"* or *"unplayed shooter"* against game titles, genres, custom tags, and playtime metrics without external API latency.
+  - **Mood-Based Filter Presets**: Added one-click mood selector chips (*Cozy & Relaxing*, *High Adrenaline*, *Spooky & Horror*, *Play with Friends*, *Quick Coffee Break*) that dynamically tune the candidate pool.
+  - **Smart Selection Rationale**: The winning card provides an explicit, human-readable rationale explanation (e.g., *"Picked because it is installed & ready to play, currently unplayed in your backlog, and matches your 'Cozy & Relaxing' mood"*).
+  - **Strict Exclusion Rules**: Excludes uninstalled, broken, or software utilities from the roulette pool with quick one-click "Play Now" and "View Details" actions directly from the celebration card.
+- **Custom Tag-Based Organization & Unified Filtering**:
+  - **Arbitrary Custom Tag Creation**: Users can assign arbitrary custom tags (e.g. `#backlog`, `#co-op-night`, `#steam-deck`) to any title from the Game Details view, with full disk persistence.
+  - **Unified Genre & Custom Tag Sidebar**: Custom tags dynamically appear in the Sidebar navigation under a dedicated "Custom Tags" section with active filter counts and clear toggles.
+  - **Multi-Tag Combinatorial Filtering**: Supports compound multi-tag filtering combining both official store categories and user tags without UI delay.
+- **Automated Smart Collections**:
+  - **Dynamic Presets in Sidebar**: Added live-updating collections with badge counters:
+    - ⏳ **Unplayed**: Titles with 0 recorded playtime minutes.
+    - 📥 **Backlog (Ready to Play)**: Installed games with 0 playtime minutes.
+    - 🏆 **High Progress**: Games with >=80% unlocked achievements or 30+ hours playtime.
+    - 🆕 **Recently Added**: Newly imported or added games.
+- **Comprehensive Sorting Engine**:
+  - Added full bi-directional sorting across the library:
+    - **Recently Played** & **Least Recently Played**
+    - **Playtime (High to Low)** & **Playtime (Low to High)**
+    - **Alphabetical (A - Z)** & **Alphabetical (Z - A)**
+    - **Release Date (Newest)** & **Release Date (Oldest)**
+    - **Date Added (Newest)** & **Date Added (Oldest)**
+    - **Genre / Primary Tag**
+    - **Source Launcher**
+- **Embedded Platform Integration (Store & Community Pages)**:
+  - **Embedded Store & Discussions Tab**: Added a dedicated "Store & Community" tab to `GameDetailView` displaying live storefronts and community discussion hubs for linked platforms (Steam, GOG, Epic Games).
+  - **Resilient Fallback & Timeout Protection**: Gracefully handles storefronts with frame embedding restrictions (`X-Frame-Options`) or load timeouts via a styled fallback with a direct, secure "Open in Browser" action using Electron's native `shell.openExternal`.
+
 ## [0.3.0] - 2026-09-23
 
 ### Added

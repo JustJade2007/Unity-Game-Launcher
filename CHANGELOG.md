@@ -8,6 +8,15 @@ This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-09-27
+
+### Added
+- **GitHub Issue Enhancer Workflow**:
+  - **Automated Issue Structuring**: Integrated the `JustJade2007/github-issue-enhancer@1.0.0` reusable GitHub Action workflow (`.github/workflows/enhance-issue.yml`) triggered on new issue submissions (`issues: [opened]`).
+  - **Gemini Flash Lite Intelligence**: Automatically rewords, clarifies, and formats opened issues into professional GitHub Flavored Markdown (Summary, Details, Context, Logs) without introducing assumptions or inventing details, preserving the author's original raw text in an expandable `<details>` section for transparency.
+  - **Secure Secrets Integration**: Configured workflow with repository secrets (`GEMINI_API_KEY`) and default `GITHUB_TOKEN` permissions (`issues: write`, `contents: read`).
+  - **Secrets & Configuration Documentation**: Updated `SECURITY.md`, `.env.example`, and `keys.env.example` with CI/CD secret guidance.
+
 ## [0.3.1] - 2026-09-23
 
 ### Added

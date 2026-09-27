@@ -37,7 +37,7 @@ function ensureConfigFiles() {
     // Default configuration file
     if (!fs.existsSync(configPath)) {
       const defaultConfig = {
-        version: '0.3.1',
+        version: '0.3.2',
         theme: 'dark',
         autoLaunchOnStartup: false,
         minimizeToTray: false,

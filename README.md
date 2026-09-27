@@ -50,6 +50,7 @@ Unity Game Launcher is a desktop application designed to be the **single hub** f
 | Embedded platform store & community integration | ✅ Implemented |
 | Interactive random game selector (Roulette wheel & NLP filter) | ✅ Implemented |
 | Cloud storage sync indicator (Supabase) | ✅ Implemented |
+| Automated GitHub issue enhancement (Gemini Flash Lite) | ✅ Implemented |
 | Account management | 🗓️ Planned |
 | Automatic updates | 🗓️ Planned |
 
@@ -138,7 +139,7 @@ Contributions, issues, and feature requests are welcome!
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-Please use the [issue templates](.github/ISSUE_TEMPLATE/) for bug reports and feature requests.
+Please use the [issue templates](.github/ISSUE_TEMPLATE/) for bug reports and feature requests. Newly submitted issues are automatically formatted and enhanced for clarity using the [`JustJade2007/github-issue-enhancer`](https://github.com/JustJade2007/github-issue-enhancer) GitHub Action workflow powered by Gemini Flash Lite.
 
 ---
 

@@ -1,0 +1,35 @@
+# Security Policy
+
+## Supported Versions
+
+| Version | Supported          |
+| ------- | ------------------ |
+| 0.3.x   | :white_check_mark: |
+| 0.2.x   | :white_check_mark: |
+| < 0.2   | :x:                |
+
+## Reporting a Vulnerability
+
+We take the security of Unity Game Launcher seriously. If you discover a security vulnerability, please do not open a public issue.
+
+Instead, please send an email to the repository maintainer or open a private security advisory on GitHub:
+- Maintainer: [@JustJade2007](https://github.com/JustJade2007)
+
+Please include:
+- A description of the issue and its potential impact.
+- Steps to reproduce or a proof of concept.
+- Any suggested remediations or mitigations.
+
+## Environment & Secrets Policy
+- **Never commit `.env` or sensitive secret files.** All local API keys and user credentials must reside in ignored environment files.
+- Only safe, public tokens (such as Supabase `anon` / public keys guarded by Row Level Security) should be referenced client-side.
+- **Steam Web API Keys**: The Steam Web API key is used exclusively for read-only library and achievement querying. API keys must remain strictly in ignored `.env` or local configuration stores and never committed to source control.
+- **Native Protocol & Process Execution**: Unity Game Launcher invokes registered OS protocols (e.g. `steam://`, `com.epicgames.launcher://`, `goggalaxy://`, `origin2://`, `uplay://`, `battlenet://`, `xbox:`) via Electron's `shell.openExternal`. All launcher IDs and URIs are sanitized before execution.
+- **Read-Only System & Registry Discovery**: Local client and game detection inspects standard Windows Registry hives and game installation folders strictly in read-only mode using built-in OS utilities (`reg query`). It does not require elevated administrator privileges and performs zero modifications to Windows system hives or launcher configuration stores.
+- **External Configuration & Data**: The user's external runtime `config.json` and `games.json` files reside in `%APPDATA%\Unity Game Launcher` (in installed mode) or within the `data\` directory alongside the portable executable. Users running the portable binary on shared or removable media should protect their USB drives with BitLocker or drive-level encryption if sensitive session or account tokens are stored.
+- **External Asset & Image Fetching**: SteamDB and Steam static CDN queries use public endpoints (`shared.fastly.steamstatic.com`, `shared.akamai.steamstatic.com`, `cdn.akamai.steamstatic.com`, and `store.steampowered.com/api/`). These requests are strictly read-only HTTPS GET and HEAD queries for public store metadata, capsule images, hero art, and headers. They do not send or require user identifiers, private tokens, or session secrets. All URLs are validated to strictly match allowed HTTPS schemes and legitimate store CDN hosts before network requests are initiated.
+- **Local Executable Launching & Process Spawning**: Custom local titles are launched via Node's detached `child_process.spawn` without passing through arbitrary command shells (`shell: false`). Executable paths are validated for existence and regular file status on disk prior to invocation. Launch arguments are parsed using quote-aware argument tokenization to prevent arbitrary command injection.
+- **Store Metadata & Category Enrichment**: Store detail lookups for category and genre resolution query public store APIs over TLS (`store.steampowered.com/api/appdetails`). Data is parsed safely without executing untrusted scripts or rendering unsanitized HTML, and genres are sanitized against normalized classification sets to eliminate inaccurate categorization and prevent data injection.
+- **Embedded Platform Pages & External URL Sandboxing**: In-app previews of official store and community pages run in isolated sandbox environments (`sandbox="allow-scripts allow-same-origin allow-popups allow-forms"`). Any external browser link invocations via `shell.openExternal` strictly validate URL protocols against trusted schemes (`http://`, `https://`, `steam://`, `goggalaxy://`) to prevent protocol handler injection or local script execution.
+- **GitHub Actions & CI/CD Secrets**: Automated repository workflows (such as the GitHub Issue Enhancer workflow) access secrets exclusively through GitHub Repository Secrets (`${{ secrets.GEMINI_API_KEY }}`). Secret values are masked in runner logs and never written to repository files, tracking history, or public outputs.
+

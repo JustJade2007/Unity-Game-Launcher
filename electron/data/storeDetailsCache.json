@@ -1,0 +1,2147 @@
+{
+  "480": {
+    "appId": "480",
+    "title": "Spacewar",
+    "releaseDate": "2009-03-24",
+    "genres": [],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "550": {
+    "appId": "550",
+    "title": "Left 4 Dead 2",
+    "releaseDate": "Nov 16, 2009",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Co-op",
+      "Shooter"
+    ],
+    "isSoftware": false
+  },
+  "620": {
+    "appId": "620",
+    "title": "Portal 2",
+    "releaseDate": "Apr 18, 2011",
+    "genres": [],
+    "categories": [
+      "Puzzle",
+      "Adventure",
+      "Co-op"
+    ],
+    "isSoftware": false
+  },
+  "730": {
+    "appId": "730",
+    "title": "Counter-Strike 2",
+    "releaseDate": "21 Aug, 2012",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Shooter",
+      "FPS"
+    ],
+    "isSoftware": false
+  },
+  "3352": {
+    "appId": "3352",
+    "title": "UNO",
+    "releaseDate": "Jan 3, 2017",
+    "genres": [],
+    "categories": [
+      "Casual"
+    ],
+    "isSoftware": false
+  },
+  "3480": {
+    "appId": "3480",
+    "title": "Peggle Deluxe",
+    "releaseDate": "Mar 6, 2007",
+    "genres": [],
+    "categories": [
+      "Casual",
+      "Puzzle"
+    ],
+    "isSoftware": false
+  },
+  "4000": {
+    "appId": "4000",
+    "title": "Garry's Mod",
+    "releaseDate": "29 Nov, 2006",
+    "genres": [],
+    "categories": [
+      "Simulation",
+      "Casual",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "8500": {
+    "appId": "8500",
+    "title": "EVE Online",
+    "releaseDate": "Dec 15, 2010",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Massively Multiplayer",
+      "RPG",
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "22380": {
+    "appId": "22380",
+    "title": "Fallout: New Vegas",
+    "releaseDate": "Oct 19, 2010",
+    "genres": [],
+    "categories": [
+      "RPG",
+      "Action",
+      "Open World"
+    ],
+    "isSoftware": false
+  },
+  "105600": {
+    "appId": "105600",
+    "title": "Terraria",
+    "releaseDate": "May 16, 2011",
+    "genres": [],
+    "categories": [
+      "Adventure",
+      "RPG",
+      "Sandbox",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "107410": {
+    "appId": "107410",
+    "title": "Arma 3",
+    "releaseDate": "Sep 12, 2013",
+    "genres": [],
+    "categories": [
+      "Simulation",
+      "Tactical",
+      "Shooter"
+    ],
+    "isSoftware": false
+  },
+  "201290": {
+    "appId": "201290",
+    "title": "Sins of a Solar Empire: Trinity",
+    "releaseDate": "Nov 16, 2011",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Sci-Fi"
+    ],
+    "isSoftware": false
+  },
+  "204880": {
+    "appId": "204880",
+    "title": "Sins of a Solar Empire: Rebellion",
+    "releaseDate": "Jun 12, 2012",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Sci-Fi"
+    ],
+    "isSoftware": false
+  },
+  "220200": {
+    "appId": "220200",
+    "title": "Kerbal Space Program",
+    "releaseDate": "Apr 27, 2015",
+    "genres": [],
+    "categories": [
+      "Simulation",
+      "Space",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "223710": {
+    "appId": "223710",
+    "title": "Cry of Fear",
+    "releaseDate": "Apr 25, 2013",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "223750": {
+    "appId": "223750",
+    "title": "DCS World Steam Edition",
+    "releaseDate": "Aug 2, 2013",
+    "genres": [],
+    "categories": [
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "233450": {
+    "appId": "233450",
+    "title": "Prison Architect",
+    "releaseDate": "Oct 6, 2015",
+    "genres": [],
+    "categories": [
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "236390": {
+    "appId": "236390",
+    "title": "War Thunder",
+    "releaseDate": "Aug 15, 2013",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Massively Multiplayer",
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "243470": {
+    "appId": "243470",
+    "title": "Watch_Dogs",
+    "releaseDate": "May 26, 2014",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure"
+    ],
+    "isSoftware": false
+  },
+  "244210": {
+    "appId": "244210",
+    "title": "Assetto Corsa",
+    "releaseDate": "19 Dec, 2014",
+    "genres": [],
+    "categories": [
+      "Indie",
+      "Racing",
+      "Simulation",
+      "Sports"
+    ],
+    "isSoftware": false
+  },
+  "244850": {
+    "appId": "244850",
+    "title": "Space Engineers",
+    "releaseDate": "Feb 28, 2019",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "250900": {
+    "appId": "250900",
+    "title": "The Binding of Isaac: Rebirth",
+    "releaseDate": "Nov 4, 2014",
+    "genres": [
+      "Action"
+    ],
+    "categories": [
+      "Action"
+    ],
+    "isSoftware": false
+  },
+  "271590": {
+    "appId": "271590",
+    "title": "Grand Theft Auto V Legacy",
+    "releaseDate": "Apr 13, 2015",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure"
+    ],
+    "isSoftware": false
+  },
+  "275850": {
+    "appId": "275850",
+    "title": "No Man's Sky",
+    "releaseDate": "Aug 12, 2016",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure"
+    ],
+    "isSoftware": false
+  },
+  "282140": {
+    "appId": "282140",
+    "title": "SOMA",
+    "releaseDate": "Sep 21, 2015",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "284160": {
+    "appId": "284160",
+    "title": "BeamNG.drive",
+    "releaseDate": "May 29, 2015",
+    "genres": [],
+    "categories": [
+      "Simulation",
+      "Driving"
+    ],
+    "isSoftware": false
+  },
+  "294100": {
+    "appId": "294100",
+    "title": "RimWorld",
+    "releaseDate": "17 Oct, 2018",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Simulation",
+      "Survival"
+    ],
+    "isSoftware": false
+  },
+  "304930": {
+    "appId": "304930",
+    "title": "Unturned",
+    "releaseDate": "Jul 7, 2017",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Casual",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "312660": {
+    "appId": "312660",
+    "title": "Sniper Elite 4",
+    "releaseDate": "Feb 13, 2017",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure"
+    ],
+    "isSoftware": false
+  },
+  "322330": {
+    "appId": "322330",
+    "title": "Don't Starve Together",
+    "releaseDate": "21 Apr, 2016",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG"
+    ],
+    "isSoftware": false
+  },
+  "359320": {
+    "appId": "359320",
+    "title": "Elite Dangerous",
+    "releaseDate": "2 Apr, 2015",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Massively Multiplayer",
+      "RPG"
+    ],
+    "isSoftware": false
+  },
+  "359550": {
+    "appId": "359550",
+    "title": "Tom Clancy's Rainbow Six Siege",
+    "releaseDate": "1 Dec, 2015",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Shooter",
+      "FPS"
+    ],
+    "isSoftware": false
+  },
+  "367520": {
+    "appId": "367520",
+    "title": "Hollow Knight",
+    "releaseDate": "Feb 24, 2017",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "377160": {
+    "appId": "377160",
+    "title": "Fallout 4",
+    "releaseDate": "2015-11-09",
+    "genres": [
+      "RPG"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "378860": {
+    "appId": "378860",
+    "title": "Project CARS 2",
+    "releaseDate": "Sep 21, 2017",
+    "genres": [],
+    "categories": [
+      "Racing"
+    ],
+    "isSoftware": false
+  },
+  "379720": {
+    "appId": "379720",
+    "title": "DOOM",
+    "releaseDate": "2016-05-12",
+    "genres": [
+      "Action"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "392160": {
+    "appId": "392160",
+    "title": "X4: Foundations",
+    "releaseDate": "2018-11-30",
+    "genres": [
+      "Action",
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "396750": {
+    "appId": "396750",
+    "title": "EVERSPACE™",
+    "releaseDate": "2017-05-25",
+    "genres": [
+      "Action",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "410900": {
+    "appId": "410900",
+    "title": "Forts",
+    "releaseDate": "2017-04-19",
+    "genres": [
+      "Action",
+      "Indie",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "413150": {
+    "appId": "413150",
+    "title": "Stardew Valley",
+    "releaseDate": "2016-02-26",
+    "genres": [
+      "Indie",
+      "RPG",
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "447040": {
+    "appId": "447040",
+    "title": "Watch_Dogs 2",
+    "releaseDate": "28 Nov, 2016",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure"
+    ],
+    "isSoftware": false
+  },
+  "450390": {
+    "appId": "450390",
+    "title": "The Lab",
+    "releaseDate": "2016-04-05",
+    "genres": [
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "457140": {
+    "appId": "457140",
+    "title": "Oxygen Not Included",
+    "releaseDate": "2019-07-30",
+    "genres": [
+      "Indie",
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "461870": {
+    "appId": "461870",
+    "title": "Police Simulator: Patrol Duty",
+    "releaseDate": "2019-06-18",
+    "genres": [],
+    "categories": [
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "471710": {
+    "appId": "471710",
+    "title": "Rec Room",
+    "releaseDate": "2021-09-02",
+    "genres": [
+      "Adventure",
+      "Casual",
+      "Massively Multiplayer",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "489630": {
+    "appId": "489630",
+    "title": "Warhammer 40,000: Gladius - Relics of War",
+    "releaseDate": "2018-07-12",
+    "genres": [],
+    "categories": [
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "489830": {
+    "appId": "489830",
+    "title": "The Elder Scrolls V: Skyrim Special Edition",
+    "releaseDate": "2016-10-27",
+    "genres": [],
+    "categories": [
+      "RPG"
+    ],
+    "isSoftware": false
+  },
+  "503560": {
+    "appId": "503560",
+    "title": "911 Operator",
+    "releaseDate": "2017-02-24",
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "508440": {
+    "appId": "508440",
+    "title": "Totally Accurate Battle Simulator",
+    "releaseDate": "2021-04-01",
+    "genres": [],
+    "categories": [
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "527100": {
+    "appId": "527100",
+    "title": "Star Trek: Bridge Crew",
+    "releaseDate": "2017-05-30",
+    "genres": [],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "544610": {
+    "appId": "544610",
+    "title": "Battlestar Galactica Deadlock",
+    "releaseDate": "2017-08-31",
+    "genres": [
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "552100": {
+    "appId": "552100",
+    "title": "Brick Rigs",
+    "releaseDate": "Jul 14, 2023",
+    "genres": [],
+    "categories": [
+      "Simulation",
+      "Sandbox"
+    ],
+    "isSoftware": false
+  },
+  "553850": {
+    "appId": "553850",
+    "title": "HELLDIVERS™ 2",
+    "releaseDate": "8 Feb, 2024",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Shooter",
+      "Co-op"
+    ],
+    "isSoftware": false
+  },
+  "573090": {
+    "appId": "573090",
+    "title": "Stormworks: Build and Rescue",
+    "releaseDate": "2020-09-17",
+    "genres": [
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "581320": {
+    "appId": "581320",
+    "title": "Insurgency: Sandstorm",
+    "releaseDate": "Dec 12, 2018",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Shooter",
+      "FPS"
+    ],
+    "isSoftware": false
+  },
+  "581330": {
+    "appId": "581330",
+    "title": "Insurgency: Sandstorm Dedicated Server",
+    "releaseDate": "2018-12-12",
+    "genres": [],
+    "categories": [
+      "Tools",
+      "Server"
+    ],
+    "isSoftware": true
+  },
+  "583010": {
+    "appId": "583010",
+    "title": "VoiceAttack",
+    "releaseDate": "Mar 18, 2017",
+    "genres": [],
+    "categories": [
+      "Utilities",
+      "Software"
+    ],
+    "isSoftware": true
+  },
+  "588430": {
+    "appId": "588430",
+    "title": "Fallout Shelter",
+    "releaseDate": "2017-03-29",
+    "genres": [
+      "RPG",
+      "Simulation",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "597170": {
+    "appId": "597170",
+    "title": "Clone Drone in the Danger Zone",
+    "releaseDate": "2021-07-27",
+    "genres": [
+      "Action",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "602960": {
+    "appId": "602960",
+    "title": "Barotrauma",
+    "releaseDate": "Mar 13, 2023",
+    "genres": [],
+    "categories": [
+      "Simulation",
+      "Survival",
+      "Co-op"
+    ],
+    "isSoftware": false
+  },
+  "605740": {
+    "appId": "605740",
+    "title": "Flashing Lights",
+    "releaseDate": "2023-05-15",
+    "genres": [
+      "Action",
+      "Indie",
+      "Massively Multiplayer",
+      "RPG",
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "623990": {
+    "appId": "623990",
+    "title": "Tom Clancy's Rainbow Six Siege - Test Server",
+    "releaseDate": "2017-02-28",
+    "genres": [],
+    "categories": [
+      "Tools",
+      "Server"
+    ],
+    "isSoftware": true
+  },
+  "632810": {
+    "appId": "632810",
+    "title": "Soundpad Demo",
+    "releaseDate": "Oct 3, 2017",
+    "genres": [],
+    "categories": [
+      "Utilities",
+      "Software",
+      "Audio Production"
+    ],
+    "isSoftware": true
+  },
+  "641990": {
+    "appId": "641990",
+    "title": "The Escapists 2",
+    "releaseDate": "2017-08-21",
+    "genres": [
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "648350": {
+    "appId": "648350",
+    "title": "Jurassic World Evolution",
+    "releaseDate": "2018-06-11",
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "677620": {
+    "appId": "677620",
+    "title": "Splitgate",
+    "releaseDate": "2019-05-24",
+    "genres": [
+      "Action",
+      "Free To Play",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "700330": {
+    "appId": "700330",
+    "title": "SCP: Secret Laboratory",
+    "releaseDate": "2017-12-29",
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie",
+      "RPG",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "727130": {
+    "appId": "727130",
+    "title": "Between the Stars",
+    "releaseDate": "2024-03-07",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG",
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "738060": {
+    "appId": "738060",
+    "title": "Freddy Fazbear's Pizzeria Simulator",
+    "releaseDate": "2017-12-04",
+    "genres": [],
+    "categories": [
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "738520": {
+    "appId": "738520",
+    "title": "Breathedge",
+    "releaseDate": "2021-02-25",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "739630": {
+    "appId": "739630",
+    "title": "Phasmophobia",
+    "releaseDate": "2020-09-18",
+    "genres": [
+      "Action",
+      "Indie",
+      "Early Access"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "823130": {
+    "appId": "823130",
+    "title": "Totally Accurate Battlegrounds",
+    "releaseDate": "2018-06-05",
+    "genres": [
+      "Action",
+      "Indie",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "823500": {
+    "appId": "823500",
+    "title": "BONEWORKS",
+    "releaseDate": "2019-12-10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "848450": {
+    "appId": "848450",
+    "title": "Subnautica: Below Zero",
+    "releaseDate": "2021-05-13",
+    "genres": [
+      "Adventure",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "863550": {
+    "appId": "863550",
+    "title": "HITMAN™ 2",
+    "releaseDate": "2018-11-13",
+    "genres": [
+      "Action"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "871720": {
+    "appId": "871720",
+    "title": "Ultimate Custom Night",
+    "releaseDate": "2018-06-27",
+    "genres": [
+      "Action",
+      "Free To Play",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "886250": {
+    "appId": "886250",
+    "title": "Vegas Infinite by PokerStars",
+    "releaseDate": "2023-11-10",
+    "genres": [
+      "Casual",
+      "Strategy",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "905370": {
+    "appId": "905370",
+    "title": "Game Migrated to Another Steam Page",
+    "releaseDate": "2019-05-30",
+    "genres": [
+      "Action",
+      "Massively Multiplayer",
+      "Strategy",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "945360": {
+    "appId": "945360",
+    "title": "Among Us",
+    "releaseDate": "2018-11-16",
+    "genres": [
+      "Casual"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "986130": {
+    "appId": "986130",
+    "title": "Shadows of Doubt",
+    "releaseDate": "2024-09-26",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "993090": {
+    "appId": "993090",
+    "title": "Lossless Scaling",
+    "releaseDate": "Dec 28, 2018",
+    "genres": [],
+    "categories": [
+      "Utilities",
+      "Software"
+    ],
+    "isSoftware": true
+  },
+  "1029690": {
+    "appId": "1029690",
+    "title": "Sniper Elite 5",
+    "releaseDate": "May 25, 2022",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Shooter"
+    ],
+    "isSoftware": false
+  },
+  "1085660": {
+    "appId": "1085660",
+    "title": "Destiny 2",
+    "releaseDate": "2019-10-01",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1086940": {
+    "appId": "1086940",
+    "title": "Baldur's Gate 3",
+    "releaseDate": "Aug 3, 2023",
+    "genres": [],
+    "categories": [
+      "Adventure",
+      "RPG",
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "1091500": {
+    "appId": "1091500",
+    "title": "Cyberpunk 2077",
+    "releaseDate": "Dec 9, 2020",
+    "genres": [],
+    "categories": [
+      "RPG",
+      "Action",
+      "Open World"
+    ],
+    "isSoftware": false
+  },
+  "1096710": {
+    "appId": "1096710",
+    "title": "Hello Neighbor Alpha 4",
+    "releaseDate": "2019-10-19",
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1170970": {
+    "appId": "1170970",
+    "title": "Marbles on Stream",
+    "releaseDate": "2019-11-06",
+    "genres": [
+      "Casual",
+      "Massively Multiplayer",
+      "Racing",
+      "Simulation",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1172380": {
+    "appId": "1172380",
+    "title": "STAR WARS Jedi: Fallen Order™ ",
+    "releaseDate": "2019-11-14",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "isSoftware": false
+  },
+  "1174180": {
+    "appId": "1174180",
+    "title": "Red Dead Redemption 2",
+    "releaseDate": "Dec 5, 2019",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Open World"
+    ],
+    "isSoftware": false
+  },
+  "1202130": {
+    "appId": "1202130",
+    "title": "Starship Troopers: Terran Command",
+    "releaseDate": "2022-06-16",
+    "genres": [],
+    "categories": [
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "1222670": {
+    "appId": "1222670",
+    "title": "The Sims™ 4",
+    "releaseDate": "2020-06-18",
+    "genres": [],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1222680": {
+    "appId": "1222680",
+    "title": "Need for Speed™ Heat ",
+    "releaseDate": "2020-06-04",
+    "genres": [],
+    "categories": [
+      "Racing"
+    ],
+    "isSoftware": false
+  },
+  "1222700": {
+    "appId": "1222700",
+    "title": "A Way Out",
+    "releaseDate": "2020-06-18",
+    "genres": [],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1237950": {
+    "appId": "1237950",
+    "title": "STAR WARS™ Battlefront™ II",
+    "releaseDate": "Jun 11, 2020",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Shooter",
+      "Sci-Fi"
+    ],
+    "isSoftware": false
+  },
+  "1241100": {
+    "appId": "1241100",
+    "title": "POLYGON",
+    "releaseDate": "2020-03-06",
+    "genres": [
+      "Action",
+      "Indie",
+      "Massively Multiplayer",
+      "Free To Play",
+      "Early Access"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1243830": {
+    "appId": "1243830",
+    "title": "Overcooked! All You Can Eat",
+    "releaseDate": "2021-03-23",
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1268750": {
+    "appId": "1268750",
+    "title": "Starship Troopers: Extermination",
+    "releaseDate": "2024-10-10",
+    "genres": [
+      "Action",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1281930": {
+    "appId": "1281930",
+    "title": "tModLoader",
+    "releaseDate": "2020-05-16",
+    "genres": [],
+    "categories": [
+      "Tools",
+      "Utilities",
+      "Software"
+    ],
+    "isSoftware": true
+  },
+  "1361000": {
+    "appId": "1361000",
+    "title": "In Silence",
+    "releaseDate": "2021-10-29",
+    "genres": [
+      "Action"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1363080": {
+    "appId": "1363080",
+    "title": "Manor Lords",
+    "releaseDate": "Apr 26, 2024",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "1364960": {
+    "appId": "1364960",
+    "title": "Hello Neighbor 2 Alpha 1.5",
+    "releaseDate": "2020-07-23",
+    "genres": [
+      "Adventure",
+      "Indie",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1366800": {
+    "appId": "1366800",
+    "title": "Crosshair X",
+    "releaseDate": "Aug 17, 2020",
+    "genres": [],
+    "categories": [
+      "Utilities",
+      "Software"
+    ],
+    "isSoftware": true
+  },
+  "1422450": {
+    "appId": "1422450",
+    "title": "Deadlock",
+    "releaseDate": "To be announced",
+    "genres": [
+      "Action"
+    ],
+    "categories": [
+      "Action"
+    ],
+    "isSoftware": false
+  },
+  "1431610": {
+    "appId": "1431610",
+    "title": "Prison Simulator: Prologue",
+    "releaseDate": "2021-05-20",
+    "genres": [],
+    "categories": [
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "1449850": {
+    "appId": "1449850",
+    "title": "Yu-Gi-Oh!  Master Duel",
+    "releaseDate": "Jan 18, 2022",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Card Game"
+    ],
+    "isSoftware": false
+  },
+  "1465470": {
+    "appId": "1465470",
+    "title": "The Crust",
+    "releaseDate": "2026-09-10",
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1473060": {
+    "appId": "1473060",
+    "title": "Reality Break",
+    "releaseDate": "2025-02-10",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1485080": {
+    "appId": "1485080",
+    "title": "Just Act Natural",
+    "releaseDate": "2022-03-25",
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1486350": {
+    "appId": "1486350",
+    "title": "VRoid Studio",
+    "releaseDate": "2020-12-23",
+    "genres": [],
+    "categories": [
+      "Animation & Modeling",
+      "Design & Illustration",
+      "Software"
+    ],
+    "isSoftware": true
+  },
+  "1489630": {
+    "appId": "1489630",
+    "title": "Carrier Command 2",
+    "releaseDate": "Aug 10, 2021",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "1517290": {
+    "appId": "1517290",
+    "title": "Battlefield™ 2042",
+    "releaseDate": "2021-11-19",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Casual"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1575940": {
+    "appId": "1575940",
+    "title": "Sins of a Solar Empire II",
+    "releaseDate": "2024-08-15",
+    "genres": [],
+    "categories": [
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "1592190": {
+    "appId": "1592190",
+    "title": "BONELAB",
+    "releaseDate": "2022-09-29",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1599600": {
+    "appId": "1599600",
+    "title": "PlateUp!",
+    "releaseDate": "Aug 4, 2022",
+    "genres": [],
+    "categories": [
+      "Simulation",
+      "Casual",
+      "Co-op"
+    ],
+    "isSoftware": false
+  },
+  "1623730": {
+    "appId": "1623730",
+    "title": "Palworld",
+    "releaseDate": "2026-07-09",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "RPG"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1625450": {
+    "appId": "1625450",
+    "title": "Muck",
+    "releaseDate": "2021-06-05",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Free To Play",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1657900": {
+    "appId": "1657900",
+    "title": "Carrier Command 2 VR",
+    "releaseDate": "2021-08-10",
+    "genres": [],
+    "categories": [
+      "Strategy"
+    ],
+    "isSoftware": false
+  },
+  "1659040": {
+    "appId": "1659040",
+    "title": "HITMAN World of Assassination",
+    "releaseDate": "20 Jan, 2022",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Stealth"
+    ],
+    "isSoftware": false
+  },
+  "1708520": {
+    "appId": "1708520",
+    "title": "F1® Manager 2022",
+    "releaseDate": "2022-08-30",
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1755300": {
+    "appId": "1755300",
+    "title": "Smart Factory Tycoon",
+    "releaseDate": "2022-03-26",
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1774580": {
+    "appId": "1774580",
+    "title": "STAR WARS Jedi: Survivor™",
+    "releaseDate": "Apr 27, 2023",
+    "genres": [],
+    "categories": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "isSoftware": false
+  },
+  "1782210": {
+    "appId": "1782210",
+    "title": "Crab Game",
+    "releaseDate": "2021-10-29",
+    "genres": [
+      "Action",
+      "Casual",
+      "Free To Play",
+      "Indie",
+      "Racing"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1815780": {
+    "appId": "1815780",
+    "title": "Asphalt Legends ",
+    "releaseDate": "2022-08-02",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Racing",
+      "Sports",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1850570": {
+    "appId": "1850570",
+    "title": "DEATH STRANDING DIRECTOR'S CUT",
+    "releaseDate": "2022-03-30",
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1902490": {
+    "appId": "1902490",
+    "title": "Aperture Desk Job",
+    "releaseDate": "2022-03-01",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Casual",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1949970": {
+    "appId": "1949970",
+    "title": "J-Jump Arena",
+    "releaseDate": "2025-10-23",
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1961460": {
+    "appId": "1961460",
+    "title": "Project Playtime",
+    "releaseDate": "2022-12-12",
+    "genres": [
+      "Action",
+      "Indie",
+      "Free To Play",
+      "Early Access"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1966720": {
+    "appId": "1966720",
+    "title": "Lethal Company",
+    "releaseDate": "2023-10-23",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie",
+      "Early Access"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "1990740": {
+    "appId": "1990740",
+    "title": "Barro GT",
+    "releaseDate": "2022-05-19",
+    "genres": [
+      "Casual",
+      "Indie",
+      "Racing"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2019620": {
+    "appId": "2019620",
+    "title": "GERONIMO",
+    "releaseDate": "Jul 10, 2026",
+    "genres": [
+      "Action",
+      "Early Access"
+    ],
+    "categories": [
+      "Action"
+    ],
+    "isSoftware": false
+  },
+  "2021910": {
+    "appId": "2021910",
+    "title": "FPS Chess",
+    "releaseDate": "2022-07-16",
+    "genres": [],
+    "categories": [
+      "Puzzle"
+    ],
+    "isSoftware": false
+  },
+  "2073850": {
+    "appId": "2073850",
+    "title": "THE FINALS",
+    "releaseDate": "2023-12-07",
+    "genres": [
+      "Action",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2108330": {
+    "appId": "2108330",
+    "title": "F1® 23",
+    "releaseDate": "2023-06-15",
+    "genres": [
+      "Racing",
+      "Sports"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2231380": {
+    "appId": "2231380",
+    "title": "Ghost Recon Breakpoint",
+    "releaseDate": "2023-01-23",
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2239550": {
+    "type": "game",
+    "isSoftware": false,
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
+    "categories": [
+      "Single-player",
+      "Multi-player",
+      "PvP",
+      "Online PvP",
+      "Co-op",
+      "Online Co-op",
+      "Steam Achievements",
+      "Captions available",
+      "In-App Purchases",
+      "Partial Controller Support",
+      "HDR available"
+    ],
+    "developers": [
+      "Ubisoft Toronto"
+    ],
+    "publishers": [
+      "Ubisoft"
+    ],
+    "releaseDate": "Jan 26, 2023",
+    "comingSoon": false,
+    "shortDescription": "Build a resistance as you fight to take back a near-future London facing its downfall. Welcome to the Resistance.",
+    "headerImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2239550/header.jpg?t=1788548571",
+    "capsuleImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2239550/capsule_231x87.jpg?t=1788548571",
+    "background": "https://store.akamai.steamstatic.com/images/storepagebackground/app/2239550?t=1788548571",
+    "screenshots": [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2239550/ss_34defa8d443c27fd4c925b37841e4d3f8c08895b.1920x1080.jpg?t=1788548571",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2239550/ss_9662b544cefb82f3d500c911f24ed58d1d0d9d9d.1920x1080.jpg?t=1788548571",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2239550/ss_6d0a08002410c1054d76e32edfc92e926b946419.1920x1080.jpg?t=1788548571",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2239550/ss_be16b7c7c36e8fe087b36e69a11c94f76ef34cc0.1920x1080.jpg?t=1788548571",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2239550/ss_280d99f0c7bd84b12e4ac5d3b5fdd9bc4bb74d02.1920x1080.jpg?t=1788548571"
+    ]
+  },
+  "2357570": {
+    "appId": "2357570",
+    "title": "Overwatch®",
+    "releaseDate": "Aug 10, 2023",
+    "genres": [
+      "Action",
+      "Free To Play"
+    ],
+    "categories": [
+      "Action"
+    ],
+    "isSoftware": false
+  },
+  "2379780": {
+    "appId": "2379780",
+    "title": "Balatro",
+    "releaseDate": "Feb 20, 2024",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Casual",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2400510": {
+    "appId": "2400510",
+    "title": "Dungeons & Degenerate Gamblers",
+    "releaseDate": "Aug 8, 2024",
+    "genres": [],
+    "categories": [
+      "Strategy",
+      "Casual",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2426960": {
+    "appId": "2426960",
+    "title": "Summoners War",
+    "releaseDate": "2024-01-07",
+    "genres": [
+      "RPG",
+      "Strategy",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2488620": {
+    "appId": "2488620",
+    "title": "F1® 24",
+    "releaseDate": "May 31, 2024",
+    "genres": [],
+    "categories": [
+      "Racing",
+      "Sports"
+    ],
+    "isSoftware": false
+  },
+  "2507950": {
+    "appId": "2507950",
+    "title": "Delta Force",
+    "releaseDate": "2024-12-04",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Massively Multiplayer",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2567870": {
+    "appId": "2567870",
+    "title": "Chained Together",
+    "releaseDate": "2024-06-19",
+    "genres": [
+      "Adventure",
+      "Casual",
+      "Indie",
+      "Simulation"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2591280": {
+    "appId": "2591280",
+    "title": "F1® Manager 2024",
+    "releaseDate": "2024-07-23",
+    "genres": [
+      "Simulation",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2708450": {
+    "appId": "2708450",
+    "title": "Oh Deer",
+    "releaseDate": "2024-06-27",
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2709570": {
+    "appId": "2709570",
+    "title": "Supermarket Together",
+    "releaseDate": "2024-08-09",
+    "genres": [
+      "Casual",
+      "Indie",
+      "Simulation",
+      "Free To Play"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2881650": {
+    "appId": "2881650",
+    "title": "Content Warning",
+    "releaseDate": "2024-04-01",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2887860": {
+    "appId": "2887860",
+    "title": "DUCKSIDE Playtest",
+    "releaseDate": "2024-09-12",
+    "genres": [],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "2904000": {
+    "appId": "2904000",
+    "title": "The Spell Brigade",
+    "releaseDate": "2026-04-29",
+    "genres": [
+      "Action",
+      "Casual",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "3146520": {
+    "appId": "3146520",
+    "title": "WEBFISHING",
+    "releaseDate": "2024-10-11",
+    "genres": [
+      "Casual",
+      "Indie",
+      "Massively Multiplayer"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "3240220": {
+    "appId": "3240220",
+    "title": "Grand Theft Auto V Enhanced",
+    "releaseDate": "2025-03-04",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Racing"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "3241660": {
+    "appId": "3241660",
+    "title": "R.E.P.O.",
+    "releaseDate": "26 Feb, 2025",
+    "genres": [
+      "Action",
+      "Early Access"
+    ],
+    "categories": [
+      "Action"
+    ],
+    "isSoftware": false
+  },
+  "3445340": {
+    "appId": "3445340",
+    "title": "Sandwich Simulator",
+    "releaseDate": "2026-01-22",
+    "genres": [],
+    "categories": [
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "3476660": {
+    "type": "game",
+    "isSoftware": false,
+    "genres": [
+      "Action",
+      "Adventure",
+      "Casual",
+      "Indie",
+      "Simulation"
+    ],
+    "categories": [
+      "Single-player",
+      "Steam Achievements",
+      "Steam Cloud",
+      "Family Sharing"
+    ],
+    "developers": [
+      "Tbjbu2"
+    ],
+    "publishers": [
+      "Tbjbu2",
+      "PlayWay S.A."
+    ],
+    "releaseDate": "Sep 26, 2025",
+    "comingSoon": false,
+    "shortDescription": "A space survival crafting mining base building and star system building game. Craft rockets to create planets and Dyson Rings, mine and craft advanced materials, terraform the terrain, manage electricity, farm food, and more as you watch the star system evolve into stunning, ever-changing views.",
+    "headerImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/header.jpg?t=1759438703",
+    "capsuleImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/3c6fc6a58a7353e7526e27a8d537289d90d682e8/capsule_231x87.jpg?t=1759438703",
+    "background": "https://store.akamai.steamstatic.com/images/storepagebackground/app/3476660?t=1759438703",
+    "screenshots": [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/5a4b1d5267aa0eebfc85a5fe4f8fa0473e4b2366/ss_5a4b1d5267aa0eebfc85a5fe4f8fa0473e4b2366.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_6092910e9215cdf7e1d85ff06ea324454c1c7772.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_219f8de58e32c3862182ab1494a6a993c12c45c1.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_1da6fa68ca9fc6c46dd1751fb024514e9ef622b6.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_648d2441ac9fb8b40a4a3019407e7051c7f4315d.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_5cec57911be3e7a1c8295ec98699f181f6852ee4.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_a74b954b15915bb4b2bcb80254416627258d9afb.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_945b2cb445fb7b36a1741e3099188f5eb69e41eb.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/80a7e2aa2cd44a584b87862d45b5d97b762e3606/ss_80a7e2aa2cd44a584b87862d45b5d97b762e3606.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_180a330b2c965a82f0f1837a6a06519706ff15d4.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_ba1576281e5719d4723f2809bffe1d42371af60e.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_30956d7de5a9a52594b7b995382f70ec05011b5b.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_82ff3511ef40b02f883f2ac0fb05aa921ebdfcd2.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_5fe7a6f67c0d6bc14c129a6d674211937043af2d.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_5fbd599ae704be5f20ca374145a356b95461c014.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_275238fd58f47ce94bc0289128852fc08e854958.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_1941dc2429926ec0dee272d9f0573a25ea6e2944.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_9882c36e89988fd14aedeff36389a797491b5906.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/f2b8b06e927815f28caacb287d50edc0387048e8/ss_f2b8b06e927815f28caacb287d50edc0387048e8.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/75811bf50c2cb7ad00ccfa0f1cae280a557e56ad/ss_75811bf50c2cb7ad00ccfa0f1cae280a557e56ad.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/0416fa707a8c0273201cfbae4c10820a02df0df2/ss_0416fa707a8c0273201cfbae4c10820a02df0df2.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/3b03a114c610ac342c924ceb3abc58897621caba/ss_3b03a114c610ac342c924ceb3abc58897621caba.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_90da57ad8e2fdc09cb31c6cd180f3b6cb54447c3.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_277bf58c58d3f33631f0ec321b3baa659f13f34c.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_e662121f6e4abdd96f69ac2c6c39202ac07f1398.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/d1be61e011cca4d299c4aae5e5086c32b4981418/ss_d1be61e011cca4d299c4aae5e5086c32b4981418.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_cbe13dd63030ad39cfca1c98bf0ec257225acfa2.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_4ac444daadba5a87b40e4180b301d3d655f44f6b.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_8caf3006d27c218a5fd9894cb20123ef0e96b713.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/94ea497d03c3c15c89ec483fa16e39d1a8ea7855/ss_94ea497d03c3c15c89ec483fa16e39d1a8ea7855.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_d6cca0571e8fae1e6c245c9bda23660480eb7c3b.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_2a8e6d57dd5431fa5570279aee5caf7fd6aad3c8.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_493cb6ffbab7b9244a20cbc750929ddbb799b46c.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_fb2b52da541af4b13329e830f2154175f9ccffec.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_50e3077e1bd2d5e61424499e380ef00ba15ac859.1920x1080.jpg?t=1759438703",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3476660/ss_03dafa2e9ce2351e58717bb9f9628d51abeed7f4.1920x1080.jpg?t=1759438703"
+    ]
+  },
+  "3477300": {
+    "appId": "3477300",
+    "title": "Scope X",
+    "releaseDate": "Jun 6, 2025",
+    "genres": [],
+    "categories": [
+      "Utilities",
+      "Software"
+    ],
+    "isSoftware": true
+  },
+  "3504780": {
+    "appId": "3504780",
+    "title": "Wildgate",
+    "releaseDate": "2025-07-22",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Casual",
+      "Massively Multiplayer",
+      "Racing",
+      "RPG",
+      "Strategy"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "3527290": {
+    "appId": "3527290",
+    "title": "PEAK",
+    "releaseDate": "2025-06-16",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Indie"
+    ],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "4001890": {
+    "appId": "4001890",
+    "title": "How to Fish",
+    "releaseDate": "Aug 20, 2026",
+    "genres": [],
+    "categories": [
+      "Casual",
+      "Indie",
+      "Simulation"
+    ],
+    "isSoftware": false
+  },
+  "4069520": {
+    "appId": "4069520",
+    "title": "Super Battle Golf",
+    "releaseDate": "2026-02-19",
+    "genres": [],
+    "categories": [
+      "Sports",
+      "Casual",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "4255580": {
+    "appId": "4255580",
+    "title": "Mouse X",
+    "releaseDate": "Jun 10, 2026",
+    "genres": [],
+    "categories": [
+      "Utilities",
+      "Software",
+      "Design & Illustration"
+    ],
+    "isSoftware": true
+  },
+  "4428340": {
+    "appId": "4428340",
+    "title": "WheelMates - Friend's Pass",
+    "releaseDate": "May 6, 2026",
+    "genres": [],
+    "categories": [
+      "Racing",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "4704690": {
+    "appId": "4704690",
+    "title": "MECCHA CHAMELEON",
+    "releaseDate": "9 Jun, 2026",
+    "genres": [],
+    "categories": [
+      "Casual",
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "4720820": {
+    "appId": "4720820",
+    "title": "tiny desktop pals",
+    "releaseDate": "Sep 18, 2026",
+    "genres": [],
+    "categories": [
+      "Utilities",
+      "Software"
+    ],
+    "isSoftware": true
+  },
+  "minecraftforwindows": {
+    "appId": "minecraftforwindows",
+    "title": "Minecraft for Windows",
+    "releaseDate": "2015-07-29",
+    "genres": [],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  },
+  "minecraftlauncher": {
+    "appId": "minecraftlauncher",
+    "title": "Minecraft Launcher",
+    "releaseDate": "2021-11-02",
+    "genres": [],
+    "categories": [
+      "Indie"
+    ],
+    "isSoftware": false
+  }
+}

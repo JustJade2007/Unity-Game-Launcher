@@ -1,0 +1,59 @@
+- name: GitHub Issue Enhancer
+  # You may pin to the exact commit or the version.
+  # uses: JustJade2007/github-issue-enhancer@42de0fd2c85e99ed76e3b4b5be930c78a24928b0
+  uses: JustJade2007/github-issue-enhancer@2.6.0
+  with:
+    # Google Gemini API Key
+    gemini-api-key: 
+    # GitHub token with issues:write permission
+    github-token: # optional, default is ${{ github.token }}
+    # Gemini model to use
+    gemini-model: # optional, default is gemini-3.1-flash-lite
+    # Sampling temperature for Gemini (0.0 to 1.0)
+    temperature: # optional, default is 0.2
+    # Custom instructions or formatting guidelines for Gemini
+    custom-instruction: # optional, default is 
+    # Whether to post a comment with contributor fix instructions if applicable (true/false)
+    post-comment: # optional, default is true
+    # Whether to append original submission in collapsible dropdown (true/false)
+    preserve-original: # optional, default is true
+    # Whether to prepend [!NOTE] header badge in issue body (true/false)
+    add-badge: # optional, default is true
+    # Whether to clarify and reword the issue title (true/false)
+    enhance-title: # optional, default is false
+    # Comma-separated static labels to apply upon enhancement
+    add-labels: # optional, default is 
+    # Comma-separated usernames/bots to ignore
+    ignore-authors: # optional, default is 
+    # Comma-separated labels that skip enhancement if already present
+    ignore-labels: # optional, default is 
+    # URL of the GitHub Project v2 (e.g. https://github.com/orgs/ORG/projects/1)
+    project-url: # optional, default is 
+    # Token with project:write permission (defaults to github-token)
+    project-token: # optional, default is 
+    # Field name for priority in GitHub Project (default: "Priority")
+    project-priority-field: # optional, default is Priority
+    # Field name for size in GitHub Project (default: "Size")
+    project-size-field: # optional, default is Size
+    # Field name for status in GitHub Project (default: "Status")
+    project-status-field: # optional, default is Status
+    # Initial status option to assign to newly added issues (default: "Backlog")
+    project-initial-status: # optional, default is Backlog
+    # Whether to automatically assign repository owner or designated assignees (true/false)
+    auto-assign: # optional, default is false
+    # Comma-separated GitHub usernames to assign to the issue
+    assignees: # optional, default is 
+    # Milestone name, number, or "auto" to let Gemini pick from open milestones
+    milestone: # optional, default is 
+    # Whether to create and link a development branch for this issue (true/false)
+    create-branch: # optional, default is false
+    # Prefix for newly created development branches (default: "issue-")
+    branch-prefix: # optional, default is issue-
+    # Whether to detect and cross-reference related issues (true/false)
+    link-related: # optional, default is true
+    # Whether to detect and link blocking/blocked-by issues (true/false)
+    link-dependencies: # optional, default is true
+    # Whether to detect and link parent/sub-issues (true/false)
+    link-sub-issues: # optional, default is true
+    # Whether to apply the duplicate label and close the issue if Gemini is certain it is a duplicate (true/false)
+    close-duplicates: # optional, default is true
